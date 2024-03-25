@@ -1,0 +1,84 @@
+---
+title: "Day 7 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(readr)
+library(data.tree)
+options(scipen = 999)
+```
+
+
+## Part 1
+Apparently, the first time I did this, I used excel.  Now, I get to learn trees.
+```{r}
+input<-read_lines("Day7Sample.txt")
+```
+
+First create the tree - folders don't have sizes, files do
+
+```{r}
+elffile<-Node$new("/",folder=TRUE)
+curr<-elffile
+### build the tree
+for(i in 2:length(input)){
+  cmd<-unlist(str_split(input[i]," "))
+  ### $ls
+  if(cmd[1]=="$"&&cmd[2]=="ls"){
+  }else if(cmd[1]=="$"&&cmd[2]=="cd"&&cmd[3]==".."){curr<-Navigate(curr,"..")
+  }else if(cmd[1]=="$"&&cmd[2]=="cd"&&cmd[3]=="/"){curr<-elffile
+  }else if(cmd[1]=="$"&&cmd[2]=="cd"){curr<-Navigate(curr,cmd[3])
+  }else if(cmd[1]=="dir"){curr$AddChild(cmd[2],
+                                        "folder"=TRUE)
+  }else{curr$AddChild(cmd[2],"size"=as.numeric(cmd[1]),
+                      folder=FALSE)}}
+
+```
+
+here's the sizes:
+
+```{r}
+
+Size <- function(node) {
+  result <- node$size
+  f<-node$folder
+  if(f==TRUE) result <- sum(sapply(node$children, Size))
+  return (result)}
+
+```
+
+convert to a dataframe (because I did not learn trees very well.)
+
+```{r}
+elfdf<-ToDataFrameTree(elffile, size=Size,"folder")
+elfdf[1:10,]
+```
+
+
+```{r}
+### then filter out the files, to just get the folders and then everything that is bigger than 100000
+part1<-elfdf %>% filter(folder==TRUE,size<=100000)
+part1<-sum(part1$size)
+part1
+```
+
+## Part 2
+
+For part2, find how much space is needed
+
+```{r}
+used<-unname(Size(elffile))
+## because it needs to be somewhere lower than 40M 
+needed<-used-40000000
+part2<-elfdf %>% filter(folder==TRUE,size>=needed)
+part2<-min(part2$size)
+part2
+```
+
+

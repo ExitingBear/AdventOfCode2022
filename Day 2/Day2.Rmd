@@ -1,0 +1,70 @@
+---
+title: "Day 2 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+
+## Part 1
+Merge with the appropriate score and add
+```{r}
+input<-read_lines("Day2Sample.txt")
+stratguide<-as.data.frame(input)
+colnames(stratguide)<-c("codes")
+```
+create the scores
+```{r}
+p1scores<-as.data.frame(matrix(nrow=0,ncol=2))
+p1scores<-rbind(p1scores,list("A X", 4))
+p1scores<-rbind(p1scores,list("A Y", 8))
+p1scores<-rbind(p1scores,list("A Z", 3))
+p1scores<-rbind(p1scores,list("B X", 1))
+p1scores<-rbind(p1scores,list("B Y", 5))
+p1scores<-rbind(p1scores,list("B Z", 9))
+p1scores<-rbind(p1scores,list("C X", 7))
+p1scores<-rbind(p1scores,list("C Y", 2))
+p1scores<-rbind(p1scores,list("C Z", 6))
+colnames(p1scores)<-c("codes","p1scores")
+```
+merge and add to get the answer
+```{r}
+stratguide<-merge(stratguide,p1scores,by="codes")
+part1<-sum(stratguide$p1scores)
+part1
+```
+## Part 2
+So the scores are slightly different now, but it's still the same idea:
+
+```{r}
+p2scores<-as.data.frame(matrix(nrow=0,ncol=2))
+p2scores<-rbind(p2scores,list("A X", 3))
+p2scores<-rbind(p2scores,list("A Y", 4))
+p2scores<-rbind(p2scores,list("A Z", 8))
+p2scores<-rbind(p2scores,list("B X", 1))
+p2scores<-rbind(p2scores,list("B Y", 5))
+p2scores<-rbind(p2scores,list("B Z", 9))
+p2scores<-rbind(p2scores,list("C X", 2))
+p2scores<-rbind(p2scores,list("C Y", 6))
+p2scores<-rbind(p2scores,list("C Z", 7))
+colnames(p2scores)<-c("codes","p2scores")
+
+### again get the answer
+
+stratguide<-merge(stratguide,p2scores,by="codes")
+part2<-sum(stratguide$p2scores)
+part2
+```

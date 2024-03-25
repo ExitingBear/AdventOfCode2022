@@ -1,0 +1,106 @@
+---
+title: "Day XX Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+
+## Part 1
+
+```{r}
+input<-read_lines("Day5Sample.txt")
+```
+
+First separate the instructions
+
+```{r}
+bl<-which(input=="")
+inst<-list()
+for(i in (bl+1):length(input)){
+  x<-input[i]
+  x<-as.numeric(c(word(x,2),word(x,4),word(x,6)))
+  inst<-append(inst,list(x))}
+```
+
+Then create the lists of stacks:
+
+```{r}
+numberofstacks<-(nchar(input[1])+1)/4
+stacklist<-list()
+for(stack in 1:numberofstacks){
+  s<-c()
+  ### what position in the input for this stack
+  inchr<-4*stack-2
+  for(j in 1:(bl-2)){
+    s<-c(str_sub(input[j],inchr,inchr),s)}
+  s<-s[which(s!=" ")]
+  stacklist<-append(stacklist,list(c(s)))}
+```
+
+Then create the function to move the crates around:
+```{r}
+movecrates <- function(inst,sl=stacklist){
+  numcrates<-inst[1]
+  oldstack<-inst[2]
+  newstack<-inst[3]
+  for(i in 1:numcrates){
+    x<-tail(sl[[oldstack]],1)
+    sl[[newstack]]<-c(sl[[newstack]],x)
+    sl[[oldstack]]<-head(sl[[oldstack]],-1)}
+  sl}
+```
+Then run the function through the instructions
+
+```{r}
+p1stack<-stacklist
+for(i in 1:length(inst)){
+  p1stack<-movecrates(inst[[i]],p1stack)}
+
+part1<-""
+for(i in 1:length(p1stack)){
+  part1<-str_c(part1,tail(p1stack[[i]],1))}
+part1
+```
+## Part 2
+Slight change to move more than one crate at a time
+
+```{r}
+movecrates2 <- function(inst,sl=stacklist){
+  numcrates<-inst[1]
+  oldstack<-inst[2]
+  newstack<-inst[3]
+  x<-tail(sl[[oldstack]],numcrates)
+  sl[[newstack]]<-c(sl[[newstack]],x)
+  sl[[oldstack]]<-head(sl[[oldstack]],-numcrates)
+  sl}
+```
+
+then run on the instructions
+
+```{r}
+p2stack<-stacklist
+for(i in 1:length(inst)){
+  p2stack<-movecrates2(inst[[i]],p2stack)}
+```
+
+
+```{r}
+part2<-""
+for(i in 1:length(p2stack)){
+  part2<-str_c(part2,tail(p2stack[[i]],1))}
+part2
+```

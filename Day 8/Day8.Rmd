@@ -1,0 +1,190 @@
+---
+title: "Day XX Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(ggplot2)
+library(readr)
+options(scipen = 999)
+```
+
+
+## Part 1
+
+First, find the visible trees
+```{r}
+input<-read_lines("Day8Sample.txt")
+
+forest<-matrix(ncol=nchar(input[1]),nrow=0)
+
+for(i in 1:length(input)){
+  x<-as.numeric(unlist(str_split(input[i],"")))
+  forest<-rbind(forest,x)}
+```
+
+As edges are all visible, no need to bother with them.  Instead work from the center points
+
+```{r}
+visible<-0
+for(x in 2:(ncol(forest)-1)){
+  for(y in 2:(nrow(forest)-1)){
+    tree<-forest[y,x]
+    if(all(forest[1:(y-1),x]<tree)||all(forest[(y+1):nrow(forest),x]<tree)||
+       all(forest[y,1:(x-1)]<tree)||all(forest[y,(x+1):ncol(forest)]<tree)){visible<-visible+1}}}
+
+part1<-(2*ncol(forest)+2*nrow(forest)-4)+visible
+part1
+```
+```{r,echo=FALSE}
+
+in2<-read_lines("../../AoCData/AOC2022/Day8.txt")
+bigforest<-bigforest<-matrix(ncol=nchar(in2[1]),nrow=0)
+for(i in 1:length(in2)){
+  x<-as.numeric(unlist(str_split(in2[i],"")))
+  bigforest<-rbind(bigforest,x)}
+
+bfg<-as.data.frame(matrix(ncol=3,nrow=0))
+colnames(bfg)<-c("x","y","visible")
+ for(x in 2:(ncol(bigforest)-1)){
+   for(y in 2:(nrow(bigforest)-1)){
+    tree<-bigforest[y,x]
+    if(all(bigforest[1:(y-1),x]<tree)||all(bigforest[(y+1):nrow(bigforest),x]<tree)||
+       all(bigforest[y,1:(x-1)]<tree)||all(bigforest[y,(x+1):ncol(bigforest)]<tree)){
+      bfg<-rbind(bfg,list(x=x,y=y,visible=1))}else{bfg<-rbind(bfg,list(x=x,y=y,visible=0))}}}
+
+for(x in 1:ncol(bigforest)){
+  bfg<-rbind(bfg,list(x=x,y=1,visible=1))
+  bfg<-rbind(bfg,list(x=x,y=nrow(bigforest),visible=1))}
+
+for(y in 1:nrow(bigforest)){
+  bfg<-rbind(bfg,list(x=1,y=y,visible=1))
+  bfg<-rbind(bfg,list(x=ncol(bigforest),y=y,visible=1))}
+
+```
+
+
+```{r,echo=FALSE}
+ggplot(bfg,aes(x,y,fill=visible))+
+  geom_tile()+
+  scale_fill_gradient(low="white",high="green")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  coord_fixed()
+```
+
+
+
+## Part 2
+Again, the edges will all have a score of 0, so there's no reason to consider them:
+
+```{r}
+part2<-0
+maxtree<-matrix(0,ncol=ncol(forest),nrow=nrow(forest))
+for(x in 2:(ncol(forest)-1)){
+  for(y in 2:(nrow(forest)-1)){
+    ## setup
+    th<-forest[y,x]
+    lscore<-1
+    rscore<-1
+    uscore<-1
+    dscore<-1
+    lsc<-TRUE
+    rsc<-TRUE
+    usc<-TRUE
+    dsc<-TRUE
+    ##crawlleft
+    while(lsc){
+      if(x-lscore==1){lsc<-FALSE
+      }else if(forest[y,x-lscore]>=th){lsc<-FALSE
+      }else{lscore<-lscore+1}}
+    while(rsc){
+      if(x+rscore==ncol(forest)){rsc<-FALSE
+      }else if(forest[y,x+rscore]>=th){rsc<-FALSE
+      }else{rscore<-rscore+1}}
+    while(usc){
+      if(y-uscore==1){usc<-FALSE
+      }else if(forest[y-uscore,x]>=th){usc<-FALSE
+      }else{uscore<-uscore+1}}
+    while(dsc){
+      if(y+dscore==nrow(forest)){dsc<-FALSE
+      }else if(forest[y+dscore,x]>=th){dsc<-FALSE
+      }else{dscore<-dscore+1}}
+    part2<-max(part2,lscore*rscore*uscore*dscore)}}
+part2
+```
+
+```{r,echo=FALSE}
+
+treehouse<-as.data.frame(matrix(ncol=3,nrow=0))
+colnames(treehouse)<-c("x","y","score")
+for(x in 2:(ncol(bigforest)-1)){
+  for(y in 2:(nrow(bigforest)-1)){
+    ## setup
+    th<-bigforest[y,x]
+    lscore<-1
+    rscore<-1
+    uscore<-1
+    dscore<-1
+    lsc<-TRUE
+    rsc<-TRUE
+    usc<-TRUE
+    dsc<-TRUE
+    ##crawlleft
+    while(lsc){
+      if(x-lscore==1){lsc<-FALSE
+      }else if(bigforest[y,x-lscore]>=th){lsc<-FALSE
+      }else{lscore<-lscore+1}}
+    while(rsc){
+      if(x+rscore==ncol(bigforest)){rsc<-FALSE
+      }else if(bigforest[y,x+rscore]>=th){rsc<-FALSE
+      }else{rscore<-rscore+1}}
+    while(usc){
+      if(y-uscore==1){usc<-FALSE
+      }else if(bigforest[y-uscore,x]>=th){usc<-FALSE
+      }else{uscore<-uscore+1}}
+    while(dsc){
+      if(y+dscore==nrow(bigforest)){dsc<-FALSE
+      }else if(bigforest[y+dscore,x]>=th){dsc<-FALSE
+      }else{dscore<-dscore+1}}
+    treehouse<-rbind(treehouse,list(x=x,y=y,score=lscore*rscore*uscore*dscore))}}
+
+for(x in 1:ncol(bigforest)){
+  treehouse<-rbind(treehouse,list(x=x,y=1,score=0))
+  treehouse<-rbind(treehouse,list(x=x,y=nrow(bigforest),score=0))}
+
+for(y in 1:nrow(bigforest)){
+  treehouse<-rbind(treehouse,list(x=1,y=y,score=0))
+  treehouse<-rbind(treehouse,list(x=ncol(bigforest),y=y,score=0))}
+```
+
+
+
+
+```{r,echo=FALSE}
+ggplot(treehouse,aes(x,y,fill=score))+
+  geom_tile()+
+  scale_fill_gradient(low="white",high="#004400")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none"
+        )+
+  coord_fixed()
+```
