@@ -1,0 +1,62 @@
+---
+title: "Day XX Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+
+## Part 1
+```{r}
+input<-read_lines("Day3Sample.txt")
+```
+
+```{r}
+letterlist <- c(letters,LETTERS)
+part1 <-0
+
+for(i in 1:length(input)){
+  rucksack<-input[i]
+  found<-FALSE
+  j<-1
+  while(!found){
+    x<-str_sub(rucksack,j,j)
+    if(str_detect(str_sub(rucksack,(nchar(rucksack)/2)+1,nchar(rucksack)),x)){
+      part1<-part1+which(letterlist==x)
+      found<-TRUE
+      next}
+    j<-j+1}}
+part1
+```
+## Part 2
+instead of dividing by 2 - just group in 3s.
+```{r}
+part2 <-0
+
+for(i in seq(from=1,to=length(input),by=3)){
+  rucksack<-input[i]
+  found<-FALSE
+  j<-1
+  while(!found){
+    x<-str_sub(rucksack,j,j)
+    if(str_detect(input[i+1],x)&&str_detect(input[i+2],x)){
+      part2<-part2+which(letterlist==x)
+      found<-TRUE
+      next}
+    j<-j+1}}
+part2
+```
+

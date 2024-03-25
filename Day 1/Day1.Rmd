@@ -1,0 +1,50 @@
+---
+title: "Day 1 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+
+## Part 1
+Read in the data
+```{r}
+input<-read_lines("Day1Sample.txt")
+```
+Split by elf
+```{r}
+input<-append(input,"")
+blanks<-which(input=="")
+elfs<-list(c(as.numeric(input[1:(blanks[1]-1)])))
+for(i in 1:(length(blanks)-1)){
+    elf<-as.numeric(input[(blanks[i]+1):(blanks[i+1]-1)])
+  elfs<-append(elfs,list(elf))}
+```
+
+Find the total calories/elf and then the max of that
+```{r}
+totalcalories<-sapply(elfs,sum)
+part1<-max(totalcalories)
+part1
+```
+
+## Part 2
+Sort the total calories and return the top 3
+```{r}
+part2<-(sum(sort(totalcalories,decreasing=TRUE)[1:3]))
+part2
+```
+

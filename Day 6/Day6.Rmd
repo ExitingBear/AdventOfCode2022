@@ -1,0 +1,55 @@
+---
+title: "Day 6 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("Day6Sample.txt")
+```
+
+## Part 1
+
+Create the function to find the the start
+
+```{r}
+
+findstart<-function(st,chrnum){
+  i<-0
+  chk<-FALSE
+  while(!chk){
+    i<-i+1
+    x<-unlist(str_split(str_sub(st,i,(i+chrnum-1)),""))
+    if(length(x)==length(unique(x))){
+      chk<-TRUE}}
+  i+chrnum-1}
+```
+
+run against the string (or in the case of the examples, all the strings), checking for a length of 4 characters
+
+```{r}
+part1<-sapply(input,function(x){findstart(x,4)})
+part1
+```
+
+## Part 2
+Same as part 1, but checking for a length of 14 characters
+
+```{r}
+part2<-sapply(input,function(x){findstart(x,14)})
+part2
+```
