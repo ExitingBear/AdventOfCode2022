@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 9 Notebook"
 output: html_notebook
 ---
 
@@ -8,16 +8,108 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
+```{r}
+input<-read_lines("Day9Sample.txt")
+```
 
 ## Part 1
+
+First, build out the path for the head of the rope, it will need to be step by step because of the way that the head pulls the tail:
+
+```{r}
+headpath<-list(c(0,0))
+for(i in 1:length(input)){
+  inst<-unlist(str_split(input[i]," "))
+  dir<-inst[1];st<-as.numeric(inst[2])
+  for(j in 1:st){
+    prev<-unlist(tail(headpath,1))
+    switch(dir,
+           "R"=nxt<-prev+c(1,0),
+           "L"=nxt<-prev-c(1,0),
+           "U"=nxt<-prev-c(0,1),
+           "D"=nxt<-prev+c(0,1),
+           cat("something is wrong\n"))
+    headpath<-append(headpath,list(c(nxt)))}}
+```
+
+Now find the tailpath, for this treat x & y separately.
+If the tail is within 1 of the head, don't move.
+Otherwise, if the tail is 2 away from the head in the x direction, move in that direction by 1, move y to match the head's y. Do the same for 
+
+```{r}
+tailpath<-function(hp){
+  tp<-list(c(0,0))
+  for(i in 2:length(hp)){
+    headpos<-hp[[i]]
+    tailpos<-unlist(tail(tp,1))
+    d<-abs(headpos-tailpos)
+    ### the head is within one of the tail
+    if(all(d<=1)){newx<-tailpos[1]
+    newy<-tailpos[2]
+    ### if the head has moved up to two away in the x direction - but not the y
+    }else if(d[1]==2&&d[2]<2){
+      newx<-mean(c(headpos[1],tailpos[1]))
+      newy<-headpos[2]
+    ### if the head has moved up to two away in the y direction, but not the x  
+    }else if(d[2]==2&&d[1]<2){
+      newy<-mean(c(headpos[2],tailpos[2]))
+      newx<-headpos[1]
+    ### if the head is two away in both directions  
+    }else if(d[1]==2&&d[2]==2){
+      newx<-mean(c(headpos[1],tailpos[1]))
+      newy<-mean(c(headpos[2],tailpos[2]))
+    }else{cat("something went wrong\n")}
+    tp<-append(tp,list(c(newx,newy)))}
+  tp}
+```
+
+```{r}
+part1<-tailpath(headpath)
+part1<-length(unique(part1))
+part1
+```
+## Part 2
+Repeat this with 10 knots (or in other words, 9 times.)  This needs new data
+
+With the original data:
+```{r}
+lotsknots<-headpath
+for(i in 1:9){
+  lotsknots<-tailpath(lotsknots)}
+
+part2<-length(unique(lotsknots))
+part2  
+```
+or for a second sample:
+
+```{r}
+## longer input
+input<-read_lines("Day9Sample2.txt")
+
+## new headpath
+p2path<-list(c(0,0))
+for(i in 1:length(input)){
+  inst<-unlist(str_split(input[i]," "))
+  dir<-inst[1];st<-as.numeric(inst[2])
+  for(j in 1:st){
+    prev<-unlist(tail(p2path,1))
+    switch(dir,
+           "R"=nxt<-prev+c(1,0),
+           "L"=nxt<-prev-c(1,0),
+           "U"=nxt<-prev-c(0,1),
+           "D"=nxt<-prev+c(0,1),
+           cat("something is wrong\n"))
+    p2path<-append(p2path,list(c(nxt)))}}
+
+## rerun
+for(i in 1:9){
+  p2path<-tailpath(p2path)}
+
+part2<-length(unique(p2path))
+part2
+```
 

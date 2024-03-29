@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 11 Notebook"
 output: html_notebook
 ---
 
@@ -20,4 +20,125 @@ options(scipen = 999)
 
 
 ## Part 1
+I have no idea how to import this data. Not a clue.  Very, very manually set up and run using the sample data:
+
+Starting configuration
+```{r}
+##monk
+monk0<-c(79,98)
+monk1<-c(54,65,75,74)
+monk2<-c(79,60,97)
+monk3<-c(74)
+
+## count of insertions
+ins0<-0
+ins1<-0
+ins2<-0
+ins3<-0
+
+## runs
+for(i in 1:20){
+  ##monk0
+  while (length(monk0) > 0) {
+    monk0[1] <- monk0[1] * 19
+    monk0[1] <- monk0[1] %/% 3
+    if (monk0[1] %% 23 == 0) {monk2 <- append(monk2, monk0[1])
+    } else {monk3 <- append(monk3, monk0[1])}
+    monk0 <- monk0[-1]
+    ins0 <- ins0 + 1}
+  
+  ##monk1
+  while (length(monk1) > 0) {
+    monk1[1] <- monk1[1] + 6
+    monk1[1] <- monk1[1] %/% 3
+    if (monk1[1] %% 19 == 0) {monk2 <- append(monk2, monk1[1])
+    } else {monk0 <- append(monk0, monk1[1])}
+    monk1 <- monk1[-1]
+    ins1 <- ins1 + 1}
+  
+  ##monk2
+  while (length(monk2) > 0) {
+    monk2[1] <- monk2[1] ^ 2
+    monk2[1] <- monk2[1] %/% 3
+    if (monk2[1] %% 13 == 0){monk1 <- append(monk1, monk2[1])
+    } else {monk3 <- append(monk3, monk2[1])}
+    monk2 <- monk2[-1]
+    ins2 <- ins2 + 1}
+  
+  ##monk3
+  while (length(monk3) > 0) {
+    monk3[1] <- monk3[1] + 3
+    monk3[1] <- monk3[1] %/% 3
+    if (monk3[1] %% 17 == 0){monk0 <- append(monk0, monk3[1])
+    } else {monk1 <- append(monk1, monk3[1])}
+    monk3 <- monk3[-1]
+    ins3 <- ins3 + 1}}
+  
+
+part1<-sort(c(ins0,ins1,ins2,ins3),decreasing=TRUE)
+part1<-part1[1:2]
+part1<-prod(part1)
+part1
+```
+## Part 2
+So because all of the tests are "is divisible by" a prime, everything should still work if it is modded by 23\*19\*13\*17 rather than divided by 3
+
+
+```{r}
+##monk
+monk0<-c(79,98)
+monk1<-c(54,65,75,74)
+monk2<-c(79,60,97)
+monk3<-c(74)
+
+## count of insertions
+ins0<-0
+ins1<-0
+ins2<-0
+ins3<-0
+
+## runs
+for(i in 1:10000){
+  ##monk0
+  while (length(monk0) > 0) {
+    monk0[1] <- monk0[1] * 19
+    monk0[1] <- monk0[1] %% (23*13*19*17)
+    if (monk0[1] %% 23 == 0) {monk2 <- append(monk2, monk0[1])
+    } else {monk3 <- append(monk3, monk0[1])}
+    monk0 <- monk0[-1]
+    ins0 <- ins0 + 1}
+  
+  ##monk1
+  while (length(monk1) > 0) {
+    monk1[1] <- monk1[1] + 6
+    monk1[1] <- monk1[1] %% (23*13*19*17)
+    if (monk1[1] %% 19 == 0) {monk2 <- append(monk2, monk1[1])
+    } else {monk0 <- append(monk0, monk1[1])}
+    monk1 <- monk1[-1]
+    ins1 <- ins1 + 1}
+  
+  ##monk2
+  while (length(monk2) > 0) {
+    monk2[1] <- monk2[1] ^ 2
+    monk2[1] <- monk2[1] %% (23*13*19*17)
+    if (monk2[1] %% 13 == 0){monk1 <- append(monk1, monk2[1])
+    } else {monk3 <- append(monk3, monk2[1])}
+    monk2 <- monk2[-1]
+    ins2 <- ins2 + 1}
+  
+  ##monk3
+  while (length(monk3) > 0) {
+    monk3[1] <- monk3[1] + 3
+    monk3[1] <- monk3[1] %% (23*13*19*17)
+    if (monk3[1] %% 17 == 0){monk0 <- append(monk0, monk3[1])
+    } else {monk1 <- append(monk1, monk3[1])}
+    monk3 <- monk3[-1]
+    ins3 <- ins3 + 1}}
+  
+
+part2<-sort(c(ins0,ins1,ins2,ins3),decreasing=TRUE)
+part2<-part2[1:2]
+part2<-prod(part2)
+part2
+```
 

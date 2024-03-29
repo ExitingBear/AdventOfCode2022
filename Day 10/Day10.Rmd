@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 10 Notebook"
 output: html_notebook
 ---
 
@@ -8,16 +8,66 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
 
+```{r}
+input<-read_lines("Day10Sample.txt")
+```
+
+
 ## Part 1
+
+Create a dataframe to track the signal strength
+
+```{r}
+signalstrength<-data.frame(matrix(nrow=0,ncol=2))
+colnames(signalstrength)<-c("cycle","xreg")
+xreg<-1
+cycle<-1
+for(i in 1:length(input)){
+  inst<-unlist(str_split(input[i]," "))
+  if(inst[1]=="noop"){
+    signalstrength<-rbind(signalstrength,list(cycle=cycle,xreg=xreg))
+    cycle<-cycle+1
+  }else if(inst[1]=="addx"){
+        signalstrength<-rbind(signalstrength,list(cycle=cycle,xreg=xreg))
+    signalstrength<-rbind(signalstrength,list(cycle=cycle+1,xreg=xreg))
+    cycle<-cycle+2
+    xreg<-xreg+as.numeric(inst[2])}}
+```
+find the strength during the 20th, 60th, 100th, 140th, 180th, 220th cycles
+
+```{r}
+part1<-signalstrength %>% ungroup %>%
+  filter(cycle %in% c(20,60,100,140,180,220))%>%
+  rowwise %>% mutate(sigstr=cycle*xreg) %>% ungroup %>%
+  summarise(sum(sigstr))
+part1
+```
+
+## Part 2
+Figure out where the CRT is for each cycle.
+If the sprite is on the cycle, 1 behind, or 1 ahead, then it's "on" else it is "off"
+
+```{r}
+picturerows<-ncol(signalstrength)/40
+signalstrength <- signalstrength %>% rowwise %>%
+  mutate(crtpos=(cycle-1)%%40)%>%
+  mutate(pixel=ifelse(xreg==crtpos||xreg-1==crtpos||xreg+1==crtpos,"#","."))%>%
+  mutate(y=6-((cycle-1) %/% 40))
+```
+
+
+Then plot it
+```{r}
+ggplot(signalstrength,aes(x=crtpos,y=y,color=pixel))+
+  geom_point()+
+  scale_color_manual(values=c("black", "white"))+
+  coord_fixed()
+```
+
 
