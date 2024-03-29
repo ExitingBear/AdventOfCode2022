@@ -20,4 +20,183 @@ options(scipen = 999)
 
 
 ## Part 1
+Start by building the walls
 
+```{r}
+input<-read_lines("Day14Sample.txt")
+
+rocks<-as.data.frame(matrix(ncol=4,nrow=0))
+colnames(rocks)<-c("x1","y1","x2","y2")
+for(i in 1:length(input)){
+  x<-as.numeric(unlist(str_split(str_replace(input[i]," ",""),"[->,]")))
+  for(j in seq(from=1,to=(length(x)-2),by=3)){
+    rocks<-rbind(rocks,list(x1=x[j],y1=x[j+1],x2=x[j+3],y2=x[j+4]))}}
+```
+
+So there's less math, (hah), first, drop y by 1 because the matrices start at 1 rather than 0.
+And then because I know part 2, the matrix will be two more than the highest (new) y.
+And then, make it a little bit wider than it is tall on the right side.
+```{r}
+rocks$y1<-rocks$y1+1
+rocks$y2<-rocks$y2+1
+
+mxy<-max(max(rocks$y1),max(rocks$y2))
+sandpit<-matrix(NA,ncol=500+mxy+4,nrow=mxy+2)
+```
+
+Then the rocks go into the pit
+
+```{r}
+
+for(i in 1:nrow(rocks)){
+  rockwall<-rocks[i,]
+  sandpit[rockwall$y1:rockwall$y2,rockwall$x1:rockwall$x2]<-"R"}
+### create a backup for part 2
+spbk<-sandpit
+
+```
+
+finally - drop some sand:
+```{r}
+
+
+sandcount<-0
+newsand<-c(500,1)
+
+while(newsand[2]<nrow(sandpit)){
+  ### if it hits the bottom of the matrix, go to the next sand
+  while(newsand[2]<nrow(sandpit)){
+    ### if there's nothing below, drop one, keep going
+    if(is.na(sandpit[newsand[2]+1,newsand[1]])){
+      newsand[2]<-newsand[2]+1
+      next
+      ### if there's something below, but nothing to the left, 
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]-1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]-1
+      next
+      ### if there's something below & to the left, check the right
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]+1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]+1
+      next
+      ### else, the sand rests and start with the next grain
+    }else{sandpit[newsand[2],newsand[1]]<-"S"
+    sandcount<-sandcount+1
+    newsand<-c(500,1)
+    break}}}
+
+part1<-sandcount
+part1
+```
+## Part 2
+
+For part 2, put a floor down.  This time, stop when there's a grain of sand at 500,1
+```{r}
+
+### restore from the backup
+sandpit<-spbk
+### add the floor
+sandpit[mxy+2,]<-"R"
+sandcount<-0
+newsand<-c(500,1)
+while(is.na(sandpit[1,500])){
+  ### if it hits the bottom of the matrix, go to the next sand
+  while(is.na(sandpit[1,500])){
+    ### if there's nothing below, drop one, keep going
+    if(is.na(sandpit[newsand[2]+1,newsand[1]])){
+      newsand[2]<-newsand[2]+1
+      next
+      ### if there's something below, but nothing to the left, 
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]-1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]-1
+      next
+      ### if there's something below & to the left, check the right
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]+1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]+1
+      next
+      ### otherwise, add a grain of sand, and reset for the next
+    }else{sandpit[newsand[2],newsand[1]]<-"S"
+    sandcount<-sandcount+1
+    newsand<-c(500,1)
+    break}}}
+
+part2<-sandcount
+part2
+```
+
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+### for the graph
+input<-read_lines("../../AoCData/AOC2022/Day14.txt")
+
+### redo the input & rocks
+rocks<-as.data.frame(matrix(ncol=4,nrow=0))
+colnames(rocks)<-c("x1","y1","x2","y2")
+for(i in 1:length(input)){
+  x<-as.numeric(unlist(str_split(str_replace(input[i]," ",""),"[->,]")))
+  for(j in seq(from=1,to=(length(x)-2),by=3)){
+    rocks<-rbind(rocks,list(x1=x[j],y1=x[j+1],x2=x[j+3],y2=x[j+4]))}}
+rocks$y1<-rocks$y1+1
+rocks$y2<-rocks$y2+1
+### recreate the sandpit
+mxy<-max(max(rocks$y1),max(rocks$y2))
+sandpit<-matrix(NA,ncol=500+mxy+4,nrow=mxy+2)
+for(i in 1:nrow(rocks)){
+  rockwall<-rocks[i,]
+  sandpit[rockwall$y1:rockwall$y2,rockwall$x1:rockwall$x2]<-"R"}
+### create a backup for part 2
+spbk<-sandpit
+
+#### rerun the sand
+sandpit[mxy+2,]<-"R"
+sandcount<-0
+newsand<-c(500,1)
+while(is.na(sandpit[1,500])){
+  ### if it hits the bottom of the matrix, go to the next sand
+  while(is.na(sandpit[1,500])){
+    ### if there's nothing below, drop one, keep going
+    if(is.na(sandpit[newsand[2]+1,newsand[1]])){
+      newsand[2]<-newsand[2]+1
+      next
+      ### if there's something below, but nothing to the left, 
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]-1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]-1
+      next
+      ### if there's something below & to the left, check the right
+    }else if(is.na(sandpit[newsand[2]+1,newsand[1]+1])){
+      newsand[2]<-newsand[2]+1
+      newsand[1]<-newsand[1]+1
+      next
+    }else{sandpit[newsand[2],newsand[1]]<-"S"
+    sandcount<-sandcount+1
+    newsand<-c(500,1)
+    break}}}
+
+bkpit<-sandpit
+
+### find the min & max of the sandpit
+lowx<-min(which(sandpit[(nrow(sandpit)-1),]=="S"))
+hix<-max(which(sandpit[(nrow(sandpit)-1),]=="S"))
+sandpit<-sandpit[,(lowx-2):(hix+2)]
+
+meltsand<-melt(sandpit)
+
+
+
+ggplot(meltsand,aes(x=Var2,y=Var1, colour=value))+geom_point()+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  scale_y_reverse()+
+  coord_fixed()
+```

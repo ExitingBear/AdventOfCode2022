@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 12 Notebook"
 output: html_notebook
 ---
 
@@ -8,16 +8,164 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
-library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
 
+```{r}
+input<-read_lines("Day12Sample.txt")
+hill<-matrix(nrow=0,ncol=nchar(input[1]))
+
+for(i in 1:length(input)){
+  x<-unlist(str_split(input[i],""))
+  hill<-rbind(hill,x)}
+
+startpoint<-which(hill=="S")
+endpoint<-which(hill=="E")
+startx<-(startpoint-1)%/%nrow(hill)+1
+starty<-(startpoint-1)%%nrow(hill)+1
+endx<-(endpoint-1)%/%nrow(hill)+1
+endy<-(endpoint-1)%%nrow(hill)+1
+
+```
+
+
+
 ## Part 1
+Should be a nice straightforward search to the end
+
+
+```{r}
+upthemountain<-function(sx=startx,sy=starty,ex=endx,ey=endy,h=hill){
+  ary<-dict()
+  pq<-priority_queue()
+  #on the thing will be value,position,path,number of steps
+  startspace<-list("a",sx,sy,paste0(sx,"~",sy),0)
+  pq$push(startspace,priority=0)
+  while(pq$size()>0){
+    i<-i+1
+    cur<-pq$pop()
+    v<-cur[[1]]
+    cx<-cur[[2]]
+    cy<-cur[[3]]
+    pth<-cur[[4]]
+    d<-cur[[5]]
+    allowed<-c(letters[which(letters<=v)],letters[which(letters==v)+1])
+    if(v=="z"||v=="y"){allowed<-c(allowed,"E")}
+    ### if at the end, finish
+    if(v=="E"){return(cur)
+      break}
+    ###if been here before, next
+    if(ary$has(paste0(cx,"~",cy))){next}else{ary$set(paste0(cx,"~",cy),d)}
+    ### else, put in all 4 directions (if possible)
+    ###left
+    if(cx>1){
+      if(h[cy,(cx-1)] %in% allowed){
+        nspace<-list(h[cy,(cx-1)],(cx-1),cy,paste0(pth,";",(cx-1),"~",cy),d+1)
+        p<-d+1+abs(cy-ey)+abs((cx-1)-ex)
+        pq$push(nspace,-p)}}
+    ###right
+    if(cx<ncol(h)){
+      if(h[cy,(cx+1)] %in% allowed){
+        nspace<-list(h[cy,(cx+1)],(cx+1),cy,paste0(pth,";",(cx+1),"~",cy),d+1)
+        p<-d+1+abs(cy-ey)+abs((cx+1)-ex)
+        pq$push(nspace,-p)}}
+    ###up
+    if(cy>1){
+      if(h[(cy-1),cx] %in% allowed){
+        nspace<-list(h[(cy-1),cx],cx,(cy-1),paste0(pth,";",cx,"~",(cy-1)),d+1)
+        p<-d+1+abs((cy-1)-ey)+abs(cx-ex)
+        pq$push(nspace,-p)}}
+    ###down
+    if(cy<nrow(h)){
+      if(h[(cy+1),cx] %in% allowed){
+        nspace<-list(h[(cy+1),cx],cx,(cy+1),paste0(pth,";",cx,"~",(cy+1)),d+1)
+        p<-d+1+abs((cy+1)-ey)+abs(cx-ex)
+        pq$push(nspace,-p)}}}
+  c(NA,NA,NA,NA,NA)}
+
+```
+
+```{r}
+part1<-upthemountain()
+part1[[5]]
+```
+## Part 2
+
+find all the "a"s, then run for each one.  Find the shortest
+
+```{r}
+lowpoints<-which(hill=="a")
+
+p2<-sapply(lowpoints,function(pt){
+  sx<-(pt-1)%/%nrow(hill)+1
+  sy<-(pt-1)%%nrow(hill)+1
+  ptpth<-upthemountain(sx,sy,endx,endy,hill)
+  return(ptpth[[5]])})
+```
+
+```{r}
+part2<-min(p2[which(!is.na(p2))])
+part2
+```
+
+
+```{r,echo=false}
+input<-read_lines("../../AoCData/AOC2022/Day12.txt")
+hill<-matrix(nrow=0,ncol=nchar(input[1]))
+
+for(i in 1:length(input)){
+  x<-unlist(str_split(input[i],""))
+  hill<-rbind(hill,x)}
+
+startpoint<-which(hill=="S")
+endpoint<-which(hill=="E")
+startx<-(startpoint-1)%/%nrow(hill)+1
+starty<-(startpoint-1)%%nrow(hill)+1
+endx<-(endpoint-1)%/%nrow(hill)+1
+endy<-(endpoint-1)%%nrow(hill)+1
+
+part1<-upthemountain()
+
+hillheat<-as.data.frame(matrix(nrow=0,ncol=3))
+for(i in 1:ncol(hill)){
+  for(j in 1:nrow(hill)){
+    hillheat<-rbind(hillheat,list(i,j,hill[j,i]))}}
+
+colnames(hillheat)<-c("x","y","l")
+hhbk<-hillheat
+
+hillheat <- hillheat %>% rowwise %>% mutate(l=ifelse(l=="S","a",l))%>%
+  mutate(l=ifelse(l=="E","z",l))%>%
+  mutate(n=which(letters==l))
+
+hillpath<-unlist(str_split(part1[[4]],";"))
+hp2<-as.data.frame(matrix(nrow=0,ncol=4))
+colnames(hp2)<-c("x1","y1","x2","y2")
+
+r<-lapply(1:(length(hillpath)-1),function(x){
+  a<-as.numeric(unlist(str_split(hillpath[x],"~")))
+  b<-as.numeric(unlist(str_split(hillpath[x+1],"~")))
+  nl<-list(x1=a[1],y1=a[2],x2=b[1],y2=b[2])})
+
+for(i in 1:length(r)){hp2<-rbind(hp2,r[[i]])}
+
+ggplot()+
+  geom_tile(data=hillheat,aes(x,y,fill=n))+
+  geom_segment(data=hp2,aes(x=x1,y=y1,xend=x2,yend=y2),colour="black",linewidth=1)+
+  scale_fill_gradient(low="brown",high="green")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  coord_fixed()
+```
+
 

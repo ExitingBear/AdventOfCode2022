@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 15 Notebook"
 output: html_notebook
 ---
 
@@ -13,11 +13,94 @@ library(ggplot2)
 library(rgl)
 library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
 
 ## Part 1
+First put everything into a data frame
+```{r}
+input<-read_lines("Day15Sample.txt")
+
+sensors<-as.data.frame(matrix(ncol=4,nrow=0))
+colnames(sensors)<-c("sx","sy","bx","by")
+for(i in 1:length(input)){
+  ln<-unlist(str_split(input[i],"[=,:]"))
+  ln<-as.numeric(ln[c(2,4,6,8)])
+  sensors<-rbind(sensors,list(sx=ln[1],sy=ln[2],bx=ln[3],by=ln[4]))}
+
+```
+then find the manhattan distances for each  sensor/beacon pair
+```{r}
+sensors <- sensors %>% rowwise %>% mutate(md=(abs(bx-sx)+abs(by-sy)))
+```
+
+for each sensor, find if its no beacon range even meets the target.
+If it does, then, find its "no beacon" range
+
+```{r}
+target<-10
+possibles<-c()
+
+### find possible places for no beacons
+for(i in 1:nrow(sensors)){
+  ### how much distance is left after getting to that line
+  rmn<-sensors$md[i]-abs(sensors$sy[i]-target)
+  if(rmn>=0){
+    possibles<-union(possibles,(sensors$sx[i]-rmn):(sensors$sx[i]+rmn))}}
+### find beacons on the target line
+beaconsattarget<-sensors$bx[which(sensors$by==target)]
+
+### pull those from the possibles, because, they're obviously not possible
+possibles<-possibles[-c(which(possibles %in% beaconsattarget))]
+part1<-length(possibles)
+part1
+```
+## Part 2
+Brute force would be an option, but it would take weeks & I have things to do.
+
+I stole this answer - I was getting nowhere slowly.
+
+The beacon lies at md+1 for some sensors.
+First find the md+1 line for all the sensors
+Then, find the intersections of all of those lines (at most 4s^2). Then filter those points to the range (0<=x,y<=4000000) the remaining points can be pretty quickly checked.
+
+find the Cs for (Ax+BY=C)
+```{r}
+sensors<-sensors %>% rowwise %>%
+  mutate(aplusb1=sx+(sy+md+1),aplusb2=sx+(sy-md-1),aminusb1=sx-(sy+md+1),aminusb2=sx-(sy-md-1))
+
+aplusbs<-unique(c(sensors$aplusb1,sensors$aplusb2))
+aminusbs<-unique(c(sensors$aminusb1,sensors$aminusb2))
+```
+find solutions:
+```{r}
+beaconpoints<-as.data.frame(matrix(ncol=2,nrow=0))
+for(i in 1:length(aplusbs)){
+  for(j in 1:length(aminusbs)){
+    possbeacon<-solve(rbind(c(1,1),c(1,-1)),c(aplusbs[i],aminusbs[j]))
+    beaconpoints<-rbind(beaconpoints,possbeacon)}}
+colnames(beaconpoints)<-c("x","y")
+beaconpoints$x<-as.numeric(beaconpoints$x)
+beaconpoints$y<-as.numeric(beaconpoints$y)
+beaconpoints<-beaconpoints %>% ungroup %>% filter(x>=0,y>=0,x<=20,y<=20)
+```
+For each point, check to see if it is further away from the sensor than md.  If so, that's the distress beacon.
+
+```{r}
+part2<-list()
+for(i in 1:nrow(beaconpoints)){
+  checkpoint<-beaconpoints[i,]
+  checkdistances<-sapply(1:nrow(sensors),function(x){
+    if((abs(sensors$sx[x]-checkpoint[1])+abs(sensors$sy[x]-checkpoint[2]))>sensors$md[x]){TRUE}else{FALSE}})
+  if(all(checkdistances)){part2<-append(part2,checkpoint)}}
+
+part2
+```
+and to find the answer:
+```{r}
+part2<-part2$x*4000000+part2$y
+part2
+```
+
 
