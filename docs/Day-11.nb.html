@@ -11,7 +11,7 @@
 
 
 
-<title>Day XX Notebook</title>
+<title>Day 11 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day XX Notebook</h1>
+<h1 class="title toc-ignore">Day 11 Notebook</h1>
 
 </div>
 
@@ -1756,10 +1756,147 @@ display: none;
 <!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
+<p>I have no idea how to import this data. Not a clue. Very, very
+manually set up and run using the sample data:</p>
+<p>Starting configuration</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMjbW9uayIsIm1vbmswPC1jKDc5LDk4KSIsIm1vbmsxPC1jKDU0LDY1LDc1LDc0KSIsIm1vbmsyPC1jKDc5LDYwLDk3KSIsIm1vbmszPC1jKDc0KSIsIiIsIiMjIGNvdW50IG9mIGluc2VydGlvbnMiLCJpbnMwPC0wIiwiaW5zMTwtMCIsImluczI8LTAiLCJpbnMzPC0wIiwiIiwiIyMgcnVucyIsImZvcihpIGluIDE6MjApe1xuICAjI21vbmswXG4gIHdoaWxlIChsZW5ndGgobW9uazApID4gMCkge1xuICAgIG1vbmswWzFdIDwtIG1vbmswWzFdICogMTlcbiAgICBtb25rMFsxXSA8LSBtb25rMFsxXSAlLyUgM1xuICAgIGlmIChtb25rMFsxXSAlJSAyMyA9PSAwKSB7bW9uazIgPC0gYXBwZW5kKG1vbmsyLCBtb25rMFsxXSlcbiAgICB9IGVsc2Uge21vbmszIDwtIGFwcGVuZChtb25rMywgbW9uazBbMV0pfVxuICAgIG1vbmswIDwtIG1vbmswWy0xXVxuICAgIGluczAgPC0gaW5zMCArIDF9XG4gIFxuICAjI21vbmsxXG4gIHdoaWxlIChsZW5ndGgobW9uazEpID4gMCkge1xuICAgIG1vbmsxWzFdIDwtIG1vbmsxWzFdICsgNlxuICAgIG1vbmsxWzFdIDwtIG1vbmsxWzFdICUvJSAzXG4gICAgaWYgKG1vbmsxWzFdICUlIDE5ID09IDApIHttb25rMiA8LSBhcHBlbmQobW9uazIsIG1vbmsxWzFdKVxuICAgIH0gZWxzZSB7bW9uazAgPC0gYXBwZW5kKG1vbmswLCBtb25rMVsxXSl9XG4gICAgbW9uazEgPC0gbW9uazFbLTFdXG4gICAgaW5zMSA8LSBpbnMxICsgMX1cbiAgXG4gICMjbW9uazJcbiAgd2hpbGUgKGxlbmd0aChtb25rMikgPiAwKSB7XG4gICAgbW9uazJbMV0gPC0gbW9uazJbMV0gXiAyXG4gICAgbW9uazJbMV0gPC0gbW9uazJbMV0gJS8lIDNcbiAgICBpZiAobW9uazJbMV0gJSUgMTMgPT0gMCl7bW9uazEgPC0gYXBwZW5kKG1vbmsxLCBtb25rMlsxXSlcbiAgICB9IGVsc2Uge21vbmszIDwtIGFwcGVuZChtb25rMywgbW9uazJbMV0pfVxuICAgIG1vbmsyIDwtIG1vbmsyWy0xXVxuICAgIGluczIgPC0gaW5zMiArIDF9XG4gIFxuICAjI21vbmszXG4gIHdoaWxlIChsZW5ndGgobW9uazMpID4gMCkge1xuICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICsgM1xuICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICUvJSAzXG4gICAgaWYgKG1vbmszWzFdICUlIDE3ID09IDApe21vbmswIDwtIGFwcGVuZChtb25rMCwgbW9uazNbMV0pXG4gICAgfSBlbHNlIHttb25rMSA8LSBhcHBlbmQobW9uazEsIG1vbmszWzFdKX1cbiAgICBtb25rMyA8LSBtb25rM1stMV1cbiAgICBpbnMzIDwtIGluczMgKyAxfX0iLCIgICIsIiIsInBhcnQxPC1zb3J0KGMoaW5zMCxpbnMxLGluczIsaW5zMyksZGVjcmVhc2luZz1UUlVFKSIsInBhcnQxPC1wYXJ0MVsxOjJdIiwicGFydDE8LXByb2QocGFydDEpIiwicGFydDEiXX0= -->
+<pre class="r"><code>##monk
+monk0&lt;-c(79,98)
+monk1&lt;-c(54,65,75,74)
+monk2&lt;-c(79,60,97)
+monk3&lt;-c(74)
+
+## count of insertions
+ins0&lt;-0
+ins1&lt;-0
+ins2&lt;-0
+ins3&lt;-0
+
+## runs
+for(i in 1:20){
+  ##monk0
+  while (length(monk0) &gt; 0) {
+    monk0[1] &lt;- monk0[1] * 19
+    monk0[1] &lt;- monk0[1] %/% 3
+    if (monk0[1] %% 23 == 0) {monk2 &lt;- append(monk2, monk0[1])
+    } else {monk3 &lt;- append(monk3, monk0[1])}
+    monk0 &lt;- monk0[-1]
+    ins0 &lt;- ins0 + 1}
+  
+  ##monk1
+  while (length(monk1) &gt; 0) {
+    monk1[1] &lt;- monk1[1] + 6
+    monk1[1] &lt;- monk1[1] %/% 3
+    if (monk1[1] %% 19 == 0) {monk2 &lt;- append(monk2, monk1[1])
+    } else {monk0 &lt;- append(monk0, monk1[1])}
+    monk1 &lt;- monk1[-1]
+    ins1 &lt;- ins1 + 1}
+  
+  ##monk2
+  while (length(monk2) &gt; 0) {
+    monk2[1] &lt;- monk2[1] ^ 2
+    monk2[1] &lt;- monk2[1] %/% 3
+    if (monk2[1] %% 13 == 0){monk1 &lt;- append(monk1, monk2[1])
+    } else {monk3 &lt;- append(monk3, monk2[1])}
+    monk2 &lt;- monk2[-1]
+    ins2 &lt;- ins2 + 1}
+  
+  ##monk3
+  while (length(monk3) &gt; 0) {
+    monk3[1] &lt;- monk3[1] + 3
+    monk3[1] &lt;- monk3[1] %/% 3
+    if (monk3[1] %% 17 == 0){monk0 &lt;- append(monk0, monk3[1])
+    } else {monk1 &lt;- append(monk1, monk3[1])}
+    monk3 &lt;- monk3[-1]
+    ins3 &lt;- ins3 + 1}}
+  
+
+part1&lt;-sort(c(ins0,ins1,ins2,ins3),decreasing=TRUE)
+part1&lt;-part1[1:2]
+part1&lt;-prod(part1)
+part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEwNjA1XG4ifQ== -->
+<pre><code>[1] 10605</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="part-2" class="section level2">
+<h2>Part 2</h2>
+<p>So because all of the tests are “is divisible by” a prime, everything
+should still work if it is modded by 23*19*13*17 rather than divided by
+3</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMjbW9uayIsIm1vbmswPC1jKDc5LDk4KSIsIm1vbmsxPC1jKDU0LDY1LDc1LDc0KSIsIm1vbmsyPC1jKDc5LDYwLDk3KSIsIm1vbmszPC1jKDc0KSIsIiIsIiMjIGNvdW50IG9mIGluc2VydGlvbnMiLCJpbnMwPC0wIiwiaW5zMTwtMCIsImluczI8LTAiLCJpbnMzPC0wIiwiIiwiIyMgcnVucyIsImZvcihpIGluIDE6MTAwMDApe1xuICAjI21vbmswXG4gIHdoaWxlIChsZW5ndGgobW9uazApID4gMCkge1xuICAgIG1vbmswWzFdIDwtIG1vbmswWzFdICogMTlcbiAgICBtb25rMFsxXSA8LSBtb25rMFsxXSAlJSAoMjMqMTMqMTkqMTcpXG4gICAgaWYgKG1vbmswWzFdICUlIDIzID09IDApIHttb25rMiA8LSBhcHBlbmQobW9uazIsIG1vbmswWzFdKVxuICAgIH0gZWxzZSB7bW9uazMgPC0gYXBwZW5kKG1vbmszLCBtb25rMFsxXSl9XG4gICAgbW9uazAgPC0gbW9uazBbLTFdXG4gICAgaW5zMCA8LSBpbnMwICsgMX1cbiAgXG4gICMjbW9uazFcbiAgd2hpbGUgKGxlbmd0aChtb25rMSkgPiAwKSB7XG4gICAgbW9uazFbMV0gPC0gbW9uazFbMV0gKyA2XG4gICAgbW9uazFbMV0gPC0gbW9uazFbMV0gJSUgKDIzKjEzKjE5KjE3KVxuICAgIGlmIChtb25rMVsxXSAlJSAxOSA9PSAwKSB7bW9uazIgPC0gYXBwZW5kKG1vbmsyLCBtb25rMVsxXSlcbiAgICB9IGVsc2Uge21vbmswIDwtIGFwcGVuZChtb25rMCwgbW9uazFbMV0pfVxuICAgIG1vbmsxIDwtIG1vbmsxWy0xXVxuICAgIGluczEgPC0gaW5zMSArIDF9XG4gIFxuICAjI21vbmsyXG4gIHdoaWxlIChsZW5ndGgobW9uazIpID4gMCkge1xuICAgIG1vbmsyWzFdIDwtIG1vbmsyWzFdIF4gMlxuICAgIG1vbmsyWzFdIDwtIG1vbmsyWzFdICUlICgyMyoxMyoxOSoxNylcbiAgICBpZiAobW9uazJbMV0gJSUgMTMgPT0gMCl7bW9uazEgPC0gYXBwZW5kKG1vbmsxLCBtb25rMlsxXSlcbiAgICB9IGVsc2Uge21vbmszIDwtIGFwcGVuZChtb25rMywgbW9uazJbMV0pfVxuICAgIG1vbmsyIDwtIG1vbmsyWy0xXVxuICAgIGluczIgPC0gaW5zMiArIDF9XG4gIFxuICAjI21vbmszXG4gIHdoaWxlIChsZW5ndGgobW9uazMpID4gMCkge1xuICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICsgM1xuICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICUlICgyMyoxMyoxOSoxNylcbiAgICBpZiAobW9uazNbMV0gJSUgMTcgPT0gMCl7bW9uazAgPC0gYXBwZW5kKG1vbmswLCBtb25rM1sxXSlcbiAgICB9IGVsc2Uge21vbmsxIDwtIGFwcGVuZChtb25rMSwgbW9uazNbMV0pfVxuICAgIG1vbmszIDwtIG1vbmszWy0xXVxuICAgIGluczMgPC0gaW5zMyArIDF9fSIsIiAgIiwiIiwicGFydDI8LXNvcnQoYyhpbnMwLGluczEsaW5zMixpbnMzKSxkZWNyZWFzaW5nPVRSVUUpIiwicGFydDI8LXBhcnQyWzE6Ml0iLCJwYXJ0MjwtcHJvZChwYXJ0MikiLCJwYXJ0MiJdfQ== -->
+<pre class="r"><code>##monk
+monk0&lt;-c(79,98)
+monk1&lt;-c(54,65,75,74)
+monk2&lt;-c(79,60,97)
+monk3&lt;-c(74)
+
+## count of insertions
+ins0&lt;-0
+ins1&lt;-0
+ins2&lt;-0
+ins3&lt;-0
+
+## runs
+for(i in 1:10000){
+  ##monk0
+  while (length(monk0) &gt; 0) {
+    monk0[1] &lt;- monk0[1] * 19
+    monk0[1] &lt;- monk0[1] %% (23*13*19*17)
+    if (monk0[1] %% 23 == 0) {monk2 &lt;- append(monk2, monk0[1])
+    } else {monk3 &lt;- append(monk3, monk0[1])}
+    monk0 &lt;- monk0[-1]
+    ins0 &lt;- ins0 + 1}
+  
+  ##monk1
+  while (length(monk1) &gt; 0) {
+    monk1[1] &lt;- monk1[1] + 6
+    monk1[1] &lt;- monk1[1] %% (23*13*19*17)
+    if (monk1[1] %% 19 == 0) {monk2 &lt;- append(monk2, monk1[1])
+    } else {monk0 &lt;- append(monk0, monk1[1])}
+    monk1 &lt;- monk1[-1]
+    ins1 &lt;- ins1 + 1}
+  
+  ##monk2
+  while (length(monk2) &gt; 0) {
+    monk2[1] &lt;- monk2[1] ^ 2
+    monk2[1] &lt;- monk2[1] %% (23*13*19*17)
+    if (monk2[1] %% 13 == 0){monk1 &lt;- append(monk1, monk2[1])
+    } else {monk3 &lt;- append(monk3, monk2[1])}
+    monk2 &lt;- monk2[-1]
+    ins2 &lt;- ins2 + 1}
+  
+  ##monk3
+  while (length(monk3) &gt; 0) {
+    monk3[1] &lt;- monk3[1] + 3
+    monk3[1] &lt;- monk3[1] %% (23*13*19*17)
+    if (monk3[1] %% 17 == 0){monk0 &lt;- append(monk0, monk3[1])
+    } else {monk1 &lt;- append(monk1, monk3[1])}
+    monk3 &lt;- monk3[-1]
+    ins3 &lt;- ins3 + 1}}
+  
+
+part2&lt;-sort(c(ins0,ins1,ins2,ins3),decreasing=TRUE)
+part2&lt;-part2[1:2]
+part2&lt;-prod(part2)
+part2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI3MTMzMTAxNThcbiJ9 -->
+<pre><code>[1] 2713310158</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxMSBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQpJIGhhdmUgbm8gaWRlYSBob3cgdG8gaW1wb3J0IHRoaXMgZGF0YS4gTm90IGEgY2x1ZS4gIFZlcnksIHZlcnkgbWFudWFsbHkgc2V0IHVwIGFuZCBydW4gdXNpbmcgdGhlIHNhbXBsZSBkYXRhOg0KDQpTdGFydGluZyBjb25maWd1cmF0aW9uDQpgYGB7cn0NCiMjbW9uaw0KbW9uazA8LWMoNzksOTgpDQptb25rMTwtYyg1NCw2NSw3NSw3NCkNCm1vbmsyPC1jKDc5LDYwLDk3KQ0KbW9uazM8LWMoNzQpDQoNCiMjIGNvdW50IG9mIGluc2VydGlvbnMNCmluczA8LTANCmluczE8LTANCmluczI8LTANCmluczM8LTANCg0KIyMgcnVucw0KZm9yKGkgaW4gMToyMCl7DQogICMjbW9uazANCiAgd2hpbGUgKGxlbmd0aChtb25rMCkgPiAwKSB7DQogICAgbW9uazBbMV0gPC0gbW9uazBbMV0gKiAxOQ0KICAgIG1vbmswWzFdIDwtIG1vbmswWzFdICUvJSAzDQogICAgaWYgKG1vbmswWzFdICUlIDIzID09IDApIHttb25rMiA8LSBhcHBlbmQobW9uazIsIG1vbmswWzFdKQ0KICAgIH0gZWxzZSB7bW9uazMgPC0gYXBwZW5kKG1vbmszLCBtb25rMFsxXSl9DQogICAgbW9uazAgPC0gbW9uazBbLTFdDQogICAgaW5zMCA8LSBpbnMwICsgMX0NCiAgDQogICMjbW9uazENCiAgd2hpbGUgKGxlbmd0aChtb25rMSkgPiAwKSB7DQogICAgbW9uazFbMV0gPC0gbW9uazFbMV0gKyA2DQogICAgbW9uazFbMV0gPC0gbW9uazFbMV0gJS8lIDMNCiAgICBpZiAobW9uazFbMV0gJSUgMTkgPT0gMCkge21vbmsyIDwtIGFwcGVuZChtb25rMiwgbW9uazFbMV0pDQogICAgfSBlbHNlIHttb25rMCA8LSBhcHBlbmQobW9uazAsIG1vbmsxWzFdKX0NCiAgICBtb25rMSA8LSBtb25rMVstMV0NCiAgICBpbnMxIDwtIGluczEgKyAxfQ0KICANCiAgIyNtb25rMg0KICB3aGlsZSAobGVuZ3RoKG1vbmsyKSA+IDApIHsNCiAgICBtb25rMlsxXSA8LSBtb25rMlsxXSBeIDINCiAgICBtb25rMlsxXSA8LSBtb25rMlsxXSAlLyUgMw0KICAgIGlmIChtb25rMlsxXSAlJSAxMyA9PSAwKXttb25rMSA8LSBhcHBlbmQobW9uazEsIG1vbmsyWzFdKQ0KICAgIH0gZWxzZSB7bW9uazMgPC0gYXBwZW5kKG1vbmszLCBtb25rMlsxXSl9DQogICAgbW9uazIgPC0gbW9uazJbLTFdDQogICAgaW5zMiA8LSBpbnMyICsgMX0NCiAgDQogICMjbW9uazMNCiAgd2hpbGUgKGxlbmd0aChtb25rMykgPiAwKSB7DQogICAgbW9uazNbMV0gPC0gbW9uazNbMV0gKyAzDQogICAgbW9uazNbMV0gPC0gbW9uazNbMV0gJS8lIDMNCiAgICBpZiAobW9uazNbMV0gJSUgMTcgPT0gMCl7bW9uazAgPC0gYXBwZW5kKG1vbmswLCBtb25rM1sxXSkNCiAgICB9IGVsc2Uge21vbmsxIDwtIGFwcGVuZChtb25rMSwgbW9uazNbMV0pfQ0KICAgIG1vbmszIDwtIG1vbmszWy0xXQ0KICAgIGluczMgPC0gaW5zMyArIDF9fQ0KICANCg0KcGFydDE8LXNvcnQoYyhpbnMwLGluczEsaW5zMixpbnMzKSxkZWNyZWFzaW5nPVRSVUUpDQpwYXJ0MTwtcGFydDFbMToyXQ0KcGFydDE8LXByb2QocGFydDEpDQpwYXJ0MQ0KYGBgDQojIyBQYXJ0IDINClNvIGJlY2F1c2UgYWxsIG9mIHRoZSB0ZXN0cyBhcmUgImlzIGRpdmlzaWJsZSBieSIgYSBwcmltZSwgZXZlcnl0aGluZyBzaG91bGQgc3RpbGwgd29yayBpZiBpdCBpcyBtb2RkZWQgYnkgMjNcKjE5XCoxM1wqMTcgcmF0aGVyIHRoYW4gZGl2aWRlZCBieSAzDQoNCg0KYGBge3J9DQojI21vbmsNCm1vbmswPC1jKDc5LDk4KQ0KbW9uazE8LWMoNTQsNjUsNzUsNzQpDQptb25rMjwtYyg3OSw2MCw5NykNCm1vbmszPC1jKDc0KQ0KDQojIyBjb3VudCBvZiBpbnNlcnRpb25zDQppbnMwPC0wDQppbnMxPC0wDQppbnMyPC0wDQppbnMzPC0wDQoNCiMjIHJ1bnMNCmZvcihpIGluIDE6MTAwMDApew0KICAjI21vbmswDQogIHdoaWxlIChsZW5ndGgobW9uazApID4gMCkgew0KICAgIG1vbmswWzFdIDwtIG1vbmswWzFdICogMTkNCiAgICBtb25rMFsxXSA8LSBtb25rMFsxXSAlJSAoMjMqMTMqMTkqMTcpDQogICAgaWYgKG1vbmswWzFdICUlIDIzID09IDApIHttb25rMiA8LSBhcHBlbmQobW9uazIsIG1vbmswWzFdKQ0KICAgIH0gZWxzZSB7bW9uazMgPC0gYXBwZW5kKG1vbmszLCBtb25rMFsxXSl9DQogICAgbW9uazAgPC0gbW9uazBbLTFdDQogICAgaW5zMCA8LSBpbnMwICsgMX0NCiAgDQogICMjbW9uazENCiAgd2hpbGUgKGxlbmd0aChtb25rMSkgPiAwKSB7DQogICAgbW9uazFbMV0gPC0gbW9uazFbMV0gKyA2DQogICAgbW9uazFbMV0gPC0gbW9uazFbMV0gJSUgKDIzKjEzKjE5KjE3KQ0KICAgIGlmIChtb25rMVsxXSAlJSAxOSA9PSAwKSB7bW9uazIgPC0gYXBwZW5kKG1vbmsyLCBtb25rMVsxXSkNCiAgICB9IGVsc2Uge21vbmswIDwtIGFwcGVuZChtb25rMCwgbW9uazFbMV0pfQ0KICAgIG1vbmsxIDwtIG1vbmsxWy0xXQ0KICAgIGluczEgPC0gaW5zMSArIDF9DQogIA0KICAjI21vbmsyDQogIHdoaWxlIChsZW5ndGgobW9uazIpID4gMCkgew0KICAgIG1vbmsyWzFdIDwtIG1vbmsyWzFdIF4gMg0KICAgIG1vbmsyWzFdIDwtIG1vbmsyWzFdICUlICgyMyoxMyoxOSoxNykNCiAgICBpZiAobW9uazJbMV0gJSUgMTMgPT0gMCl7bW9uazEgPC0gYXBwZW5kKG1vbmsxLCBtb25rMlsxXSkNCiAgICB9IGVsc2Uge21vbmszIDwtIGFwcGVuZChtb25rMywgbW9uazJbMV0pfQ0KICAgIG1vbmsyIDwtIG1vbmsyWy0xXQ0KICAgIGluczIgPC0gaW5zMiArIDF9DQogIA0KICAjI21vbmszDQogIHdoaWxlIChsZW5ndGgobW9uazMpID4gMCkgew0KICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICsgMw0KICAgIG1vbmszWzFdIDwtIG1vbmszWzFdICUlICgyMyoxMyoxOSoxNykNCiAgICBpZiAobW9uazNbMV0gJSUgMTcgPT0gMCl7bW9uazAgPC0gYXBwZW5kKG1vbmswLCBtb25rM1sxXSkNCiAgICB9IGVsc2Uge21vbmsxIDwtIGFwcGVuZChtb25rMSwgbW9uazNbMV0pfQ0KICAgIG1vbmszIDwtIG1vbmszWy0xXQ0KICAgIGluczMgPC0gaW5zMyArIDF9fQ0KICANCg0KcGFydDI8LXNvcnQoYyhpbnMwLGluczEsaW5zMixpbnMzKSxkZWNyZWFzaW5nPVRSVUUpDQpwYXJ0MjwtcGFydDJbMToyXQ0KcGFydDI8LXByb2QocGFydDIpDQpwYXJ0Mg0KYGBgDQoNCg==</div>
 
 
 
