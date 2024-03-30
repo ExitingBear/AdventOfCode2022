@@ -11,7 +11,7 @@
 
 
 
-<title>Day XX Notebook</title>
+<title>Day 15 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day XX Notebook</h1>
+<h1 class="title toc-ignore">Day 15 Notebook</h1>
 
 </div>
 
@@ -1756,10 +1756,134 @@ display: none;
 <!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
+<p>First put everything into a data frame</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImlucHV0PC1yZWFkX2xpbmVzKFwiRGF5MTVTYW1wbGUudHh0XCIpIiwiIiwic2Vuc29yczwtYXMuZGF0YS5mcmFtZShtYXRyaXgobmNvbD00LG5yb3c9MCkpIiwiY29sbmFtZXMoc2Vuc29ycyk8LWMoXCJzeFwiLFwic3lcIixcImJ4XCIsXCJieVwiKSIsImZvcihpIGluIDE6bGVuZ3RoKGlucHV0KSl7XG4gIGxuPC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLFwiWz0sOl1cIikpXG4gIGxuPC1hcy5udW1lcmljKGxuW2MoMiw0LDYsOCldKVxuICBzZW5zb3JzPC1yYmluZChzZW5zb3JzLGxpc3Qoc3g9bG5bMV0sc3k9bG5bMl0sYng9bG5bM10sYnk9bG5bNF0pKX0iXX0= -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day15Sample.txt&quot;)
+
+sensors&lt;-as.data.frame(matrix(ncol=4,nrow=0))
+colnames(sensors)&lt;-c(&quot;sx&quot;,&quot;sy&quot;,&quot;bx&quot;,&quot;by&quot;)
+for(i in 1:length(input)){
+  ln&lt;-unlist(str_split(input[i],&quot;[=,:]&quot;))
+  ln&lt;-as.numeric(ln[c(2,4,6,8)])
+  sensors&lt;-rbind(sensors,list(sx=ln[1],sy=ln[2],bx=ln[3],by=ln[4]))}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>then find the manhattan distances for each sensor/beacon pair</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoic2Vuc29ycyA8LSBzZW5zb3JzICU+JSByb3d3aXNlICU+JSBtdXRhdGUobWQ9KGFicyhieC1zeCkrYWJzKGJ5LXN5KSkpIn0= -->
+<pre class="r"><code>sensors &lt;- sensors %&gt;% rowwise %&gt;% mutate(md=(abs(bx-sx)+abs(by-sy)))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>for each sensor, find if its no beacon range even meets the target.
+If it does, then, find its “no beacon” range</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInRhcmdldDwtMTAiLCJwb3NzaWJsZXM8LWMoKSIsIiIsIiMjIyBmaW5kIHBvc3NpYmxlIHBsYWNlcyBmb3Igbm8gYmVhY29ucyIsImZvcihpIGluIDE6bnJvdyhzZW5zb3JzKSl7XG4gICMjIyBob3cgbXVjaCBkaXN0YW5jZSBpcyBsZWZ0IGFmdGVyIGdldHRpbmcgdG8gdGhhdCBsaW5lXG4gIHJtbjwtc2Vuc29ycyRtZFtpXS1hYnMoc2Vuc29ycyRzeVtpXS10YXJnZXQpXG4gIGlmKHJtbj49MCl7XG4gICAgcG9zc2libGVzPC11bmlvbihwb3NzaWJsZXMsKHNlbnNvcnMkc3hbaV0tcm1uKTooc2Vuc29ycyRzeFtpXStybW4pKX19IiwiIyMjIGZpbmQgYmVhY29ucyBvbiB0aGUgdGFyZ2V0IGxpbmUiLCJiZWFjb25zYXR0YXJnZXQ8LXNlbnNvcnMkYnhbd2hpY2goc2Vuc29ycyRieT09dGFyZ2V0KV0iLCIiLCIjIyMgcHVsbCB0aG9zZSBmcm9tIHRoZSBwb3NzaWJsZXMsIGJlY2F1c2UsIHRoZXkncmUgb2J2aW91c2x5IG5vdCBwb3NzaWJsZSIsInBvc3NpYmxlczwtcG9zc2libGVzWy1jKHdoaWNoKHBvc3NpYmxlcyAlaW4lIGJlYWNvbnNhdHRhcmdldCkpXSIsInBhcnQxPC1sZW5ndGgocG9zc2libGVzKSIsInBhcnQxIl19 -->
+<pre class="r"><code>target&lt;-10
+possibles&lt;-c()
+
+### find possible places for no beacons
+for(i in 1:nrow(sensors)){
+  ### how much distance is left after getting to that line
+  rmn&lt;-sensors$md[i]-abs(sensors$sy[i]-target)
+  if(rmn&gt;=0){
+    possibles&lt;-union(possibles,(sensors$sx[i]-rmn):(sensors$sx[i]+rmn))}}
+### find beacons on the target line
+beaconsattarget&lt;-sensors$bx[which(sensors$by==target)]
+
+### pull those from the possibles, because, they&#39;re obviously not possible
+possibles&lt;-possibles[-c(which(possibles %in% beaconsattarget))]
+part1&lt;-length(possibles)
+part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI2XG4ifQ== -->
+<pre><code>[1] 26</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="part-2" class="section level2">
+<h2>Part 2</h2>
+<p>Brute force would be an option, but it would take weeks &amp; I have
+things to do.</p>
+<p>I stole this answer - I was getting nowhere slowly.</p>
+<p>The beacon lies at md+1 for some sensors. First find the md+1 line
+for all the sensors Then, find the intersections of all of those lines
+(at most 4s^2). Then filter those points to the range
+(0&lt;=x,y&lt;=4000000) the remaining points can be pretty quickly
+checked.</p>
+<p>find the Cs for (Ax+BY=C)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInNlbnNvcnM8LXNlbnNvcnMgJT4lIHJvd3dpc2UgJT4lXG4gIG11dGF0ZShhcGx1c2IxPXN4KyhzeSttZCsxKSxhcGx1c2IyPXN4KyhzeS1tZC0xKSxhbWludXNiMT1zeC0oc3krbWQrMSksYW1pbnVzYjI9c3gtKHN5LW1kLTEpKSIsIiIsImFwbHVzYnM8LXVuaXF1ZShjKHNlbnNvcnMkYXBsdXNiMSxzZW5zb3JzJGFwbHVzYjIpKSIsImFtaW51c2JzPC11bmlxdWUoYyhzZW5zb3JzJGFtaW51c2IxLHNlbnNvcnMkYW1pbnVzYjIpKSJdfQ== -->
+<pre class="r"><code>sensors&lt;-sensors %&gt;% rowwise %&gt;%
+  mutate(aplusb1=sx+(sy+md+1),aplusb2=sx+(sy-md-1),aminusb1=sx-(sy+md+1),aminusb2=sx-(sy-md-1))
+
+aplusbs&lt;-unique(c(sensors$aplusb1,sensors$aplusb2))
+aminusbs&lt;-unique(c(sensors$aminusb1,sensors$aminusb2))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>find solutions:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImJlYWNvbnBvaW50czwtYXMuZGF0YS5mcmFtZShtYXRyaXgobmNvbD0yLG5yb3c9MCkpIiwiZm9yKGkgaW4gMTpsZW5ndGgoYXBsdXNicykpe1xuICBmb3IoaiBpbiAxOmxlbmd0aChhbWludXNicykpe1xuICAgIHBvc3NiZWFjb248LXNvbHZlKHJiaW5kKGMoMSwxKSxjKDEsLTEpKSxjKGFwbHVzYnNbaV0sYW1pbnVzYnNbal0pKVxuICAgIGJlYWNvbnBvaW50czwtcmJpbmQoYmVhY29ucG9pbnRzLHBvc3NiZWFjb24pfX0iLCJjb2xuYW1lcyhiZWFjb25wb2ludHMpPC1jKFwieFwiLFwieVwiKSIsImJlYWNvbnBvaW50cyR4PC1hcy5udW1lcmljKGJlYWNvbnBvaW50cyR4KSIsImJlYWNvbnBvaW50cyR5PC1hcy5udW1lcmljKGJlYWNvbnBvaW50cyR5KSIsImJlYWNvbnBvaW50czwtYmVhY29ucG9pbnRzICU+JSB1bmdyb3VwICU+JSBmaWx0ZXIoeD49MCx5Pj0wLHg8PTIwLHk8PTIwKSJdfQ== -->
+<pre class="r"><code>beaconpoints&lt;-as.data.frame(matrix(ncol=2,nrow=0))
+for(i in 1:length(aplusbs)){
+  for(j in 1:length(aminusbs)){
+    possbeacon&lt;-solve(rbind(c(1,1),c(1,-1)),c(aplusbs[i],aminusbs[j]))
+    beaconpoints&lt;-rbind(beaconpoints,possbeacon)}}
+colnames(beaconpoints)&lt;-c(&quot;x&quot;,&quot;y&quot;)
+beaconpoints$x&lt;-as.numeric(beaconpoints$x)
+beaconpoints$y&lt;-as.numeric(beaconpoints$y)
+beaconpoints&lt;-beaconpoints %&gt;% ungroup %&gt;% filter(x&gt;=0,y&gt;=0,x&lt;=20,y&lt;=20)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>For each point, check to see if it is further away from the sensor
+than md. If so, that’s the distress beacon.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQyPC1saXN0KCkiLCJmb3IoaSBpbiAxOm5yb3coYmVhY29ucG9pbnRzKSl7XG4gIGNoZWNrcG9pbnQ8LWJlYWNvbnBvaW50c1tpLF1cbiAgY2hlY2tkaXN0YW5jZXM8LXNhcHBseSgxOm5yb3coc2Vuc29ycyksZnVuY3Rpb24oeCl7XG4gICAgaWYoKGFicyhzZW5zb3JzJHN4W3hdLWNoZWNrcG9pbnRbMV0pK2FicyhzZW5zb3JzJHN5W3hdLWNoZWNrcG9pbnRbMl0pKT5zZW5zb3JzJG1kW3hdKXtUUlVFfWVsc2V7RkFMU0V9fSlcbiAgaWYoYWxsKGNoZWNrZGlzdGFuY2VzKSl7cGFydDI8LWFwcGVuZChwYXJ0MixjaGVja3BvaW50KX19IiwiIiwicGFydDIiXX0= -->
+<pre class="r"><code>part2&lt;-list()
+for(i in 1:nrow(beaconpoints)){
+  checkpoint&lt;-beaconpoints[i,]
+  checkdistances&lt;-sapply(1:nrow(sensors),function(x){
+    if((abs(sensors$sx[x]-checkpoint[1])+abs(sensors$sy[x]-checkpoint[2]))&gt;sensors$md[x]){TRUE}else{FALSE}})
+  if(all(checkdistances)){part2&lt;-append(part2,checkpoint)}}
+
+part2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJHhcblsxXSAxNFxuXG4keVxuWzFdIDExXG4ifQ== -->
+<pre><code>$x
+[1] 14
+
+$y
+[1] 11</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>and to find the answer:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQyPC1wYXJ0MiR4KjQwMDAwMDArcGFydDIkeSIsInBhcnQyIl19 -->
+<pre class="r"><code>part2&lt;-part2$x*4000000+part2$y
+part2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDU2MDAwMDExXG4ifQ== -->
+<pre><code>[1] 56000011</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxNSBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQoNCiMjIFBhcnQgMQ0KRmlyc3QgcHV0IGV2ZXJ5dGhpbmcgaW50byBhIGRhdGEgZnJhbWUNCmBgYHtyfQ0KaW5wdXQ8LXJlYWRfbGluZXMoIkRheTE1U2FtcGxlLnR4dCIpDQoNCnNlbnNvcnM8LWFzLmRhdGEuZnJhbWUobWF0cml4KG5jb2w9NCxucm93PTApKQ0KY29sbmFtZXMoc2Vuc29ycyk8LWMoInN4Iiwic3kiLCJieCIsImJ5IikNCmZvcihpIGluIDE6bGVuZ3RoKGlucHV0KSl7DQogIGxuPC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLCJbPSw6XSIpKQ0KICBsbjwtYXMubnVtZXJpYyhsbltjKDIsNCw2LDgpXSkNCiAgc2Vuc29yczwtcmJpbmQoc2Vuc29ycyxsaXN0KHN4PWxuWzFdLHN5PWxuWzJdLGJ4PWxuWzNdLGJ5PWxuWzRdKSl9DQoNCmBgYA0KdGhlbiBmaW5kIHRoZSBtYW5oYXR0YW4gZGlzdGFuY2VzIGZvciBlYWNoICBzZW5zb3IvYmVhY29uIHBhaXINCmBgYHtyfQ0Kc2Vuc29ycyA8LSBzZW5zb3JzICU+JSByb3d3aXNlICU+JSBtdXRhdGUobWQ9KGFicyhieC1zeCkrYWJzKGJ5LXN5KSkpDQpgYGANCg0KZm9yIGVhY2ggc2Vuc29yLCBmaW5kIGlmIGl0cyBubyBiZWFjb24gcmFuZ2UgZXZlbiBtZWV0cyB0aGUgdGFyZ2V0Lg0KSWYgaXQgZG9lcywgdGhlbiwgZmluZCBpdHMgIm5vIGJlYWNvbiIgcmFuZ2UNCg0KYGBge3J9DQp0YXJnZXQ8LTEwDQpwb3NzaWJsZXM8LWMoKQ0KDQojIyMgZmluZCBwb3NzaWJsZSBwbGFjZXMgZm9yIG5vIGJlYWNvbnMNCmZvcihpIGluIDE6bnJvdyhzZW5zb3JzKSl7DQogICMjIyBob3cgbXVjaCBkaXN0YW5jZSBpcyBsZWZ0IGFmdGVyIGdldHRpbmcgdG8gdGhhdCBsaW5lDQogIHJtbjwtc2Vuc29ycyRtZFtpXS1hYnMoc2Vuc29ycyRzeVtpXS10YXJnZXQpDQogIGlmKHJtbj49MCl7DQogICAgcG9zc2libGVzPC11bmlvbihwb3NzaWJsZXMsKHNlbnNvcnMkc3hbaV0tcm1uKTooc2Vuc29ycyRzeFtpXStybW4pKX19DQojIyMgZmluZCBiZWFjb25zIG9uIHRoZSB0YXJnZXQgbGluZQ0KYmVhY29uc2F0dGFyZ2V0PC1zZW5zb3JzJGJ4W3doaWNoKHNlbnNvcnMkYnk9PXRhcmdldCldDQoNCiMjIyBwdWxsIHRob3NlIGZyb20gdGhlIHBvc3NpYmxlcywgYmVjYXVzZSwgdGhleSdyZSBvYnZpb3VzbHkgbm90IHBvc3NpYmxlDQpwb3NzaWJsZXM8LXBvc3NpYmxlc1stYyh3aGljaChwb3NzaWJsZXMgJWluJSBiZWFjb25zYXR0YXJnZXQpKV0NCnBhcnQxPC1sZW5ndGgocG9zc2libGVzKQ0KcGFydDENCmBgYA0KIyMgUGFydCAyDQpCcnV0ZSBmb3JjZSB3b3VsZCBiZSBhbiBvcHRpb24sIGJ1dCBpdCB3b3VsZCB0YWtlIHdlZWtzICYgSSBoYXZlIHRoaW5ncyB0byBkby4NCg0KSSBzdG9sZSB0aGlzIGFuc3dlciAtIEkgd2FzIGdldHRpbmcgbm93aGVyZSBzbG93bHkuDQoNClRoZSBiZWFjb24gbGllcyBhdCBtZCsxIGZvciBzb21lIHNlbnNvcnMuDQpGaXJzdCBmaW5kIHRoZSBtZCsxIGxpbmUgZm9yIGFsbCB0aGUgc2Vuc29ycw0KVGhlbiwgZmluZCB0aGUgaW50ZXJzZWN0aW9ucyBvZiBhbGwgb2YgdGhvc2UgbGluZXMgKGF0IG1vc3QgNHNeMikuIFRoZW4gZmlsdGVyIHRob3NlIHBvaW50cyB0byB0aGUgcmFuZ2UgKDA8PXgseTw9NDAwMDAwMCkgdGhlIHJlbWFpbmluZyBwb2ludHMgY2FuIGJlIHByZXR0eSBxdWlja2x5IGNoZWNrZWQuDQoNCmZpbmQgdGhlIENzIGZvciAoQXgrQlk9QykNCmBgYHtyfQ0Kc2Vuc29yczwtc2Vuc29ycyAlPiUgcm93d2lzZSAlPiUNCiAgbXV0YXRlKGFwbHVzYjE9c3grKHN5K21kKzEpLGFwbHVzYjI9c3grKHN5LW1kLTEpLGFtaW51c2IxPXN4LShzeSttZCsxKSxhbWludXNiMj1zeC0oc3ktbWQtMSkpDQoNCmFwbHVzYnM8LXVuaXF1ZShjKHNlbnNvcnMkYXBsdXNiMSxzZW5zb3JzJGFwbHVzYjIpKQ0KYW1pbnVzYnM8LXVuaXF1ZShjKHNlbnNvcnMkYW1pbnVzYjEsc2Vuc29ycyRhbWludXNiMikpDQpgYGANCmZpbmQgc29sdXRpb25zOg0KYGBge3J9DQpiZWFjb25wb2ludHM8LWFzLmRhdGEuZnJhbWUobWF0cml4KG5jb2w9Mixucm93PTApKQ0KZm9yKGkgaW4gMTpsZW5ndGgoYXBsdXNicykpew0KICBmb3IoaiBpbiAxOmxlbmd0aChhbWludXNicykpew0KICAgIHBvc3NiZWFjb248LXNvbHZlKHJiaW5kKGMoMSwxKSxjKDEsLTEpKSxjKGFwbHVzYnNbaV0sYW1pbnVzYnNbal0pKQ0KICAgIGJlYWNvbnBvaW50czwtcmJpbmQoYmVhY29ucG9pbnRzLHBvc3NiZWFjb24pfX0NCmNvbG5hbWVzKGJlYWNvbnBvaW50cyk8LWMoIngiLCJ5IikNCmJlYWNvbnBvaW50cyR4PC1hcy5udW1lcmljKGJlYWNvbnBvaW50cyR4KQ0KYmVhY29ucG9pbnRzJHk8LWFzLm51bWVyaWMoYmVhY29ucG9pbnRzJHkpDQpiZWFjb25wb2ludHM8LWJlYWNvbnBvaW50cyAlPiUgdW5ncm91cCAlPiUgZmlsdGVyKHg+PTAseT49MCx4PD0yMCx5PD0yMCkNCmBgYA0KRm9yIGVhY2ggcG9pbnQsIGNoZWNrIHRvIHNlZSBpZiBpdCBpcyBmdXJ0aGVyIGF3YXkgZnJvbSB0aGUgc2Vuc29yIHRoYW4gbWQuICBJZiBzbywgdGhhdCdzIHRoZSBkaXN0cmVzcyBiZWFjb24uDQoNCmBgYHtyfQ0KcGFydDI8LWxpc3QoKQ0KZm9yKGkgaW4gMTpucm93KGJlYWNvbnBvaW50cykpew0KICBjaGVja3BvaW50PC1iZWFjb25wb2ludHNbaSxdDQogIGNoZWNrZGlzdGFuY2VzPC1zYXBwbHkoMTpucm93KHNlbnNvcnMpLGZ1bmN0aW9uKHgpew0KICAgIGlmKChhYnMoc2Vuc29ycyRzeFt4XS1jaGVja3BvaW50WzFdKSthYnMoc2Vuc29ycyRzeVt4XS1jaGVja3BvaW50WzJdKSk+c2Vuc29ycyRtZFt4XSl7VFJVRX1lbHNle0ZBTFNFfX0pDQogIGlmKGFsbChjaGVja2Rpc3RhbmNlcykpe3BhcnQyPC1hcHBlbmQocGFydDIsY2hlY2twb2ludCl9fQ0KDQpwYXJ0Mg0KYGBgDQphbmQgdG8gZmluZCB0aGUgYW5zd2VyOg0KYGBge3J9DQpwYXJ0MjwtcGFydDIkeCo0MDAwMDAwK3BhcnQyJHkNCnBhcnQyDQpgYGANCg0KDQo=</div>
 
 
 
