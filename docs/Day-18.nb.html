@@ -11,7 +11,7 @@
 
 
 
-<title>Day XX Notebook</title>
+<title>Day 18 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day XX Notebook</h1>
+<h1 class="title toc-ignore">Day 18 Notebook</h1>
 
 </div>
 
@@ -1756,10 +1756,157 @@ display: none;
 <!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
+<p>For part 1, find all six sides, find which ones aren’t in the
+list</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImlucHV0PC1yZWFkX2xpbmVzKFwiRGF5MThTYW1wbGUudHh0XCIpIiwiY3ViZXM8LWlucHV0Il19 -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day18Sample.txt&quot;)
+cubes&lt;-input</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIm9wZW5mYWNlczwtc2FwcGx5KGN1YmVzLGZ1bmN0aW9uKHgpe1xuICB4PC1hcy5udW1lcmljKHVubGlzdChzdHJfc3BsaXQoeCxcIixcIikpKVxuICB1cDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDEsMCwwKSxcIixcIikgJWluJSBjdWJlcyl7MH1lbHNlezF9XG4gIGRvd248LWlmKHN0cl9mbGF0dGVuKHgrYygtMSwwLDApLFwiLFwiKSVpbiUgY3ViZXMpezB9ZWxzZXsxfVxuICBsZWZ0PC1pZihzdHJfZmxhdHRlbih4K2MoMCwxLDApLFwiLFwiKSVpbiUgY3ViZXMpezB9ZWxzZXsxfVxuICByaWdodDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsLTEsMCksXCIsXCIpJWluJSBjdWJlcyl7MH1lbHNlezF9XG4gIGZyb250PC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLDEpLFwiLFwiKSVpbiUgY3ViZXMpezB9ZWxzZXsxfVxuICBiYWNrPC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLC0xKSxcIixcIiklaW4lIGN1YmVzKXswfWVsc2V7MX1cbiAgeTwtdXArZG93bitsZWZ0K3JpZ2h0K2Zyb250K2JhY2tcbnl9KSIsIiIsInBhcnQxPC1zdW0ob3BlbmZhY2VzKSIsInBhcnQxIl19 -->
+<pre class="r"><code>openfaces&lt;-sapply(cubes,function(x){
+  x&lt;-as.numeric(unlist(str_split(x,&quot;,&quot;)))
+  up&lt;-if(str_flatten(x+c(1,0,0),&quot;,&quot;) %in% cubes){0}else{1}
+  down&lt;-if(str_flatten(x+c(-1,0,0),&quot;,&quot;)%in% cubes){0}else{1}
+  left&lt;-if(str_flatten(x+c(0,1,0),&quot;,&quot;)%in% cubes){0}else{1}
+  right&lt;-if(str_flatten(x+c(0,-1,0),&quot;,&quot;)%in% cubes){0}else{1}
+  front&lt;-if(str_flatten(x+c(0,0,1),&quot;,&quot;)%in% cubes){0}else{1}
+  back&lt;-if(str_flatten(x+c(0,0,-1),&quot;,&quot;)%in% cubes){0}else{1}
+  y&lt;-up+down+left+right+front+back
+y})
+
+part1&lt;-sum(openfaces)
+part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDY0XG4ifQ== -->
+<pre><code>[1] 64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>##Part 2</p>
+<p>To find the outside, flood fill around the outside - from (0,0,0) to
+(max(x)+1,max(y)+1,max(z)+1). Then find how many of the flood fill
+surfaces are touching the lump.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMjIyBmaW5kIG1heGVzIiwibWF4eDwtMCIsIm1heHk8LTAiLCJtYXh6PC0wIiwiZm9yKGkgaW4gMTpsZW5ndGgoY3ViZXMpKXtcbiAgYzwtYXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KGN1YmVzW2ldLFwiLFwiKSkpXG4gIG1heHg8LW1heChtYXh4LGNbMV0pXG4gIG1heHk8LW1heChtYXh5LGNbMl0pXG4gIG1heHo8LW1heChtYXh6LGNbM10pfSIsIm1heHg7bWF4eTttYXh6Il19 -->
+<pre class="r"><code>### find maxes
+maxx&lt;-0
+maxy&lt;-0
+maxz&lt;-0
+for(i in 1:length(cubes)){
+  c&lt;-as.numeric(unlist(str_split(cubes[i],&quot;,&quot;)))
+  maxx&lt;-max(maxx,c[1])
+  maxy&lt;-max(maxy,c[2])
+  maxz&lt;-max(maxz,c[3])}
+maxx;maxy;maxz</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDZcbiJ9 -->
+<pre><code>[1] 6</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiZmxvb2RjdWJlPC1mdW5jdGlvbihteD1tYXh4KzIsbXk9bWF4eSsyLG16PW1heHorMixjdWJlbGlzdD1jdWJlcyl7XG4gIGQ8LWRpY3QoKVxuICBxPC1xdWV1ZSgpXG4gICMjIyBzdGFydCBhdCAoLTEsLTEsLTEpIGJlY2F1c2UgKDAsMCwwKSBkaWRuJ3QgZ28gYXJvdW5kIGZhciBlbm91Z2hcbiAgcG9zPC1jKC0xLC0xLC0xKVxuICBxJHB1c2gobGlzdChwb3Msc3RyX2ZsYXR0ZW4ocG9zLFwiLFwiKSkpXG4gIHdoaWxlKHEkc2l6ZSgpPjApe1xuICAgICMjIyBwb3BcbiAgICBwPC1xJHBvcCgpXG4gICAgIyMjIGZsYXR0ZW5lZHZlcnNpb25cbiAgICBzdDwtcFtbMl1dXG4gICAgIyMjIGFzIGNvb3JkaW5hdGVzXG4gICAgY3I8LXBbWzFdXVxuICAgICMjIyBpZiBiZWVuIGhlcmUgYmVmb3JlLCBnZXQgdGhlIG5leHQgaXRlbSBvbiB0aGUgc3RhY2tcbiAgICBpZihkJGhhcyhzdCkpe25leHRcbiAgICB9ZWxzZXtcbiAgICAgICMjIyBvdGhlcndpc2UsIGFkZCB0aGlzIHRvIHRoZSBkaWN0aW9uYXJ5XG4gICAgICBkJHNldChzdCxjcilcbiAgICAgICMjIyBjaGVjayBpbiBhbGwgc2l4IGRpcmVjdGlvbnMuICBpZiBpdCdzIHdpdGhpbiBib3VuZHMgYW5kIG5vdCBpbiB0aGUgY3ViZSwgdGhlbiBhZGQgaXQgdG8gdGhlIHF1ZXVlXG4gICAgICBpZihjclsxXT4tMSl7XG4gICAgICAgIG54PC0oY3ItYygxLDAsMCkpXG4gICAgICAgIGZueDwtc3RyX2ZsYXR0ZW4obngsXCIsXCIpXG4gICAgICAgIGlmKCEoZm54JWluJWN1YmVsaXN0KSl7cSRwdXNoKGxpc3QobngsZm54KSl9fVxuICAgICAgaWYoY3JbMV08bXgpe1xuICAgICAgICBueDwtKGNyK2MoMSwwLDApKVxuICAgICAgICBmbng8LXN0cl9mbGF0dGVuKG54LFwiLFwiKVxuICAgICAgICBpZighKGZueCVpbiVjdWJlbGlzdCkpe3EkcHVzaChsaXN0KG54LGZueCkpfX1cbiAgICAgIGlmKGNyWzJdPi0xKXtcbiAgICAgICAgbng8LShjci1jKDAsMSwwKSlcbiAgICAgICAgZm54PC1zdHJfZmxhdHRlbihueCxcIixcIilcbiAgICAgICAgaWYoIShmbnglaW4lY3ViZWxpc3QpKXtxJHB1c2gobGlzdChueCxmbngpKX19XG4gICAgICBpZihjclsyXTxteSl7XG4gICAgICAgIG54PC0oY3IrYygwLDEsMCkpXG4gICAgICAgIGZueDwtc3RyX2ZsYXR0ZW4obngsXCIsXCIpXG4gICAgICAgIGlmKCEoZm54JWluJWN1YmVsaXN0KSl7cSRwdXNoKGxpc3QobngsZm54KSl9fVxuICAgICAgaWYoY3JbM10+LTEpe1xuICAgICAgICBueDwtKGNyLWMoMCwwLDEpKVxuICAgICAgICBmbng8LXN0cl9mbGF0dGVuKG54LFwiLFwiKVxuICAgICAgICBpZighKGZueCVpbiVjdWJlbGlzdCkpe3EkcHVzaChsaXN0KG54LGZueCkpfX1cbiAgICAgIGlmKGNyWzNdPG16KXtcbiAgICAgICAgbng8LShjcitjKDAsMCwxKSlcbiAgICAgICAgZm54PC1zdHJfZmxhdHRlbihueCxcIixcIilcbiAgICAgICAgaWYoIShmbnglaW4lY3ViZWxpc3QpKXtxJHB1c2gobGlzdChueCxmbngpKX19fX1cbiAgIyMjIHJldHVybiB0aGUgZGljdGlvbmFyeVxuICBkfSJ9 -->
+<pre class="r"><code>floodcube&lt;-function(mx=maxx+2,my=maxy+2,mz=maxz+2,cubelist=cubes){
+  d&lt;-dict()
+  q&lt;-queue()
+  ### start at (-1,-1,-1) because (0,0,0) didn&#39;t go around far enough
+  pos&lt;-c(-1,-1,-1)
+  q$push(list(pos,str_flatten(pos,&quot;,&quot;)))
+  while(q$size()&gt;0){
+    ### pop
+    p&lt;-q$pop()
+    ### flattenedversion
+    st&lt;-p[[2]]
+    ### as coordinates
+    cr&lt;-p[[1]]
+    ### if been here before, get the next item on the stack
+    if(d$has(st)){next
+    }else{
+      ### otherwise, add this to the dictionary
+      d$set(st,cr)
+      ### check in all six directions.  if it&#39;s within bounds and not in the cube, then add it to the queue
+      if(cr[1]&gt;-1){
+        nx&lt;-(cr-c(1,0,0))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[1]&lt;mx){
+        nx&lt;-(cr+c(1,0,0))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[2]&gt;-1){
+        nx&lt;-(cr-c(0,1,0))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[2]&lt;my){
+        nx&lt;-(cr+c(0,1,0))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[3]&gt;-1){
+        nx&lt;-(cr-c(0,0,1))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[3]&lt;mz){
+        nx&lt;-(cr+c(0,0,1))
+        fnx&lt;-str_flatten(nx,&quot;,&quot;)
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}}}
+  ### return the dictionary
+  d}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMjI3J1biB0byBnZXQgdGhlIGxpc3Qgd2hlcmUgaXQgd291bGQgaGF2ZSBmbG9vZGVkIGZyb20gdGhlIG91dHNpZGUuIiwid2F0ZXJsaXN0PC1mbG9vZGN1YmUoKSIsIndhdGVybGlzdDwtd2F0ZXJsaXN0JHZhbHVlcygpIl19 -->
+<pre class="r"><code>###run to get the list where it would have flooded from the outside.
+waterlist&lt;-floodcube()
+waterlist&lt;-waterlist$values()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>With the new waterlist, do something similar to what was done earlier
+- which (if any) of these cubes is next to a cube face.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIndldGZhY2VzPC1zYXBwbHkod2F0ZXJsaXN0LGZ1bmN0aW9uKHgpe1xuICAjI3VubGlrZSBhYm92ZSwgY291bnQgaWYgaXQgKmlzKiBuZXh0IHRvIGEgY3ViZVxuICB1cDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDEsMCwwKSxcIixcIikgJWluJSBjdWJlcyl7MX1lbHNlezB9XG4gIGRvd248LWlmKHN0cl9mbGF0dGVuKHgrYygtMSwwLDApLFwiLFwiKSVpbiUgY3ViZXMpezF9ZWxzZXswfVxuICBsZWZ0PC1pZihzdHJfZmxhdHRlbih4K2MoMCwxLDApLFwiLFwiKSVpbiUgY3ViZXMpezF9ZWxzZXswfVxuICByaWdodDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsLTEsMCksXCIsXCIpJWluJSBjdWJlcyl7MX1lbHNlezB9XG4gIGZyb250PC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLDEpLFwiLFwiKSVpbiUgY3ViZXMpezF9ZWxzZXswfVxuICBiYWNrPC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLC0xKSxcIixcIiklaW4lIGN1YmVzKXsxfWVsc2V7MH1cbiAgeTwtdXArZG93bitsZWZ0K3JpZ2h0K2Zyb250K2JhY2tcbnl9KSIsIiIsInBhcnQyPC1zdW0od2V0ZmFjZXMpIiwicGFydDIiXX0= -->
+<pre class="r"><code>wetfaces&lt;-sapply(waterlist,function(x){
+  ##unlike above, count if it *is* next to a cube
+  up&lt;-if(str_flatten(x+c(1,0,0),&quot;,&quot;) %in% cubes){1}else{0}
+  down&lt;-if(str_flatten(x+c(-1,0,0),&quot;,&quot;)%in% cubes){1}else{0}
+  left&lt;-if(str_flatten(x+c(0,1,0),&quot;,&quot;)%in% cubes){1}else{0}
+  right&lt;-if(str_flatten(x+c(0,-1,0),&quot;,&quot;)%in% cubes){1}else{0}
+  front&lt;-if(str_flatten(x+c(0,0,1),&quot;,&quot;)%in% cubes){1}else{0}
+  back&lt;-if(str_flatten(x+c(0,0,-1),&quot;,&quot;)%in% cubes){1}else{0}
+  y&lt;-up+down+left+right+front+back
+y})
+
+part2&lt;-sum(wetfaces)
+part2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDU4XG4ifQ== -->
+<pre><code>[1] 58</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxOCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCmxpYnJhcnkoY29sbGVjdGlvbnMpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQoNCiMjIFBhcnQgMQ0KRm9yIHBhcnQgMSwgZmluZCBhbGwgc2l4IHNpZGVzLCBmaW5kIHdoaWNoIG9uZXMgYXJlbid0IGluIHRoZSBsaXN0DQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCJEYXkxOFNhbXBsZS50eHQiKQ0KY3ViZXM8LWlucHV0DQpgYGANCg0KYGBge3J9DQpvcGVuZmFjZXM8LXNhcHBseShjdWJlcyxmdW5jdGlvbih4KXsNCiAgeDwtYXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KHgsIiwiKSkpDQogIHVwPC1pZihzdHJfZmxhdHRlbih4K2MoMSwwLDApLCIsIikgJWluJSBjdWJlcyl7MH1lbHNlezF9DQogIGRvd248LWlmKHN0cl9mbGF0dGVuKHgrYygtMSwwLDApLCIsIiklaW4lIGN1YmVzKXswfWVsc2V7MX0NCiAgbGVmdDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsMSwwKSwiLCIpJWluJSBjdWJlcyl7MH1lbHNlezF9DQogIHJpZ2h0PC1pZihzdHJfZmxhdHRlbih4K2MoMCwtMSwwKSwiLCIpJWluJSBjdWJlcyl7MH1lbHNlezF9DQogIGZyb250PC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLDEpLCIsIiklaW4lIGN1YmVzKXswfWVsc2V7MX0NCiAgYmFjazwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsMCwtMSksIiwiKSVpbiUgY3ViZXMpezB9ZWxzZXsxfQ0KICB5PC11cCtkb3duK2xlZnQrcmlnaHQrZnJvbnQrYmFjaw0KeX0pDQoNCnBhcnQxPC1zdW0ob3BlbmZhY2VzKQ0KcGFydDENCmBgYA0KDQojI1BhcnQgMg0KDQpUbyBmaW5kIHRoZSBvdXRzaWRlLCBmbG9vZCBmaWxsIGFyb3VuZCB0aGUgb3V0c2lkZSAtIGZyb20gKDAsMCwwKSB0byAobWF4KHgpKzEsbWF4KHkpKzEsbWF4KHopKzEpLiAgVGhlbiBmaW5kIGhvdyBtYW55IG9mIHRoZSBmbG9vZCBmaWxsIHN1cmZhY2VzIGFyZSB0b3VjaGluZyB0aGUgbHVtcC4NCg0KYGBge3J9DQojIyMgZmluZCBtYXhlcw0KbWF4eDwtMA0KbWF4eTwtMA0KbWF4ejwtMA0KZm9yKGkgaW4gMTpsZW5ndGgoY3ViZXMpKXsNCiAgYzwtYXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KGN1YmVzW2ldLCIsIikpKQ0KICBtYXh4PC1tYXgobWF4eCxjWzFdKQ0KICBtYXh5PC1tYXgobWF4eSxjWzJdKQ0KICBtYXh6PC1tYXgobWF4eixjWzNdKX0NCm1heHg7bWF4eTttYXh6DQpgYGANCg0KYGBge3J9DQpmbG9vZGN1YmU8LWZ1bmN0aW9uKG14PW1heHgrMixteT1tYXh5KzIsbXo9bWF4eisyLGN1YmVsaXN0PWN1YmVzKXsNCiAgZDwtZGljdCgpDQogIHE8LXF1ZXVlKCkNCiAgIyMjIHN0YXJ0IGF0ICgtMSwtMSwtMSkgYmVjYXVzZSAoMCwwLDApIGRpZG4ndCBnbyBhcm91bmQgZmFyIGVub3VnaA0KICBwb3M8LWMoLTEsLTEsLTEpDQogIHEkcHVzaChsaXN0KHBvcyxzdHJfZmxhdHRlbihwb3MsIiwiKSkpDQogIHdoaWxlKHEkc2l6ZSgpPjApew0KICAgICMjIyBwb3ANCiAgICBwPC1xJHBvcCgpDQogICAgIyMjIGZsYXR0ZW5lZHZlcnNpb24NCiAgICBzdDwtcFtbMl1dDQogICAgIyMjIGFzIGNvb3JkaW5hdGVzDQogICAgY3I8LXBbWzFdXQ0KICAgICMjIyBpZiBiZWVuIGhlcmUgYmVmb3JlLCBnZXQgdGhlIG5leHQgaXRlbSBvbiB0aGUgc3RhY2sNCiAgICBpZihkJGhhcyhzdCkpe25leHQNCiAgICB9ZWxzZXsNCiAgICAgICMjIyBvdGhlcndpc2UsIGFkZCB0aGlzIHRvIHRoZSBkaWN0aW9uYXJ5DQogICAgICBkJHNldChzdCxjcikNCiAgICAgICMjIyBjaGVjayBpbiBhbGwgc2l4IGRpcmVjdGlvbnMuICBpZiBpdCdzIHdpdGhpbiBib3VuZHMgYW5kIG5vdCBpbiB0aGUgY3ViZSwgdGhlbiBhZGQgaXQgdG8gdGhlIHF1ZXVlDQogICAgICBpZihjclsxXT4tMSl7DQogICAgICAgIG54PC0oY3ItYygxLDAsMCkpDQogICAgICAgIGZueDwtc3RyX2ZsYXR0ZW4obngsIiwiKQ0KICAgICAgICBpZighKGZueCVpbiVjdWJlbGlzdCkpe3EkcHVzaChsaXN0KG54LGZueCkpfX0NCiAgICAgIGlmKGNyWzFdPG14KXsNCiAgICAgICAgbng8LShjcitjKDEsMCwwKSkNCiAgICAgICAgZm54PC1zdHJfZmxhdHRlbihueCwiLCIpDQogICAgICAgIGlmKCEoZm54JWluJWN1YmVsaXN0KSl7cSRwdXNoKGxpc3QobngsZm54KSl9fQ0KICAgICAgaWYoY3JbMl0+LTEpew0KICAgICAgICBueDwtKGNyLWMoMCwxLDApKQ0KICAgICAgICBmbng8LXN0cl9mbGF0dGVuKG54LCIsIikNCiAgICAgICAgaWYoIShmbnglaW4lY3ViZWxpc3QpKXtxJHB1c2gobGlzdChueCxmbngpKX19DQogICAgICBpZihjclsyXTxteSl7DQogICAgICAgIG54PC0oY3IrYygwLDEsMCkpDQogICAgICAgIGZueDwtc3RyX2ZsYXR0ZW4obngsIiwiKQ0KICAgICAgICBpZighKGZueCVpbiVjdWJlbGlzdCkpe3EkcHVzaChsaXN0KG54LGZueCkpfX0NCiAgICAgIGlmKGNyWzNdPi0xKXsNCiAgICAgICAgbng8LShjci1jKDAsMCwxKSkNCiAgICAgICAgZm54PC1zdHJfZmxhdHRlbihueCwiLCIpDQogICAgICAgIGlmKCEoZm54JWluJWN1YmVsaXN0KSl7cSRwdXNoKGxpc3QobngsZm54KSl9fQ0KICAgICAgaWYoY3JbM108bXopew0KICAgICAgICBueDwtKGNyK2MoMCwwLDEpKQ0KICAgICAgICBmbng8LXN0cl9mbGF0dGVuKG54LCIsIikNCiAgICAgICAgaWYoIShmbnglaW4lY3ViZWxpc3QpKXtxJHB1c2gobGlzdChueCxmbngpKX19fX0NCiAgIyMjIHJldHVybiB0aGUgZGljdGlvbmFyeQ0KICBkfQ0KYGBgDQoNCg0KYGBge3J9DQoNCiMjI3J1biB0byBnZXQgdGhlIGxpc3Qgd2hlcmUgaXQgd291bGQgaGF2ZSBmbG9vZGVkIGZyb20gdGhlIG91dHNpZGUuDQp3YXRlcmxpc3Q8LWZsb29kY3ViZSgpDQp3YXRlcmxpc3Q8LXdhdGVybGlzdCR2YWx1ZXMoKQ0KYGBgDQoNCldpdGggdGhlIG5ldyB3YXRlcmxpc3QsIGRvIHNvbWV0aGluZyBzaW1pbGFyIHRvIHdoYXQgd2FzIGRvbmUgZWFybGllciAtIHdoaWNoIChpZiBhbnkpIG9mIHRoZXNlIGN1YmVzIGlzIG5leHQgdG8gYSBjdWJlIGZhY2UuDQoNCmBgYHtyfQ0Kd2V0ZmFjZXM8LXNhcHBseSh3YXRlcmxpc3QsZnVuY3Rpb24oeCl7DQogICMjdW5saWtlIGFib3ZlLCBjb3VudCBpZiBpdCAqaXMqIG5leHQgdG8gYSBjdWJlDQogIHVwPC1pZihzdHJfZmxhdHRlbih4K2MoMSwwLDApLCIsIikgJWluJSBjdWJlcyl7MX1lbHNlezB9DQogIGRvd248LWlmKHN0cl9mbGF0dGVuKHgrYygtMSwwLDApLCIsIiklaW4lIGN1YmVzKXsxfWVsc2V7MH0NCiAgbGVmdDwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsMSwwKSwiLCIpJWluJSBjdWJlcyl7MX1lbHNlezB9DQogIHJpZ2h0PC1pZihzdHJfZmxhdHRlbih4K2MoMCwtMSwwKSwiLCIpJWluJSBjdWJlcyl7MX1lbHNlezB9DQogIGZyb250PC1pZihzdHJfZmxhdHRlbih4K2MoMCwwLDEpLCIsIiklaW4lIGN1YmVzKXsxfWVsc2V7MH0NCiAgYmFjazwtaWYoc3RyX2ZsYXR0ZW4oeCtjKDAsMCwtMSksIiwiKSVpbiUgY3ViZXMpezF9ZWxzZXswfQ0KICB5PC11cCtkb3duK2xlZnQrcmlnaHQrZnJvbnQrYmFjaw0KeX0pDQoNCnBhcnQyPC1zdW0od2V0ZmFjZXMpDQpwYXJ0Mg0KYGBgDQoNCmBgYHtyLGluY2x1ZGU9RkFMU0UsZWNobz1GQUxTRSxldmFsPUZBTFNFLHdlYmdsPVRSVUV9DQpyZWFsaW5wdXQgPC0gcmVhZF9saW5lcygiLi4vLi4vQW9DRGF0YS9BT0MyMDIyL0RheTE4LnR4dCIpDQpyZWFsY3ViZXM8LWxhcHBseShyZWFsaW5wdXQsZnVuY3Rpb24oeCl7YXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KHgsIiwiKSkpfSkNCnJteDwtMA0Kcm15PC0wDQpybXo8LTANCmZvcihpIGluIDE6bGVuZ3RoKHJlYWxjdWJlcykpew0KICBjPC1yZWFsY3ViZXNbW2ldXQ0KICBybXg8LW1heChybXgsY1sxXSkNCiAgcm15PC1tYXgocm15LGNbMl0pDQogIHJtejwtbWF4KHJteixjWzNdKX0NCg0KcmVhbHdsPC1mbG9vZGN1YmUocm14KzIscm15KzIscm16KzIscmVhbGlucHV0KQ0KcmVhbHdsPC1yZWFsd2wkdmFsdWVzKCkNCg0KDQpsYXZhPC10KGFzLmRhdGEuZnJhbWUocmVhbGN1YmVzKSkNCndhdGVyPC10KGFzLmRhdGEuZnJhbWUocmVhbHdsKSkNCndhdGVyWywxXTwtYXMubnVtZXJpYyh3YXRlclssMV0pDQp3YXRlclssMl08LWFzLm51bWVyaWMod2F0ZXJbLDJdKQ0Kd2F0ZXJbLDNdPC1hcy5udW1lcmljKHdhdGVyWywzXSkNCg0KZm9yKGkgaW4gMToobnJvdyhsYXZhKSkpew0KICAgICAgc2hhZGUzZCh0cmFuc2xhdGUzZChjdWJlM2QoY29sID0gIiMyMjIyMjIiKSxsYXZhW2ksMV0rMixsYXZhW2ksMl0rMixsYXZhW2ksM10rMikpfQ0KDQpmb3IoaSBpbiAxOihucm93KHdhdGVyKSkpew0KICAgICAgc3BoZXJlczNkKHg9KHdhdGVyW2ksMV0rMikseT0od2F0ZXJbaSwyXSsyKSx6PSh3YXRlcltpLDNdKzIpLHJhZGl1cz0uMjUsY29sID0gIiM4OENDRkYiLGFscGhhPS4yNSl9DQoNCg0KYGBgDQoNCg0K</div>
 
 
 

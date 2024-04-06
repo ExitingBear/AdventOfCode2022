@@ -11,7 +11,7 @@
 
 
 
-<title>Day XX Notebook</title>
+<title>Day 13 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day XX Notebook</h1>
+<h1 class="title toc-ignore">Day 13 Notebook</h1>
 
 </div>
 
@@ -1757,109 +1757,180 @@ display: none;
 <p>This has recursion written all over it….</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkxM1NhbXBsZS50eHRcIilcbmBgYCJ9 -->
-<pre class="r"><code>input&lt;-read_lines(&quot;Day13Sample.txt&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>First, prep the data</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJlcGlucHV0PC1zYXBwbHkoaW5wdXQsZnVuY3Rpb24oeCl7XG4gICNyZW1vdmUgdGhlIGNvbW1hcyBhbmQgcmVwbGFjZSB3aXRoIHNwYWNlc1xuICAjYWRkIHNwYWNlcyBhcm91bmQgdGhlIGJyYWNrZXRzXG4gIHk8LXN0cl9yZXBsYWNlX2FsbCh4LFwiLFwiLFwiIFwiKVxuICB5PC1zdHJfcmVwbGFjZV9hbGwoeSxcIlxcXFxbXCIsXCIgXFxcXFsgXCIpXG4gIHk8LXN0cl9yZXBsYWNlX2FsbCh5LFwiXFxcXF1cIixcIiBcXFxcXSBcIilcbiAgeTwtc3RyX3NxdWlzaCh5KVxuICB5fSlcblxubGVmdHM8LWxpc3QoKVxucmlnaHRzPC1saXN0KClcbmBgYCJ9 -->
-<pre class="r"><code>prepinput&lt;-sapply(input,function(x){
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXFxEYXkxM1NhbXBsZS50eHRcXClcbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+input&lt;-read_lines(\Day13Sample.txt\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+First, prep the data
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucHJlcGlucHV0PC1zYXBwbHkoaW5wdXQsZnVuY3Rpb24oeCl7XG4gICNyZW1vdmUgdGhlIGNvbW1hcyBhbmQgcmVwbGFjZSB3aXRoIHNwYWNlc1xuICAjYWRkIHNwYWNlcyBhcm91bmQgdGhlIGJyYWNrZXRzXG4gIHk8LXN0cl9yZXBsYWNlX2FsbCh4LFxcXG5gYGAifQ== --&gt;
+
+```r
+```r
+prepinput&lt;-sapply(input,function(x){
   #remove the commas and replace with spaces
   #add spaces around the brackets
-  y&lt;-str_replace_all(x,&quot;,&quot;,&quot; &quot;)
-  y&lt;-str_replace_all(y,&quot;\\[&quot;,&quot; \\[ &quot;)
-  y&lt;-str_replace_all(y,&quot;\\]&quot;,&quot; \\] &quot;)
-  y&lt;-str_squish(y)
-  y})
+  y&lt;-str_replace_all(x,\</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZm9yKGkgaW4gc2VxKGZyb209MSx0bz1sZW5ndGgocHJlcGlucHV0KSxieT0zKSl7XG4gIGxlZnRzPC1jKGxlZnRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpXSxcXCBcXCkpKVxuICByaWdodHM8LWMocmlnaHRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpKzFdLFxcIFxcKSkpfVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+for(i in seq(from=1,to=length(prepinput),by=3)){
+  lefts&lt;-c(lefts,c(str_split(prepinput[i],\ \)))
+  rights&lt;-c(rights,c(str_split(prepinput[i+1],\ \)))}</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
 
-lefts&lt;-list()
-rights&lt;-list()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9yKGkgaW4gc2VxKGZyb209MSx0bz1sZW5ndGgocHJlcGlucHV0KSxieT0zKSl7XG4gIGxlZnRzPC1jKGxlZnRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpXSxcIiBcIikpKVxuICByaWdodHM8LWMocmlnaHRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpKzFdLFwiIFwiKSkpfVxuYGBgIn0= -->
-<pre class="r"><code>for(i in seq(from=1,to=length(prepinput),by=3)){
-  lefts&lt;-c(lefts,c(str_split(prepinput[i],&quot; &quot;)))
-  rights&lt;-c(rights,c(str_split(prepinput[i+1],&quot; &quot;)))}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="part-1" class="section level2">
-<h2>Part 1</h2>
-<p>start with a function that says which should come first</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGVmdG9ycmlnaHQ8LWZ1bmN0aW9uKGxlZnQscmlnaHQpe1xuICBudW1zPC1jKFwiMFwiLFwiMVwiLFwiMlwiLFwiM1wiLFwiNFwiLFwiNVwiLFwiNlwiLFwiN1wiLFwiOFwiLFwiOVwiKVxuICAjdHJpbSBsZWFkaW5nIHNwYWNlc1xuICAjIyMgaWYgZWl0aGVyIGxlZnQgb3IgcmlnaHQgaXMgZW1wdHksIGl0IGNvbWVzIGZpcnN0LlxuICAjIyMgY2hlY2sgaWYgd2UndmUgcmVhY2hlZCB0aGUgZW5kXG4gIGlmKGxlbmd0aChsZWZ0KT09MCl7cmV0dXJuKFwibGVmdFwiKVxuICB9IGVsc2UgaWYgKGxlbmd0aChyaWdodCk9PTApe1xuICAgIHJldHVybihcInJpZ2h0XCIpXG4gICAgIyMjIGNoZWNrIGlmIHRoaXMgaXMgdGhlIGVuZCBvZiBhIGxpc3RcbiAgfWVsc2V7XG4gICAgbDE8LWxlZnRbMV1cbiAgICByMTwtcmlnaHRbMV1cbiAgICBpZihsMT09XCJdXCImJnIxIT1cIl1cIil7XG4gICAgICByZXR1cm4oXCJsZWZ0XCIpXG4gICAgfWVsc2UgaWYocjE9PVwiXVwiJiZsMSE9XCJdXCIpe1xuICAgICAgcmV0dXJuKFwicmlnaHRcIilcbiAgICAgICMjIyBpZiBib3RoIGF0IHRoZSBlbmQgb3IgYm90aCBhdCB0aGUgYmVnaW5uaW5nLCBkdW1wIGZpcnN0IGNoYXIgJiBkbyBpdCBhZ2Fpbi5cbiAgICB9ZWxzZSBpZigocjE9PVwiXVwiJiZsMT09XCJdXCIpfHwocjE9PVwiW1wiJiZsMT09XCJbXCIpKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSlcbiAgICAgICMjICBpZiBvbmUgYSBsaXN0IGFuZCB0aGUgb3RoZXIgaXMgbm90LiBqdXN0IHJlbW92ZSB0aGUgb3BlbmluZyBicmFja2V0IFxuICAgIH1lbHNlIGlmKHIxPT1cIltcIiYmbDEhPVwiW1wiKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGMobGVmdFsxXSxcIl1cIixsZWZ0Wy0xXSkscmlnaHRbLTFdKVxuICAgIH1lbHNlIGlmKGwxPT1cIltcIiYmcjEhPVwiW1wiKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLGMocmlnaHRbMV0sXCJdXCIscmlnaHRbLTFdKSlcbiAgICB9ZWxzZXtcbiAgICAgIGwxPC1hcy5udW1lcmljKGwxKVxuICAgICAgcjE8LWFzLm51bWVyaWMocjEpXG4gICAgICBpZihsMTxyMSl7cmV0dXJuKFwibGVmdFwiKVxuICAgICAgfWVsc2UgaWYocjE8bDEpe3JldHVybihcInJpZ2h0XCIpXG4gICAgICB9ZWxzZXtsZWZ0b3JyaWdodChsZWZ0Wy0xXSxyaWdodFstMV0pfX19fVxuYGBgIn0= -->
-<pre class="r"><code>leftorright&lt;-function(left,right){
-  nums&lt;-c(&quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;,&quot;8&quot;,&quot;9&quot;)
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+## Part 1
+
+start with a function that says which should come first
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGVmdG9ycmlnaHQ8LWZ1bmN0aW9uKGxlZnQscmlnaHQpe1xuICBudW1zPC1jKFxcMFxcLFxcMVxcLFxcMlxcLFxcM1xcLFxcNFxcLFxcNVxcLFxcNlxcLFxcN1xcLFxcOFxcLFxcOVxcKVxuICAjdHJpbSBsZWFkaW5nIHNwYWNlc1xuICAjIyMgaWYgZWl0aGVyIGxlZnQgb3IgcmlnaHQgaXMgZW1wdHksIGl0IGNvbWVzIGZpcnN0LlxuICAjIyMgY2hlY2sgaWYgd2UndmUgcmVhY2hlZCB0aGUgZW5kXG4gIGlmKGxlbmd0aChsZWZ0KT09MCl7cmV0dXJuKFxcbGVmdFxcKVxuICB9IGVsc2UgaWYgKGxlbmd0aChyaWdodCk9PTApe1xuICAgIHJldHVybihcXHJpZ2h0XFwpXG4gICAgIyMjIGNoZWNrIGlmIHRoaXMgaXMgdGhlIGVuZCBvZiBhIGxpc3RcbiAgfWVsc2V7XG4gICAgbDE8LWxlZnRbMV1cbiAgICByMTwtcmlnaHRbMV1cbiAgICBpZihsMT09XFxdXFwmJnIxIT1cXF1cXCl7XG4gICAgICByZXR1cm4oXFxsZWZ0XFwpXG4gICAgfWVsc2UgaWYocjE9PVxcXVxcJiZsMSE9XFxdXFwpe1xuICAgICAgcmV0dXJuKFxccmlnaHRcXClcbiAgICAgICMjIyBpZiBib3RoIGF0IHRoZSBlbmQgb3IgYm90aCBhdCB0aGUgYmVnaW5uaW5nLCBkdW1wIGZpcnN0IGNoYXIgJiBkbyBpdCBhZ2Fpbi5cbiAgICB9ZWxzZSBpZigocjE9PVxcXVxcJiZsMT09XFxdXFwpfHwocjE9PVxcW1xcJiZsMT09XFxbXFwpKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSlcbiAgICAgICMjICBpZiBvbmUgYSBsaXN0IGFuZCB0aGUgb3RoZXIgaXMgbm90LiBqdXN0IHJlbW92ZSB0aGUgb3BlbmluZyBicmFja2V0IFxuICAgIH1lbHNlIGlmKHIxPT1cXFtcXCYmbDEhPVxcW1xcKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGMobGVmdFsxXSxcXF1cXCxsZWZ0Wy0xXSkscmlnaHRbLTFdKVxuICAgIH1lbHNlIGlmKGwxPT1cXFtcXCYmcjEhPVxcW1xcKXtcbiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLGMocmlnaHRbMV0sXFxdXFwscmlnaHRbLTFdKSlcbiAgICB9ZWxzZXtcbiAgICAgIGwxPC1hcy5udW1lcmljKGwxKVxuICAgICAgcjE8LWFzLm51bWVyaWMocjEpXG4gICAgICBpZihsMTxyMSl7cmV0dXJuKFxcbGVmdFxcKVxuICAgICAgfWVsc2UgaWYocjE8bDEpe3JldHVybihcXHJpZ2h0XFwpXG4gICAgICB9ZWxzZXtsZWZ0b3JyaWdodChsZWZ0Wy0xXSxyaWdodFstMV0pfX19fVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+leftorright&lt;-function(left,right){
+  nums&lt;-c(\0\,\1\,\2\,\3\,\4\,\5\,\6\,\7\,\8\,\9\)
   #trim leading spaces
   ### if either left or right is empty, it comes first.
   ### check if we&#39;ve reached the end
-  if(length(left)==0){return(&quot;left&quot;)
+  if(length(left)==0){return(\left\)
   } else if (length(right)==0){
-    return(&quot;right&quot;)
+    return(\right\)
     ### check if this is the end of a list
   }else{
     l1&lt;-left[1]
     r1&lt;-right[1]
-    if(l1==&quot;]&quot;&amp;&amp;r1!=&quot;]&quot;){
-      return(&quot;left&quot;)
-    }else if(r1==&quot;]&quot;&amp;&amp;l1!=&quot;]&quot;){
-      return(&quot;right&quot;)
+    if(l1==\]\&amp;&amp;r1!=\]\){
+      return(\left\)
+    }else if(r1==\]\&amp;&amp;l1!=\]\){
+      return(\right\)
       ### if both at the end or both at the beginning, dump first char &amp; do it again.
-    }else if((r1==&quot;]&quot;&amp;&amp;l1==&quot;]&quot;)||(r1==&quot;[&quot;&amp;&amp;l1==&quot;[&quot;)){
+    }else if((r1==\]\&amp;&amp;l1==\]\)||(r1==\[\&amp;&amp;l1==\[\)){
       leftorright(left[-1],right[-1])
       ##  if one a list and the other is not. just remove the opening bracket 
-    }else if(r1==&quot;[&quot;&amp;&amp;l1!=&quot;[&quot;){
-      leftorright(c(left[1],&quot;]&quot;,left[-1]),right[-1])
-    }else if(l1==&quot;[&quot;&amp;&amp;r1!=&quot;[&quot;){
-      leftorright(left[-1],c(right[1],&quot;]&quot;,right[-1]))
+    }else if(r1==\[\&amp;&amp;l1!=\[\){
+      leftorright(c(left[1],\]\,left[-1]),right[-1])
+    }else if(l1==\[\&amp;&amp;r1!=\[\){
+      leftorright(left[-1],c(right[1],\]\,right[-1]))
     }else{
       l1&lt;-as.numeric(l1)
       r1&lt;-as.numeric(r1)
-      if(l1&lt;r1){return(&quot;left&quot;)
-      }else if(r1&lt;l1){return(&quot;right&quot;)
+      if(l1&lt;r1){return(\left\)
+      }else if(r1&lt;l1){return(\right\)
       }else{leftorright(left[-1],right[-1])}}}}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>apply to the input</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LXNhcHBseSgxOigobGVuZ3RoKGlucHV0KSUvJTMpKzEpLGZ1bmN0aW9uKHgpe1xuICBsZWZ0b3JyaWdodChsZWZ0c1tbeF1dLHJpZ2h0c1tbeF1dKX0pXG5gYGAifQ== -->
-<pre class="r"><code>part1&lt;-sapply(1:((length(input)%/%3)+1),function(x){
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+apply to the input
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucGFydDE8LXNhcHBseSgxOigobGVuZ3RoKGlucHV0KSUvJTMpKzEpLGZ1bmN0aW9uKHgpe1xuICBsZWZ0b3JyaWdodChsZWZ0c1tbeF1dLHJpZ2h0c1tbeF1dKX0pXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+part1&lt;-sapply(1:((length(input)%/%3)+1),function(x){
   leftorright(lefts[[x]],rights[[x]])})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>because the “lefts” are correct, sum the indicies of the lefts</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LXN1bSh3aGljaChwYXJ0MT09XCJsZWZ0XCIpKVxucGFydDFcbmBgYCJ9 -->
-<pre class="r"><code>part1&lt;-sum(which(part1==&quot;left&quot;))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+because the &quot;lefts&quot; are correct, sum the indicies of the lefts
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucGFydDE8LXN1bSh3aGljaChwYXJ0MT09XFxsZWZ0XFwpKVxucGFydDFcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+part1&lt;-sum(which(part1==\left\))
 part1</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzXG4ifQ== -->
-<pre><code>[1] 13</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>##Part 2 it’s possible to sort this, but it’s really not necessary.
-for both [[2]]&amp;[[6]], run those on against all of the input (left
-and right). Find out how many would go before. [[2]] will be 1 plus the
-number before [[6]] will be 2 plus the number before (1 for the number,
-1 for the [[2]])</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyN0cmFuc2Zvcm0gaW50byB0aGUgcmlnaHQgZm9ybWF0XG5icmFja2V0MjwtYyhcIltcIixcIltcIixcIjJcIixcIl1cIixcIl1cIilcbmJyYWNrZXQ2PC1jKFwiW1wiLFwiW1wiLFwiNlwiLFwiXVwiLFwiXVwiKVxuXG4jIyBjb21iaW5lIGxlZnRzIGFuZCByaWdodHNcbmFsbHBhY2tldHM8LWMobGVmdHMscmlnaHRzKVxuXG4jIyBydW4gYWdhaW5zdCB0aGUgcGFja2V0c1xuYjI8LXNhcHBseShhbGxwYWNrZXRzLGZ1bmN0aW9uKHgpe2xlZnRvcnJpZ2h0KHgsYnJhY2tldDIpfSlcbmI2PC1zYXBwbHkoYWxscGFja2V0cyxmdW5jdGlvbih4KXtsZWZ0b3JyaWdodCh4LGJyYWNrZXQ2KX0pXG5cbiMjIGNvdW50IHRoZSBsZWZ0c1xuYjI8LXRhYmxlKGIyKVtcImxlZnRcIl0rMVxuYjY8LXRhYmxlKGI2KVtcImxlZnRcIl0rMlxucGFydDI8LXVubmFtZShiMipiNilcbnBhcnQyXG5gYGAifQ== -->
-<pre class="r"><code>##transform into the right format
-bracket2&lt;-c(&quot;[&quot;,&quot;[&quot;,&quot;2&quot;,&quot;]&quot;,&quot;]&quot;)
-bracket6&lt;-c(&quot;[&quot;,&quot;[&quot;,&quot;6&quot;,&quot;]&quot;,&quot;]&quot;)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzXG4ifQ== --&gt;
+</code></pre>
+<p>[1] 13</p>
+<pre><code>
+
+
+&lt;!-- rnb-output-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+##Part 2
+it&#39;s possible to sort this, but it&#39;s really not necessary.
+for both [[2]]&amp;[[6]], run those on against all of the input (left and right). Find out how many would go before.
+[[2]] will be 1 plus the number before
+[[6]] will be 2 plus the number before (1 for the number, 1 for the [[2]])
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyN0cmFuc2Zvcm0gaW50byB0aGUgcmlnaHQgZm9ybWF0XG5icmFja2V0MjwtYyhcXFtcXCxcXFtcXCxcXDJcXCxcXF1cXCxcXF1cXClcbmJyYWNrZXQ2PC1jKFxcW1xcLFxcW1xcLFxcNlxcLFxcXVxcLFxcXVxcKVxuXG4jIyBjb21iaW5lIGxlZnRzIGFuZCByaWdodHNcbmFsbHBhY2tldHM8LWMobGVmdHMscmlnaHRzKVxuXG4jIyBydW4gYWdhaW5zdCB0aGUgcGFja2V0c1xuYjI8LXNhcHBseShhbGxwYWNrZXRzLGZ1bmN0aW9uKHgpe2xlZnRvcnJpZ2h0KHgsYnJhY2tldDIpfSlcbmI2PC1zYXBwbHkoYWxscGFja2V0cyxmdW5jdGlvbih4KXtsZWZ0b3JyaWdodCh4LGJyYWNrZXQ2KX0pXG5cbiMjIGNvdW50IHRoZSBsZWZ0c1xuYjI8LXRhYmxlKGIyKVtcXGxlZnRcXF0rMVxuYjY8LXRhYmxlKGI2KVtcXGxlZnRcXF0rMlxucGFydDI8LXVubmFtZShiMipiNilcbnBhcnQyXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+##transform into the right format
+bracket2&lt;-c(\[\,\[\,\2\,\]\,\]\)
+bracket6&lt;-c(\[\,\[\,\6\,\]\,\]\)
 
 ## combine lefts and rights
 allpackets&lt;-c(lefts,rights)
@@ -1869,20 +1940,22 @@ b2&lt;-sapply(allpackets,function(x){leftorright(x,bracket2)})
 b6&lt;-sapply(allpackets,function(x){leftorright(x,bracket6)})
 
 ## count the lefts
-b2&lt;-table(b2)[&quot;left&quot;]+1
-b6&lt;-table(b6)[&quot;left&quot;]+2
+b2&lt;-table(b2)[\left\]+1
+b6&lt;-table(b6)[\left\]+2
 part2&lt;-unname(b2*b6)
 part2</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE0MFxuIn0= -->
-<pre><code>[1] 140</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE0MFxuIn0= --&gt;
+</code></pre>
+<p>[1] 140 ```</p>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
-</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KDQpUaGlzIGhhcyByZWN1cnNpb24gd3JpdHRlbiBhbGwgb3ZlciBpdC4uLi4NCg0KYGBge3J9DQppbnB1dDwtcmVhZF9saW5lcygiRGF5MTNTYW1wbGUudHh0IikNCmBgYA0KDQpGaXJzdCwgcHJlcCB0aGUgZGF0YQ0KDQpgYGB7cn0NCnByZXBpbnB1dDwtc2FwcGx5KGlucHV0LGZ1bmN0aW9uKHgpew0KICAjcmVtb3ZlIHRoZSBjb21tYXMgYW5kIHJlcGxhY2Ugd2l0aCBzcGFjZXMNCiAgI2FkZCBzcGFjZXMgYXJvdW5kIHRoZSBicmFja2V0cw0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeCwiLCIsIiAiKQ0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeSwiXFxbIiwiIFxcWyAiKQ0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeSwiXFxdIiwiIFxcXSAiKQ0KICB5PC1zdHJfc3F1aXNoKHkpDQogIHl9KQ0KDQpsZWZ0czwtbGlzdCgpDQpyaWdodHM8LWxpc3QoKQ0KYGBgDQoNCg0KYGBge3J9DQpmb3IoaSBpbiBzZXEoZnJvbT0xLHRvPWxlbmd0aChwcmVwaW5wdXQpLGJ5PTMpKXsNCiAgbGVmdHM8LWMobGVmdHMsYyhzdHJfc3BsaXQocHJlcGlucHV0W2ldLCIgIikpKQ0KICByaWdodHM8LWMocmlnaHRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpKzFdLCIgIikpKX0NCmBgYA0KIyMgUGFydCAxDQoNCnN0YXJ0IHdpdGggYSBmdW5jdGlvbiB0aGF0IHNheXMgd2hpY2ggc2hvdWxkIGNvbWUgZmlyc3QNCg0KYGBge3J9DQpsZWZ0b3JyaWdodDwtZnVuY3Rpb24obGVmdCxyaWdodCl7DQogIG51bXM8LWMoIjAiLCIxIiwiMiIsIjMiLCI0IiwiNSIsIjYiLCI3IiwiOCIsIjkiKQ0KICAjdHJpbSBsZWFkaW5nIHNwYWNlcw0KICAjIyMgaWYgZWl0aGVyIGxlZnQgb3IgcmlnaHQgaXMgZW1wdHksIGl0IGNvbWVzIGZpcnN0Lg0KICAjIyMgY2hlY2sgaWYgd2UndmUgcmVhY2hlZCB0aGUgZW5kDQogIGlmKGxlbmd0aChsZWZ0KT09MCl7cmV0dXJuKCJsZWZ0IikNCiAgfSBlbHNlIGlmIChsZW5ndGgocmlnaHQpPT0wKXsNCiAgICByZXR1cm4oInJpZ2h0IikNCiAgICAjIyMgY2hlY2sgaWYgdGhpcyBpcyB0aGUgZW5kIG9mIGEgbGlzdA0KICB9ZWxzZXsNCiAgICBsMTwtbGVmdFsxXQ0KICAgIHIxPC1yaWdodFsxXQ0KICAgIGlmKGwxPT0iXSImJnIxIT0iXSIpew0KICAgICAgcmV0dXJuKCJsZWZ0IikNCiAgICB9ZWxzZSBpZihyMT09Il0iJiZsMSE9Il0iKXsNCiAgICAgIHJldHVybigicmlnaHQiKQ0KICAgICAgIyMjIGlmIGJvdGggYXQgdGhlIGVuZCBvciBib3RoIGF0IHRoZSBiZWdpbm5pbmcsIGR1bXAgZmlyc3QgY2hhciAmIGRvIGl0IGFnYWluLg0KICAgIH1lbHNlIGlmKChyMT09Il0iJiZsMT09Il0iKXx8KHIxPT0iWyImJmwxPT0iWyIpKXsNCiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSkNCiAgICAgICMjICBpZiBvbmUgYSBsaXN0IGFuZCB0aGUgb3RoZXIgaXMgbm90LiBqdXN0IHJlbW92ZSB0aGUgb3BlbmluZyBicmFja2V0IA0KICAgIH1lbHNlIGlmKHIxPT0iWyImJmwxIT0iWyIpew0KICAgICAgbGVmdG9ycmlnaHQoYyhsZWZ0WzFdLCJdIixsZWZ0Wy0xXSkscmlnaHRbLTFdKQ0KICAgIH1lbHNlIGlmKGwxPT0iWyImJnIxIT0iWyIpew0KICAgICAgbGVmdG9ycmlnaHQobGVmdFstMV0sYyhyaWdodFsxXSwiXSIscmlnaHRbLTFdKSkNCiAgICB9ZWxzZXsNCiAgICAgIGwxPC1hcy5udW1lcmljKGwxKQ0KICAgICAgcjE8LWFzLm51bWVyaWMocjEpDQogICAgICBpZihsMTxyMSl7cmV0dXJuKCJsZWZ0IikNCiAgICAgIH1lbHNlIGlmKHIxPGwxKXtyZXR1cm4oInJpZ2h0IikNCiAgICAgIH1lbHNle2xlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSl9fX19DQpgYGANCg0KDQphcHBseSB0byB0aGUgaW5wdXQNCmBgYHtyfQ0KcGFydDE8LXNhcHBseSgxOigobGVuZ3RoKGlucHV0KSUvJTMpKzEpLGZ1bmN0aW9uKHgpew0KICBsZWZ0b3JyaWdodChsZWZ0c1tbeF1dLHJpZ2h0c1tbeF1dKX0pDQpgYGANCg0KYmVjYXVzZSB0aGUgImxlZnRzIiBhcmUgY29ycmVjdCwgc3VtIHRoZSBpbmRpY2llcyBvZiB0aGUgbGVmdHMNCmBgYHtyfQ0KcGFydDE8LXN1bSh3aGljaChwYXJ0MT09ImxlZnQiKSkNCnBhcnQxDQpgYGANCiMjUGFydCAyDQppdCdzIHBvc3NpYmxlIHRvIHNvcnQgdGhpcywgYnV0IGl0J3MgcmVhbGx5IG5vdCBuZWNlc3NhcnkuDQpmb3IgYm90aCBbWzJdXSZbWzZdXSwgcnVuIHRob3NlIG9uIGFnYWluc3QgYWxsIG9mIHRoZSBpbnB1dCAobGVmdCBhbmQgcmlnaHQpLiBGaW5kIG91dCBob3cgbWFueSB3b3VsZCBnbyBiZWZvcmUuDQpbWzJdXSB3aWxsIGJlIDEgcGx1cyB0aGUgbnVtYmVyIGJlZm9yZQ0KW1s2XV0gd2lsbCBiZSAyIHBsdXMgdGhlIG51bWJlciBiZWZvcmUgKDEgZm9yIHRoZSBudW1iZXIsIDEgZm9yIHRoZSBbWzJdXSkNCmBgYHtyfQ0KIyN0cmFuc2Zvcm0gaW50byB0aGUgcmlnaHQgZm9ybWF0DQpicmFja2V0MjwtYygiWyIsIlsiLCIyIiwiXSIsIl0iKQ0KYnJhY2tldDY8LWMoIlsiLCJbIiwiNiIsIl0iLCJdIikNCg0KIyMgY29tYmluZSBsZWZ0cyBhbmQgcmlnaHRzDQphbGxwYWNrZXRzPC1jKGxlZnRzLHJpZ2h0cykNCg0KIyMgcnVuIGFnYWluc3QgdGhlIHBhY2tldHMNCmIyPC1zYXBwbHkoYWxscGFja2V0cyxmdW5jdGlvbih4KXtsZWZ0b3JyaWdodCh4LGJyYWNrZXQyKX0pDQpiNjwtc2FwcGx5KGFsbHBhY2tldHMsZnVuY3Rpb24oeCl7bGVmdG9ycmlnaHQoeCxicmFja2V0Nil9KQ0KDQojIyBjb3VudCB0aGUgbGVmdHMNCmIyPC10YWJsZShiMilbImxlZnQiXSsxDQpiNjwtdGFibGUoYjYpWyJsZWZ0Il0rMg0KcGFydDI8LXVubmFtZShiMipiNikNCnBhcnQyDQpgYGANCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxMyBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KDQpUaGlzIGhhcyByZWN1cnNpb24gd3JpdHRlbiBhbGwgb3ZlciBpdC4uLi4NCg0KYGBge3J9DQppbnB1dDwtcmVhZF9saW5lcygiRGF5MTNTYW1wbGUudHh0IikNCmBgYA0KDQpGaXJzdCwgcHJlcCB0aGUgZGF0YQ0KDQpgYGB7cn0NCnByZXBpbnB1dDwtc2FwcGx5KGlucHV0LGZ1bmN0aW9uKHgpew0KICAjcmVtb3ZlIHRoZSBjb21tYXMgYW5kIHJlcGxhY2Ugd2l0aCBzcGFjZXMNCiAgI2FkZCBzcGFjZXMgYXJvdW5kIHRoZSBicmFja2V0cw0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeCwiLCIsIiAiKQ0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeSwiXFxbIiwiIFxcWyAiKQ0KICB5PC1zdHJfcmVwbGFjZV9hbGwoeSwiXFxdIiwiIFxcXSAiKQ0KICB5PC1zdHJfc3F1aXNoKHkpDQogIHl9KQ0KDQpsZWZ0czwtbGlzdCgpDQpyaWdodHM8LWxpc3QoKQ0KYGBgDQoNCg0KYGBge3J9DQpmb3IoaSBpbiBzZXEoZnJvbT0xLHRvPWxlbmd0aChwcmVwaW5wdXQpLGJ5PTMpKXsNCiAgbGVmdHM8LWMobGVmdHMsYyhzdHJfc3BsaXQocHJlcGlucHV0W2ldLCIgIikpKQ0KICByaWdodHM8LWMocmlnaHRzLGMoc3RyX3NwbGl0KHByZXBpbnB1dFtpKzFdLCIgIikpKX0NCmBgYA0KIyMgUGFydCAxDQoNCnN0YXJ0IHdpdGggYSBmdW5jdGlvbiB0aGF0IHNheXMgd2hpY2ggc2hvdWxkIGNvbWUgZmlyc3QNCg0KYGBge3J9DQpsZWZ0b3JyaWdodDwtZnVuY3Rpb24obGVmdCxyaWdodCl7DQogIG51bXM8LWMoIjAiLCIxIiwiMiIsIjMiLCI0IiwiNSIsIjYiLCI3IiwiOCIsIjkiKQ0KICAjdHJpbSBsZWFkaW5nIHNwYWNlcw0KICAjIyMgaWYgZWl0aGVyIGxlZnQgb3IgcmlnaHQgaXMgZW1wdHksIGl0IGNvbWVzIGZpcnN0Lg0KICAjIyMgY2hlY2sgaWYgd2UndmUgcmVhY2hlZCB0aGUgZW5kDQogIGlmKGxlbmd0aChsZWZ0KT09MCl7cmV0dXJuKCJsZWZ0IikNCiAgfSBlbHNlIGlmIChsZW5ndGgocmlnaHQpPT0wKXsNCiAgICByZXR1cm4oInJpZ2h0IikNCiAgICAjIyMgY2hlY2sgaWYgdGhpcyBpcyB0aGUgZW5kIG9mIGEgbGlzdA0KICB9ZWxzZXsNCiAgICBsMTwtbGVmdFsxXQ0KICAgIHIxPC1yaWdodFsxXQ0KICAgIGlmKGwxPT0iXSImJnIxIT0iXSIpew0KICAgICAgcmV0dXJuKCJsZWZ0IikNCiAgICB9ZWxzZSBpZihyMT09Il0iJiZsMSE9Il0iKXsNCiAgICAgIHJldHVybigicmlnaHQiKQ0KICAgICAgIyMjIGlmIGJvdGggYXQgdGhlIGVuZCBvciBib3RoIGF0IHRoZSBiZWdpbm5pbmcsIGR1bXAgZmlyc3QgY2hhciAmIGRvIGl0IGFnYWluLg0KICAgIH1lbHNlIGlmKChyMT09Il0iJiZsMT09Il0iKXx8KHIxPT0iWyImJmwxPT0iWyIpKXsNCiAgICAgIGxlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSkNCiAgICAgICMjICBpZiBvbmUgYSBsaXN0IGFuZCB0aGUgb3RoZXIgaXMgbm90LiBqdXN0IHJlbW92ZSB0aGUgb3BlbmluZyBicmFja2V0IA0KICAgIH1lbHNlIGlmKHIxPT0iWyImJmwxIT0iWyIpew0KICAgICAgbGVmdG9ycmlnaHQoYyhsZWZ0WzFdLCJdIixsZWZ0Wy0xXSkscmlnaHRbLTFdKQ0KICAgIH1lbHNlIGlmKGwxPT0iWyImJnIxIT0iWyIpew0KICAgICAgbGVmdG9ycmlnaHQobGVmdFstMV0sYyhyaWdodFsxXSwiXSIscmlnaHRbLTFdKSkNCiAgICB9ZWxzZXsNCiAgICAgIGwxPC1hcy5udW1lcmljKGwxKQ0KICAgICAgcjE8LWFzLm51bWVyaWMocjEpDQogICAgICBpZihsMTxyMSl7cmV0dXJuKCJsZWZ0IikNCiAgICAgIH1lbHNlIGlmKHIxPGwxKXtyZXR1cm4oInJpZ2h0IikNCiAgICAgIH1lbHNle2xlZnRvcnJpZ2h0KGxlZnRbLTFdLHJpZ2h0Wy0xXSl9fX19DQpgYGANCg0KDQphcHBseSB0byB0aGUgaW5wdXQNCmBgYHtyfQ0KcGFydDE8LXNhcHBseSgxOigobGVuZ3RoKGlucHV0KSUvJTMpKzEpLGZ1bmN0aW9uKHgpew0KICBsZWZ0b3JyaWdodChsZWZ0c1tbeF1dLHJpZ2h0c1tbeF1dKX0pDQpgYGANCg0KYmVjYXVzZSB0aGUgImxlZnRzIiBhcmUgY29ycmVjdCwgc3VtIHRoZSBpbmRpY2llcyBvZiB0aGUgbGVmdHMNCmBgYHtyfQ0KcGFydDE8LXN1bSh3aGljaChwYXJ0MT09ImxlZnQiKSkNCnBhcnQxDQpgYGANCiMjUGFydCAyDQppdCdzIHBvc3NpYmxlIHRvIHNvcnQgdGhpcywgYnV0IGl0J3MgcmVhbGx5IG5vdCBuZWNlc3NhcnkuDQpmb3IgYm90aCBbWzJdXSZbWzZdXSwgcnVuIHRob3NlIG9uIGFnYWluc3QgYWxsIG9mIHRoZSBpbnB1dCAobGVmdCBhbmQgcmlnaHQpLiBGaW5kIG91dCBob3cgbWFueSB3b3VsZCBnbyBiZWZvcmUuDQpbWzJdXSB3aWxsIGJlIDEgcGx1cyB0aGUgbnVtYmVyIGJlZm9yZQ0KW1s2XV0gd2lsbCBiZSAyIHBsdXMgdGhlIG51bWJlciBiZWZvcmUgKDEgZm9yIHRoZSBudW1iZXIsIDEgZm9yIHRoZSBbWzJdXSkNCmBgYHtyfQ0KIyN0cmFuc2Zvcm0gaW50byB0aGUgcmlnaHQgZm9ybWF0DQpicmFja2V0MjwtYygiWyIsIlsiLCIyIiwiXSIsIl0iKQ0KYnJhY2tldDY8LWMoIlsiLCJbIiwiNiIsIl0iLCJdIikNCg0KIyMgY29tYmluZSBsZWZ0cyBhbmQgcmlnaHRzDQphbGxwYWNrZXRzPC1jKGxlZnRzLHJpZ2h0cykNCg0KIyMgcnVuIGFnYWluc3QgdGhlIHBhY2tldHMNCmIyPC1zYXBwbHkoYWxscGFja2V0cyxmdW5jdGlvbih4KXtsZWZ0b3JyaWdodCh4LGJyYWNrZXQyKX0pDQpiNjwtc2FwcGx5KGFsbHBhY2tldHMsZnVuY3Rpb24oeCl7bGVmdG9ycmlnaHQoeCxicmFja2V0Nil9KQ0KDQojIyBjb3VudCB0aGUgbGVmdHMNCmIyPC10YWJsZShiMilbImxlZnQiXSsxDQpiNjwtdGFibGUoYjYpWyJsZWZ0Il0rMg0KcGFydDI8LXVubmFtZShiMipiNikNCnBhcnQyDQpgYGANCg0K</div>
 
 
 

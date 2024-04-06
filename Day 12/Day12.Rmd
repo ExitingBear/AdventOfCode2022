@@ -112,7 +112,7 @@ part2
 ```
 
 
-```{r,echo=false}
+```{r,echo=FALSE}
 input<-read_lines("../../AoCData/AOC2022/Day12.txt")
 hill<-matrix(nrow=0,ncol=nchar(input[1]))
 

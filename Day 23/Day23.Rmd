@@ -1,23 +1,357 @@
 ---
-title: "Day XX Notebook"
+title: "Day 23 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(knitr)
+library(conflicted)
+library(sets)
 library(dplyr)
+conflict_prefer("%>%", "dplyr")
+library(knitr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(gridExtra)
+library(collections)
 options(scipen = 999)
 ```
 
 
 ## Part 1
+
+```{r}
+input<-read_lines("Day23Sample2.txt")
+```
+
+go through the input, put all of the pieces into a dataframe
+
+```{r}
+elffield<-as.data.frame(matrix(nrow=0,ncol=1))
+
+## treat coordinates as complex numbers vertical is imaginary, horizontal is real
+
+for(i in 1:length(input)){
+  for(j in 1:nchar(input[1])){
+    if(str_sub(input[i],j,j)=="#"){
+      c<-j+(0+1i)*i
+      elffield<-rbind(elffield,c)}}}
+colnames(elffield)<-c("starter")
+```
+
+
+
+```{r}
+scatter<-function(ef=elffield,rpt=1){
+  #check to the north ()
+  round<-0
+  while(round<rpt){
+    rd<-dict()
+    
+    for(i in 1:length(ef$starter)){
+      rd$set(ef$starter[i],ef$starter[i])}
+    
+    ef <- ef %>% rowwise %>%
+      ### as we have to look in all 8 directions, may as well start there, if something there - 1 else 0
+      mutate(NW=ifelse(rd$has(starter+(-1-1i)),1,0),
+             N=ifelse(rd$has(starter+(0-1i)),1,0),
+             NE=ifelse(rd$has(starter+(1-1i)),1,0),
+             E=ifelse(rd$has(starter+(1)),1,0),
+             SE=ifelse(rd$has(starter+(1+1i)),1,0),
+             S=ifelse(rd$has(starter+(+1i)),1,0),
+             SW=ifelse(rd$has(starter+(-1+1i)),1,0),
+             W=ifelse(rd$has(starter+(-1)),1,0)) %>%
+      ### start checking directions
+      mutate(proposal=ifelse(NW+N+NE+E+SE+S+SW+W==0,starter,NA))
+    
+    
+    ### change order based on round
+    
+    if(round%%4==0){
+      ##north
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+N+NE==0,starter+(0-1i),NA))
+      ### south
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(SW+S+SE==0,starter+(0+1i),NA))
+      ### west
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+W+SW==0,starter+(-1),NA))
+      ### east
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NE+E+SE==0,starter+(+1),NA))
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=starter)}
+    
+    if(round%%4==1){
+      ### south
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(SW+S+SE==0,starter+(0+1i),NA))
+      ### west
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+W+SW==0,starter+(-1),NA))
+      ### east
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NE+E+SE==0,starter+(+1),NA))
+      ### north
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+N+NE==0,starter+(0-1i),NA))
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=starter)}
+    
+    if(round%%4==2){
+      ### west
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+W+SW==0,starter+(-1),NA))
+      ### east
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NE+E+SE==0,starter+(+1),NA))
+      ##north
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+N+NE==0,starter+(0-1i),NA))
+      ### south
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(SW+S+SE==0,starter+(0+1i),NA))
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=starter)}
+    
+    if(round%%4==3){
+      ### east
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NE+E+SE==0,starter+(+1),NA))
+      ##north
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+N+NE==0,starter+(0-1i),NA))
+      ### south
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(SW+S+SE==0,starter+(0+1i),NA))
+      ### west
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=ifelse(NW+W+SW==0,starter+(-1),NA))
+      ef[which(is.na(ef$proposal)),]<-ef[which(is.na(ef$proposal)),] %>%
+        mutate(proposal=starter)}
+    
+    ### get list of proposed spaces
+    allprops<-ef$proposal
+    ef<-ef%>%rowwise%>%
+      ### check for duplicates, if there are any, put in starter instead
+      mutate(proposal=ifelse(length(which(allprops%in%proposal))>1,starter,proposal))%>%
+      ### move proposal back to starter
+      mutate(starter=proposal)%>%
+      ### drop everything else
+      select(starter)
+    ### before while
+    round<-round+1}
+  ### after while
+  ef} 
+
+```
+
+
+
+
+```{r}
+newfield<-scatter(elffield,10)
+
+newfield<-newfield%>%rowwise%>%mutate(x=Re(starter),y=Im(starter))%>%arrange(y,x)
+```
+
+
+
+
+```{r,echo=FALSE}
+elffield<-elffield %>%rowwise%>%mutate(x=Re(starter),y=Im(starter))
+
+p1<- ggplot(data=elffield,aes(x,y))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  geom_point()+
+  scale_y_reverse()+
+  coord_fixed()+
+  xlim(min(newfield$x)-5,max(newfield$x)+5)
+
+
+p2<- ggplot(data=newfield,aes(x,y))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  geom_point()+
+  scale_y_reverse()+
+  coord_fixed()+
+  xlim(min(newfield$x)-5,max(newfield$x)+5)
+
+grid.arrange(p1,p2,ncol=2)
+
+```
+```{r}
+part1<-(max(newfield$x)-min(newfield$x)+1)*(max(newfield$y)-min(newfield$y)+1)-nrow(elffield)
+part1
+```
+##Part 2
+
+Make a small, small change to keep it running until it no longer makes sense to run
+
+```{r}
+scatterlimit<-function(ef=elffield){
+  round<-0
+  done<-FALSE
+  while(!done){
+    roundstart<-ef$starter
+    ef <- ef %>% rowwise %>%
+      ### as we have to look in all 8 directions, may as well start there, if something there - 1 else 0
+      mutate(NW=ifelse((starter+(-1-1i))%in%roundstart,1,0),
+             N=ifelse((starter+(0-1i))%in%roundstart,1,0),
+             NE=ifelse((starter+(1-1i))%in%roundstart,1,0),
+             E=ifelse((starter+(1))%in%roundstart,1,0),
+             SE=ifelse((starter+(1+1i))%in%roundstart,1,0),
+             S=ifelse((starter+(+1i))%in%roundstart,1,0),
+             SW=ifelse((starter+(-1+1i))%in%roundstart,1,0),
+             W=ifelse((starter+(-1))%in%roundstart,1,0)) %>%
+      ### start checking directions
+      mutate(proposal=ifelse(NW+N+NE+E+SE+S+SW+W==0,starter,NA))
+    
+    
+    ### change order based on round
+    
+    if(round%%4==0){
+      ef<-ef%>%rowwise%>%
+        ### north
+        mutate(proposal=ifelse(is.na(proposal)&&NW+N+NE==0,starter+(0-1i),proposal))%>%
+        ### south
+        mutate(proposal=ifelse(is.na(proposal)&&SW+S+SE==0,starter+(0+1i),proposal))%>%
+        ### west
+        mutate(proposal=ifelse(is.na(proposal)&&NW+W+SW==0,starter+(-1),proposal))%>%
+        ### east
+        mutate(proposal=ifelse(is.na(proposal)&&NE+E+SE==0,starter+(+1),proposal))%>%
+        ### can't move anywhere, so stay
+        mutate(proposal=ifelse(is.na(proposal),starter,proposal))}
+    
+    if(round%%4==1){
+      ef<-ef%>%rowwise%>%
+        ### south
+        mutate(proposal=ifelse(is.na(proposal)&&SW+S+SE==0,starter+(0+1i),proposal))%>%
+        ### west
+        mutate(proposal=ifelse(is.na(proposal)&&NW+W+SW==0,starter+(-1),proposal))%>%
+        ### east
+        mutate(proposal=ifelse(is.na(proposal)&&NE+E+SE==0,starter+(+1),proposal))%>%
+        ### north
+        mutate(proposal=ifelse(is.na(proposal)&&NW+N+NE==0,starter+(0-1i),proposal))%>%
+        ### can't move anywhere, so stay
+        mutate(proposal=ifelse(is.na(proposal),starter,proposal))}
+    
+    if(round%%4==2){
+      ef<-ef%>%rowwise%>%
+        ### west
+        mutate(proposal=ifelse(is.na(proposal)&&NW+W+SW==0,starter+(-1),proposal))%>%
+        ### east
+        mutate(proposal=ifelse(is.na(proposal)&&NE+E+SE==0,starter+(+1),proposal))%>%
+        ### north
+        mutate(proposal=ifelse(is.na(proposal)&&NW+N+NE==0,starter+(0-1i),proposal))%>%
+        ### south
+        mutate(proposal=ifelse(is.na(proposal)&&SW+S+SE==0,starter+(0+1i),proposal))%>%
+        ### can't move anywhere, so stay
+        mutate(proposal=ifelse(is.na(proposal),starter,proposal))}
+    
+    if(round%%4==3){
+      ef<-ef%>%rowwise%>%
+        ### east
+        mutate(proposal=ifelse(is.na(proposal)&&NE+E+SE==0,starter+(+1),proposal))%>%
+        ### north
+        mutate(proposal=ifelse(is.na(proposal)&&NW+N+NE==0,starter+(0-1i),proposal))%>%
+        ### south
+        mutate(proposal=ifelse(is.na(proposal)&&SW+S+SE==0,starter+(0+1i),proposal))%>%
+        ### west
+        mutate(proposal=ifelse(is.na(proposal)&&NW+W+SW==0,starter+(-1),proposal))%>%
+        ### can't move anywhere, so stay
+        mutate(proposal=ifelse(is.na(proposal),starter,proposal))}
+    
+    ### get list of proposed spaces
+    allprops<-ef$proposal
+    ef<-ef%>%rowwise%>%
+      ### check for duplicates, if there are any, put in starter instead
+      mutate(proposal=ifelse(length(which(allprops%in%proposal))>1,starter,proposal))
+    if(sum(ef$N+ef$E+ef$W+ef$S+ef$NW+ef$NE+ef$SW+ef$SE)==0){done<-TRUE}
+    ### move proposal back to starter
+    ef<-ef%>% rowwise %>%mutate(starter=proposal)%>%
+      ### drop everything else
+      select(starter)
+    ### before while
+    if(round%%100==0){cat(round,"\n")}
+    round<-round+1}
+  ### after while
+  list(round,ef)} 
+```
+
+```{r}
+part2<-scatterlimit()
+part2[[1]]
+```
+```{r, echo=FALSE}
+
+fin<-part2[[2]] %>%rowwise%>%mutate(x=Re(starter),y=Im(starter))
+
+p1<- ggplot(data=elffield,aes(x,y))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  
+  geom_point()+
+  scale_y_reverse()+
+  coord_fixed()+
+  xlim(min(fin$x)-5,max(fin$x)+5)
+
+
+p2<- ggplot(data=newfield,aes(x,y))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  geom_point()+
+  scale_y_reverse()+
+  coord_fixed()+
+  xlim(min(fin$x)-5,max(fin$x)+5)
+
+p3<-ggplot(data=fin,aes(x,y))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  geom_point()+
+  scale_y_reverse()+
+  coord_fixed()+
+  xlim(min(fin$x)-5,max(fin$x)+5)
+
+grid.arrange(p1,p2,p3,ncol=3)
+
+
+```
 

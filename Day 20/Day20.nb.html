@@ -11,7 +11,7 @@
 
 
 
-<title>Day 9 Notebook</title>
+<title>Day 20 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day 9 Notebook</h1>
+<h1 class="title toc-ignore">Day 20 Notebook</h1>
 
 </div>
 
@@ -1754,141 +1754,92 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXk5U2FtcGxlLnR4dFwiKSJ9 -->
-<pre class="r"><code>input&lt;-read_lines(&quot;Day9Sample.txt&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
-<p>First, build out the path for the head of the rope, it will need to
-be step by step because of the way that the head pulls the tail:</p>
+<p>First, read in the input Then make that into a dataframe - one column
+is the “current position” the other is the numbers</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbImhlYWRwYXRoPC1saXN0KGMoMCwwKSkiLCJmb3IoaSBpbiAxOmxlbmd0aChpbnB1dCkpe1xuICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLFwiIFwiKSlcbiAgZGlyPC1pbnN0WzFdO3N0PC1hcy5udW1lcmljKGluc3RbMl0pXG4gIGZvcihqIGluIDE6c3Qpe1xuICAgIHByZXY8LXVubGlzdCh0YWlsKGhlYWRwYXRoLDEpKVxuICAgIHN3aXRjaChkaXIsXG4gICAgICAgICAgIFwiUlwiPW54dDwtcHJlditjKDEsMCksXG4gICAgICAgICAgIFwiTFwiPW54dDwtcHJldi1jKDEsMCksXG4gICAgICAgICAgIFwiVVwiPW54dDwtcHJldi1jKDAsMSksXG4gICAgICAgICAgIFwiRFwiPW54dDwtcHJlditjKDAsMSksXG4gICAgICAgICAgIGNhdChcInNvbWV0aGluZyBpcyB3cm9uZ1xcblwiKSlcbiAgICBoZWFkcGF0aDwtYXBwZW5kKGhlYWRwYXRoLGxpc3QoYyhueHQpKSl9fSJdfQ== -->
-<pre class="r"><code>headpath&lt;-list(c(0,0))
-for(i in 1:length(input)){
-  inst&lt;-unlist(str_split(input[i],&quot; &quot;))
-  dir&lt;-inst[1];st&lt;-as.numeric(inst[2])
-  for(j in 1:st){
-    prev&lt;-unlist(tail(headpath,1))
-    switch(dir,
-           &quot;R&quot;=nxt&lt;-prev+c(1,0),
-           &quot;L&quot;=nxt&lt;-prev-c(1,0),
-           &quot;U&quot;=nxt&lt;-prev-c(0,1),
-           &quot;D&quot;=nxt&lt;-prev+c(0,1),
-           cat(&quot;something is wrong\n&quot;))
-    headpath&lt;-append(headpath,list(c(nxt)))}}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWQuY3N2KFwiRGF5MjBTYW1wbGUudHh0XCIsaGVhZGVyPUZBTFNFKVxuXG5lbmNmaWxlPC1jYmluZCgwOihucm93KGlucHV0KS0xKSxpbnB1dClcbmNvbG5hbWVzKGVuY2ZpbGUpPC1jKFwicG9zXCIsXCJudW1cIilcbmBgYCJ9 -->
+<pre class="r"><code>input&lt;-read.csv(&quot;Day20Sample.txt&quot;,header=FALSE)
+
+encfile&lt;-cbind(0:(nrow(input)-1),input)
+colnames(encfile)&lt;-c(&quot;pos&quot;,&quot;num&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Now find the tailpath, for this treat x &amp; y separately. If the
-tail is within 1 of the head, don’t move. Otherwise, if the tail is 2
-away from the head in the x direction, move in that direction by 1, move
-y to match the head’s y. Do the same for</p>
+<p>Then create the function to mix the numbers - * if the number is
+negative, make it into a positive (mod, length of the chain -1) * then
+either move it forward or backwards, depending on which takes less
+math</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoidGFpbHBhdGg8LWZ1bmN0aW9uKGhwKXtcbiAgdHA8LWxpc3QoYygwLDApKVxuICBmb3IoaSBpbiAyOmxlbmd0aChocCkpe1xuICAgIGhlYWRwb3M8LWhwW1tpXV1cbiAgICB0YWlscG9zPC11bmxpc3QodGFpbCh0cCwxKSlcbiAgICBkPC1hYnMoaGVhZHBvcy10YWlscG9zKVxuICAgICMjIyB0aGUgaGVhZCBpcyB3aXRoaW4gb25lIG9mIHRoZSB0YWlsXG4gICAgaWYoYWxsKGQ8PTEpKXtuZXd4PC10YWlscG9zWzFdXG4gICAgbmV3eTwtdGFpbHBvc1syXVxuICAgICMjIyBpZiB0aGUgaGVhZCBoYXMgbW92ZWQgdXAgdG8gdHdvIGF3YXkgaW4gdGhlIHggZGlyZWN0aW9uIC0gYnV0IG5vdCB0aGUgeVxuICAgIH1lbHNlIGlmKGRbMV09PTImJmRbMl08Mil7XG4gICAgICBuZXd4PC1tZWFuKGMoaGVhZHBvc1sxXSx0YWlscG9zWzFdKSlcbiAgICAgIG5ld3k8LWhlYWRwb3NbMl1cbiAgICAjIyMgaWYgdGhlIGhlYWQgaGFzIG1vdmVkIHVwIHRvIHR3byBhd2F5IGluIHRoZSB5IGRpcmVjdGlvbiwgYnV0IG5vdCB0aGUgeCAgXG4gICAgfWVsc2UgaWYoZFsyXT09MiYmZFsxXTwyKXtcbiAgICAgIG5ld3k8LW1lYW4oYyhoZWFkcG9zWzJdLHRhaWxwb3NbMl0pKVxuICAgICAgbmV3eDwtaGVhZHBvc1sxXVxuICAgICMjIyBpZiB0aGUgaGVhZCBpcyB0d28gYXdheSBpbiBib3RoIGRpcmVjdGlvbnMgIFxuICAgIH1lbHNlIGlmKGRbMV09PTImJmRbMl09PTIpe1xuICAgICAgbmV3eDwtbWVhbihjKGhlYWRwb3NbMV0sdGFpbHBvc1sxXSkpXG4gICAgICBuZXd5PC1tZWFuKGMoaGVhZHBvc1syXSx0YWlscG9zWzJdKSlcbiAgICB9ZWxzZXtjYXQoXCJzb21ldGhpbmcgd2VudCB3cm9uZ1xcblwiKX1cbiAgICB0cDwtYXBwZW5kKHRwLGxpc3QoYyhuZXd4LG5ld3kpKSl9XG4gIHRwfSJ9 -->
-<pre class="r"><code>tailpath&lt;-function(hp){
-  tp&lt;-list(c(0,0))
-  for(i in 2:length(hp)){
-    headpos&lt;-hp[[i]]
-    tailpos&lt;-unlist(tail(tp,1))
-    d&lt;-abs(headpos-tailpos)
-    ### the head is within one of the tail
-    if(all(d&lt;=1)){newx&lt;-tailpos[1]
-    newy&lt;-tailpos[2]
-    ### if the head has moved up to two away in the x direction - but not the y
-    }else if(d[1]==2&amp;&amp;d[2]&lt;2){
-      newx&lt;-mean(c(headpos[1],tailpos[1]))
-      newy&lt;-headpos[2]
-    ### if the head has moved up to two away in the y direction, but not the x  
-    }else if(d[2]==2&amp;&amp;d[1]&lt;2){
-      newy&lt;-mean(c(headpos[2],tailpos[2]))
-      newx&lt;-headpos[1]
-    ### if the head is two away in both directions  
-    }else if(d[1]==2&amp;&amp;d[2]==2){
-      newx&lt;-mean(c(headpos[1],tailpos[1]))
-      newy&lt;-mean(c(headpos[2],tailpos[2]))
-    }else{cat(&quot;something went wrong\n&quot;)}
-    tp&lt;-append(tp,list(c(newx,newy)))}
-  tp}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWl4ZmlsZTwtZnVuY3Rpb24obWl4ZXM9MSxkZil7XG4gIGZvcihtIGluIDE6bWl4ZXMpe1xuICAgIGVuY3J5cHRsZW5ndGg8LW5yb3coZGYpXG4gICAgZm9yIChpIGluIDE6ZW5jcnlwdGxlbmd0aCl7XG4gICAgICAjIyMgaSBpcyB0aGUgcG9zaXRpb24gb2YgdGhlIGN1cnJlbnRseSB3b3JraW5nIG51bWJlclxuICAgICAgIyMjICBmaWd1cmUgb3V0IHRoZSBudW1iZXJzIHRvIG1vdmVcbiAgICAgICMjIGdldCB0aGUgbnVtYmVyICYgbWFrZSBpdCBwb3NpdGl2ZVxuICAgICAgIyMjIHJlbnVtIGlzIHRoZSBcIndvcmtpbmdcIiBudW1iZXJcbiAgICAgIHJlbnVtPC1kZiRudW1baV0lJShlbmNyeXB0bGVuZ3RoLTEpXG4gICAgICAjIyMgc3AgaXMgdGhlIHN0YXJ0aW5nIHBvc2l0aW9uXG4gICAgICBzcDwtZGYkcG9zW2ldXG4gICAgICAjIyBpZiB0aGUgbnVtYmVyIHdvdWxkIGhhdmUgdG8gY2lyY2xlIGFsbCB0aGUgd2F5IGFyb3VuZCB0byBnbyBmb3J3YXJkLCBtYWtlIGl0IGdvIGJhY2t3YXJkcyBpbnN0ZWFkXG4gICAgICAjIyBtYWtlcyB0aGUgbmV4dCBzdGVwIGVhc2llclxuICAgICAgaWYocmVudW0rc3A+ZW5jcnlwdGxlbmd0aCl7cmVudW08LXJlbnVtLShlbmNyeXB0bGVuZ3RoLTEpfVxuICAgICAgIyMgc2h1ZmZsZSBhbGwgdGhlIG51bWJlcnMgYmV0d2VlbiB0aGUgb2xkICYgbmV3IHBvc2l0aW9uIC0gZm9yd2FyZCBvciBiYWNrd2FyZFxuICAgICAgaWYgKHJlbnVtID4gMCkge1xuICAgICAgICBzaHVmZmxlc2VhdDwtKHNwKygxOnJlbnVtKSklJWVuY3J5cHRsZW5ndGhcbiAgICAgICAgZGYkcG9zW3doaWNoKGRmJHBvcyAlaW4lIHNodWZmbGVzZWF0KV0gPC1zYXBwbHkoZGYkcG9zW3doaWNoKGRmJHBvcyAlaW4lIHNodWZmbGVzZWF0KV0sXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZ1bmN0aW9uKHgpeyh4IC0gMSklJWVuY3J5cHRsZW5ndGh9KVxuICAgICAgICB9ZWxzZSBpZihyZW51bSA8IDApIHtcbiAgICAgICAgc2h1ZmZsZXNlYXQ8LShzcCsoKC0xKTpyZW51bSkpJSUgZW5jcnlwdGxlbmd0aFxuICAgICAgICBkZiRwb3Nbd2hpY2goZGYkcG9zICVpbiUgc2h1ZmZsZXNlYXQpXSA8LXNhcHBseShkZiRwb3Nbd2hpY2goZGYkcG9zICVpbiUgc2h1ZmZsZXNlYXQpXSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZnVuY3Rpb24oeCl7KHggKyAxKSUlZW5jcnlwdGxlbmd0aH0pfVxuICAgICAgZGYkcG9zW2ldIDwtIChzcCArIHJlbnVtKSAlJSBlbmNyeXB0bGVuZ3RofX1cbiAgIyMgYWZ0ZXIgY29tcGxldGluZyBhbGwsIGZpbmQgdGhlIDEwMDAsMjAwMCwgJiAzMDAwIHBsYWNlLlxuICBncm92ZTwtYygxMDAwLDIwMDAsMzAwMClcbiAgZ3Jjb29yZDwtc2FwcGx5KGdyb3ZlLGZ1bmN0aW9uKHgpe1xuICAgIHk8LSh4K2RmJHBvc1t3aGljaChkZiRudW09PTApXSklJWVuY3J5cHRsZW5ndGhcbiAgICBkZiRudW1bd2hpY2goZGYkcG9zPT15KV19KVxuICBncmNvb3JkfVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>mixfile&lt;-function(mixes=1,df){
+  for(m in 1:mixes){
+    encryptlength&lt;-nrow(df)
+    for (i in 1:encryptlength){
+      ### i is the position of the currently working number
+      ###  figure out the numbers to move
+      ## get the number &amp; make it positive
+      ### renum is the &quot;working&quot; number
+      renum&lt;-df$num[i]%%(encryptlength-1)
+      ### sp is the starting position
+      sp&lt;-df$pos[i]
+      ## if the number would have to circle all the way around to go forward, make it go backwards instead
+      ## makes the next step easier
+      if(renum+sp&gt;encryptlength){renum&lt;-renum-(encryptlength-1)}
+      ## shuffle all the numbers between the old &amp; new position - forward or backward
+      if (renum &gt; 0) {
+        shuffleseat&lt;-(sp+(1:renum))%%encryptlength
+        df$pos[which(df$pos %in% shuffleseat)] &lt;-sapply(df$pos[which(df$pos %in% shuffleseat)],
+                                                        function(x){(x - 1)%%encryptlength})
+        }else if(renum &lt; 0) {
+        shuffleseat&lt;-(sp+((-1):renum))%% encryptlength
+        df$pos[which(df$pos %in% shuffleseat)] &lt;-sapply(df$pos[which(df$pos %in% shuffleseat)],
+                                                        function(x){(x + 1)%%encryptlength})}
+      df$pos[i] &lt;- (sp + renum) %% encryptlength}}
+  ## after completing all, find the 1000,2000, &amp; 3000 place.
+  grove&lt;-c(1000,2000,3000)
+  grcoord&lt;-sapply(grove,function(x){
+    y&lt;-(x+df$pos[which(df$num==0)])%%encryptlength
+    df$num[which(df$pos==y)]})
+  grcoord}
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQxPC10YWlscGF0aChoZWFkcGF0aCkiLCJwYXJ0MTwtbGVuZ3RoKHVuaXF1ZShwYXJ0MSkpIiwicGFydDEiXX0= -->
-<pre class="r"><code>part1&lt;-tailpath(headpath)
-part1&lt;-length(unique(part1))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LXN1bShtaXhmaWxlKDEsZW5jZmlsZSkpXG5wYXJ0MVxuYGBgIn0= -->
+<pre class="r"><code>part1&lt;-sum(mixfile(1,encfile))
 part1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzXG4ifQ== -->
-<pre><code>[1] 13</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 <div id="part-2" class="section level2">
 <h2>Part 2</h2>
-<p>Repeat this with 10 knots (or in other words, 9 times.) This needs
-new data</p>
-<p>With the original data:</p>
+<p>Multiply the numbers and run it again, 10 times.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbImxvdHNrbm90czwtaGVhZHBhdGgiLCJmb3IoaSBpbiAxOjkpe1xuICBsb3Rza25vdHM8LXRhaWxwYXRoKGxvdHNrbm90cyl9IiwiIiwicGFydDI8LWxlbmd0aCh1bmlxdWUobG90c2tub3RzKSkiLCJwYXJ0MiAgIl19 -->
-<pre class="r"><code>lotsknots&lt;-headpath
-for(i in 1:9){
-  lotsknots&lt;-tailpath(lotsknots)}
-
-part2&lt;-length(unique(lotsknots))
-part2  </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDFcbiJ9 -->
-<pre><code>[1] 1</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>or for a second sample:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbIiMjIGxvbmdlciBpbnB1dCIsImlucHV0PC1yZWFkX2xpbmVzKFwiRGF5OVNhbXBsZTIudHh0XCIpIiwiIiwiIyMgbmV3IGhlYWRwYXRoIiwicDJwYXRoPC1saXN0KGMoMCwwKSkiLCJmb3IoaSBpbiAxOmxlbmd0aChpbnB1dCkpe1xuICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLFwiIFwiKSlcbiAgZGlyPC1pbnN0WzFdO3N0PC1hcy5udW1lcmljKGluc3RbMl0pXG4gIGZvcihqIGluIDE6c3Qpe1xuICAgIHByZXY8LXVubGlzdCh0YWlsKHAycGF0aCwxKSlcbiAgICBzd2l0Y2goZGlyLFxuICAgICAgICAgICBcIlJcIj1ueHQ8LXByZXYrYygxLDApLFxuICAgICAgICAgICBcIkxcIj1ueHQ8LXByZXYtYygxLDApLFxuICAgICAgICAgICBcIlVcIj1ueHQ8LXByZXYtYygwLDEpLFxuICAgICAgICAgICBcIkRcIj1ueHQ8LXByZXYrYygwLDEpLFxuICAgICAgICAgICBjYXQoXCJzb21ldGhpbmcgaXMgd3JvbmdcXG5cIikpXG4gICAgcDJwYXRoPC1hcHBlbmQocDJwYXRoLGxpc3QoYyhueHQpKSl9fSIsIiIsIiMjIHJlcnVuIiwiZm9yKGkgaW4gMTo5KXtcbiAgcDJwYXRoPC10YWlscGF0aChwMnBhdGgpfSIsIiIsInBhcnQyPC1sZW5ndGgodW5pcXVlKHAycGF0aCkpIiwicGFydDIiXX0= -->
-<pre class="r"><code>## longer input
-input&lt;-read_lines(&quot;Day9Sample2.txt&quot;)
-
-## new headpath
-p2path&lt;-list(c(0,0))
-for(i in 1:length(input)){
-  inst&lt;-unlist(str_split(input[i],&quot; &quot;))
-  dir&lt;-inst[1];st&lt;-as.numeric(inst[2])
-  for(j in 1:st){
-    prev&lt;-unlist(tail(p2path,1))
-    switch(dir,
-           &quot;R&quot;=nxt&lt;-prev+c(1,0),
-           &quot;L&quot;=nxt&lt;-prev-c(1,0),
-           &quot;U&quot;=nxt&lt;-prev-c(0,1),
-           &quot;D&quot;=nxt&lt;-prev+c(0,1),
-           cat(&quot;something is wrong\n&quot;))
-    p2path&lt;-append(p2path,list(c(nxt)))}}
-
-## rerun
-for(i in 1:9){
-  p2path&lt;-tailpath(p2path)}
-
-part2&lt;-length(unique(p2path))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua2V5ZmlsZTwtZW5jZmlsZSAlPiUgbXV0YXRlKG51bT1udW0qODExNTg5MTUzKVxucGFydDI8LXN1bShtaXhmaWxlKDEwLGtleWZpbGUpKVxucGFydDJcbmBgYCJ9 -->
+<pre class="r"><code>keyfile&lt;-encfile %&gt;% mutate(num=num*811589153)
+part2&lt;-sum(mixfile(10,keyfile))
 part2</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM2XG4ifQ== -->
-<pre><code>[1] 36</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE2MjMxNzgzMDZcbiJ9 -->
+<pre><code>[1] 1623178306</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSA5IE5vdGVib29rIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KGtuaXRyKQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkoc3RyaW5ncikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShyZWFkcikNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCmBgYHtyfQ0KaW5wdXQ8LXJlYWRfbGluZXMoIkRheTlTYW1wbGUudHh0IikNCmBgYA0KDQojIyBQYXJ0IDENCg0KRmlyc3QsIGJ1aWxkIG91dCB0aGUgcGF0aCBmb3IgdGhlIGhlYWQgb2YgdGhlIHJvcGUsIGl0IHdpbGwgbmVlZCB0byBiZSBzdGVwIGJ5IHN0ZXAgYmVjYXVzZSBvZiB0aGUgd2F5IHRoYXQgdGhlIGhlYWQgcHVsbHMgdGhlIHRhaWw6DQoNCmBgYHtyfQ0KaGVhZHBhdGg8LWxpc3QoYygwLDApKQ0KZm9yKGkgaW4gMTpsZW5ndGgoaW5wdXQpKXsNCiAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnB1dFtpXSwiICIpKQ0KICBkaXI8LWluc3RbMV07c3Q8LWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgZm9yKGogaW4gMTpzdCl7DQogICAgcHJldjwtdW5saXN0KHRhaWwoaGVhZHBhdGgsMSkpDQogICAgc3dpdGNoKGRpciwNCiAgICAgICAgICAgIlIiPW54dDwtcHJlditjKDEsMCksDQogICAgICAgICAgICJMIj1ueHQ8LXByZXYtYygxLDApLA0KICAgICAgICAgICAiVSI9bnh0PC1wcmV2LWMoMCwxKSwNCiAgICAgICAgICAgIkQiPW54dDwtcHJlditjKDAsMSksDQogICAgICAgICAgIGNhdCgic29tZXRoaW5nIGlzIHdyb25nXG4iKSkNCiAgICBoZWFkcGF0aDwtYXBwZW5kKGhlYWRwYXRoLGxpc3QoYyhueHQpKSl9fQ0KYGBgDQoNCk5vdyBmaW5kIHRoZSB0YWlscGF0aCwgZm9yIHRoaXMgdHJlYXQgeCAmIHkgc2VwYXJhdGVseS4NCklmIHRoZSB0YWlsIGlzIHdpdGhpbiAxIG9mIHRoZSBoZWFkLCBkb24ndCBtb3ZlLg0KT3RoZXJ3aXNlLCBpZiB0aGUgdGFpbCBpcyAyIGF3YXkgZnJvbSB0aGUgaGVhZCBpbiB0aGUgeCBkaXJlY3Rpb24sIG1vdmUgaW4gdGhhdCBkaXJlY3Rpb24gYnkgMSwgbW92ZSB5IHRvIG1hdGNoIHRoZSBoZWFkJ3MgeS4gRG8gdGhlIHNhbWUgZm9yIA0KDQpgYGB7cn0NCnRhaWxwYXRoPC1mdW5jdGlvbihocCl7DQogIHRwPC1saXN0KGMoMCwwKSkNCiAgZm9yKGkgaW4gMjpsZW5ndGgoaHApKXsNCiAgICBoZWFkcG9zPC1ocFtbaV1dDQogICAgdGFpbHBvczwtdW5saXN0KHRhaWwodHAsMSkpDQogICAgZDwtYWJzKGhlYWRwb3MtdGFpbHBvcykNCiAgICAjIyMgdGhlIGhlYWQgaXMgd2l0aGluIG9uZSBvZiB0aGUgdGFpbA0KICAgIGlmKGFsbChkPD0xKSl7bmV3eDwtdGFpbHBvc1sxXQ0KICAgIG5ld3k8LXRhaWxwb3NbMl0NCiAgICAjIyMgaWYgdGhlIGhlYWQgaGFzIG1vdmVkIHVwIHRvIHR3byBhd2F5IGluIHRoZSB4IGRpcmVjdGlvbiAtIGJ1dCBub3QgdGhlIHkNCiAgICB9ZWxzZSBpZihkWzFdPT0yJiZkWzJdPDIpew0KICAgICAgbmV3eDwtbWVhbihjKGhlYWRwb3NbMV0sdGFpbHBvc1sxXSkpDQogICAgICBuZXd5PC1oZWFkcG9zWzJdDQogICAgIyMjIGlmIHRoZSBoZWFkIGhhcyBtb3ZlZCB1cCB0byB0d28gYXdheSBpbiB0aGUgeSBkaXJlY3Rpb24sIGJ1dCBub3QgdGhlIHggIA0KICAgIH1lbHNlIGlmKGRbMl09PTImJmRbMV08Mil7DQogICAgICBuZXd5PC1tZWFuKGMoaGVhZHBvc1syXSx0YWlscG9zWzJdKSkNCiAgICAgIG5ld3g8LWhlYWRwb3NbMV0NCiAgICAjIyMgaWYgdGhlIGhlYWQgaXMgdHdvIGF3YXkgaW4gYm90aCBkaXJlY3Rpb25zICANCiAgICB9ZWxzZSBpZihkWzFdPT0yJiZkWzJdPT0yKXsNCiAgICAgIG5ld3g8LW1lYW4oYyhoZWFkcG9zWzFdLHRhaWxwb3NbMV0pKQ0KICAgICAgbmV3eTwtbWVhbihjKGhlYWRwb3NbMl0sdGFpbHBvc1syXSkpDQogICAgfWVsc2V7Y2F0KCJzb21ldGhpbmcgd2VudCB3cm9uZ1xuIil9DQogICAgdHA8LWFwcGVuZCh0cCxsaXN0KGMobmV3eCxuZXd5KSkpfQ0KICB0cH0NCmBgYA0KDQpgYGB7cn0NCnBhcnQxPC10YWlscGF0aChoZWFkcGF0aCkNCnBhcnQxPC1sZW5ndGgodW5pcXVlKHBhcnQxKSkNCnBhcnQxDQpgYGANCiMjIFBhcnQgMg0KUmVwZWF0IHRoaXMgd2l0aCAxMCBrbm90cyAob3IgaW4gb3RoZXIgd29yZHMsIDkgdGltZXMuKSAgVGhpcyBuZWVkcyBuZXcgZGF0YQ0KDQpXaXRoIHRoZSBvcmlnaW5hbCBkYXRhOg0KYGBge3J9DQpsb3Rza25vdHM8LWhlYWRwYXRoDQpmb3IoaSBpbiAxOjkpew0KICBsb3Rza25vdHM8LXRhaWxwYXRoKGxvdHNrbm90cyl9DQoNCnBhcnQyPC1sZW5ndGgodW5pcXVlKGxvdHNrbm90cykpDQpwYXJ0MiAgDQpgYGANCm9yIGZvciBhIHNlY29uZCBzYW1wbGU6DQoNCmBgYHtyfQ0KIyMgbG9uZ2VyIGlucHV0DQppbnB1dDwtcmVhZF9saW5lcygiRGF5OVNhbXBsZTIudHh0IikNCg0KIyMgbmV3IGhlYWRwYXRoDQpwMnBhdGg8LWxpc3QoYygwLDApKQ0KZm9yKGkgaW4gMTpsZW5ndGgoaW5wdXQpKXsNCiAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnB1dFtpXSwiICIpKQ0KICBkaXI8LWluc3RbMV07c3Q8LWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgZm9yKGogaW4gMTpzdCl7DQogICAgcHJldjwtdW5saXN0KHRhaWwocDJwYXRoLDEpKQ0KICAgIHN3aXRjaChkaXIsDQogICAgICAgICAgICJSIj1ueHQ8LXByZXYrYygxLDApLA0KICAgICAgICAgICAiTCI9bnh0PC1wcmV2LWMoMSwwKSwNCiAgICAgICAgICAgIlUiPW54dDwtcHJldi1jKDAsMSksDQogICAgICAgICAgICJEIj1ueHQ8LXByZXYrYygwLDEpLA0KICAgICAgICAgICBjYXQoInNvbWV0aGluZyBpcyB3cm9uZ1xuIikpDQogICAgcDJwYXRoPC1hcHBlbmQocDJwYXRoLGxpc3QoYyhueHQpKSl9fQ0KDQojIyByZXJ1bg0KZm9yKGkgaW4gMTo5KXsNCiAgcDJwYXRoPC10YWlscGF0aChwMnBhdGgpfQ0KDQpwYXJ0MjwtbGVuZ3RoKHVuaXF1ZShwMnBhdGgpKQ0KcGFydDINCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAyMCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg0KRmlyc3QsIHJlYWQgaW4gdGhlIGlucHV0DQpUaGVuIG1ha2UgdGhhdCBpbnRvIGEgZGF0YWZyYW1lIC0gb25lIGNvbHVtbiBpcyB0aGUgImN1cnJlbnQgcG9zaXRpb24iIHRoZSBvdGhlciBpcyB0aGUgbnVtYmVycw0KDQpgYGB7cn0NCmlucHV0PC1yZWFkLmNzdigiRGF5MjBTYW1wbGUudHh0IixoZWFkZXI9RkFMU0UpDQoNCmVuY2ZpbGU8LWNiaW5kKDA6KG5yb3coaW5wdXQpLTEpLGlucHV0KQ0KY29sbmFtZXMoZW5jZmlsZSk8LWMoInBvcyIsIm51bSIpDQpgYGANCg0KVGhlbiBjcmVhdGUgdGhlIGZ1bmN0aW9uIHRvIG1peCB0aGUgbnVtYmVycyAtIA0KKiBpZiB0aGUgbnVtYmVyIGlzIG5lZ2F0aXZlLCBtYWtlIGl0IGludG8gYSBwb3NpdGl2ZSAobW9kLCBsZW5ndGggb2YgdGhlIGNoYWluIC0xKQ0KKiB0aGVuIGVpdGhlciBtb3ZlIGl0IGZvcndhcmQgb3IgYmFja3dhcmRzLCBkZXBlbmRpbmcgb24gd2hpY2ggdGFrZXMgbGVzcyBtYXRoDQoNCmBgYHtyfQ0KbWl4ZmlsZTwtZnVuY3Rpb24obWl4ZXM9MSxkZil7DQogIGZvcihtIGluIDE6bWl4ZXMpew0KICAgIGVuY3J5cHRsZW5ndGg8LW5yb3coZGYpDQogICAgZm9yIChpIGluIDE6ZW5jcnlwdGxlbmd0aCl7DQogICAgICAjIyMgaSBpcyB0aGUgcG9zaXRpb24gb2YgdGhlIGN1cnJlbnRseSB3b3JraW5nIG51bWJlcg0KICAgICAgIyMjICBmaWd1cmUgb3V0IHRoZSBudW1iZXJzIHRvIG1vdmUNCiAgICAgICMjIGdldCB0aGUgbnVtYmVyICYgbWFrZSBpdCBwb3NpdGl2ZQ0KICAgICAgIyMjIHJlbnVtIGlzIHRoZSAid29ya2luZyIgbnVtYmVyDQogICAgICByZW51bTwtZGYkbnVtW2ldJSUoZW5jcnlwdGxlbmd0aC0xKQ0KICAgICAgIyMjIHNwIGlzIHRoZSBzdGFydGluZyBwb3NpdGlvbg0KICAgICAgc3A8LWRmJHBvc1tpXQ0KICAgICAgIyMgaWYgdGhlIG51bWJlciB3b3VsZCBoYXZlIHRvIGNpcmNsZSBhbGwgdGhlIHdheSBhcm91bmQgdG8gZ28gZm9yd2FyZCwgbWFrZSBpdCBnbyBiYWNrd2FyZHMgaW5zdGVhZA0KICAgICAgIyMgbWFrZXMgdGhlIG5leHQgc3RlcCBlYXNpZXINCiAgICAgIGlmKHJlbnVtK3NwPmVuY3J5cHRsZW5ndGgpe3JlbnVtPC1yZW51bS0oZW5jcnlwdGxlbmd0aC0xKX0NCiAgICAgICMjIHNodWZmbGUgYWxsIHRoZSBudW1iZXJzIGJldHdlZW4gdGhlIG9sZCAmIG5ldyBwb3NpdGlvbiAtIGZvcndhcmQgb3IgYmFja3dhcmQNCiAgICAgIGlmIChyZW51bSA+IDApIHsNCiAgICAgICAgc2h1ZmZsZXNlYXQ8LShzcCsoMTpyZW51bSkpJSVlbmNyeXB0bGVuZ3RoDQogICAgICAgIGRmJHBvc1t3aGljaChkZiRwb3MgJWluJSBzaHVmZmxlc2VhdCldIDwtc2FwcGx5KGRmJHBvc1t3aGljaChkZiRwb3MgJWluJSBzaHVmZmxlc2VhdCldLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmdW5jdGlvbih4KXsoeCAtIDEpJSVlbmNyeXB0bGVuZ3RofSkNCiAgICAgICAgfWVsc2UgaWYocmVudW0gPCAwKSB7DQogICAgICAgIHNodWZmbGVzZWF0PC0oc3ArKCgtMSk6cmVudW0pKSUlIGVuY3J5cHRsZW5ndGgNCiAgICAgICAgZGYkcG9zW3doaWNoKGRmJHBvcyAlaW4lIHNodWZmbGVzZWF0KV0gPC1zYXBwbHkoZGYkcG9zW3doaWNoKGRmJHBvcyAlaW4lIHNodWZmbGVzZWF0KV0sDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZ1bmN0aW9uKHgpeyh4ICsgMSklJWVuY3J5cHRsZW5ndGh9KX0NCiAgICAgIGRmJHBvc1tpXSA8LSAoc3AgKyByZW51bSkgJSUgZW5jcnlwdGxlbmd0aH19DQogICMjIGFmdGVyIGNvbXBsZXRpbmcgYWxsLCBmaW5kIHRoZSAxMDAwLDIwMDAsICYgMzAwMCBwbGFjZS4NCiAgZ3JvdmU8LWMoMTAwMCwyMDAwLDMwMDApDQogIGdyY29vcmQ8LXNhcHBseShncm92ZSxmdW5jdGlvbih4KXsNCiAgICB5PC0oeCtkZiRwb3Nbd2hpY2goZGYkbnVtPT0wKV0pJSVlbmNyeXB0bGVuZ3RoDQogICAgZGYkbnVtW3doaWNoKGRmJHBvcz09eSldfSkNCiAgZ3Jjb29yZH0NCg0KDQpgYGANCg0KDQpgYGB7cn0NCnBhcnQxPC1zdW0obWl4ZmlsZSgxLGVuY2ZpbGUpKQ0KcGFydDENCmBgYA0KDQojIyBQYXJ0IDINCg0KTXVsdGlwbHkgdGhlIG51bWJlcnMgYW5kIHJ1biBpdCBhZ2FpbiwgMTAgdGltZXMuDQpgYGB7cn0NCmtleWZpbGU8LWVuY2ZpbGUgJT4lIG11dGF0ZShudW09bnVtKjgxMTU4OTE1MykNCnBhcnQyPC1zdW0obWl4ZmlsZSgxMCxrZXlmaWxlKSkNCnBhcnQyDQpgYGANCg0K</div>
 
 
 
@@ -1935,7 +1886,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Day9.Rmd");
+  window.initializeSourceEmbed("Day20.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

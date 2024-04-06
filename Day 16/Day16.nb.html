@@ -11,7 +11,7 @@
 
 
 
-<title>Day 9 Notebook</title>
+<title>Day 16 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day 9 Notebook</h1>
+<h1 class="title toc-ignore">Day 16 Notebook</h1>
 
 </div>
 
@@ -1756,139 +1756,181 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXk5U2FtcGxlLnR4dFwiKSJ9 -->
-<pre class="r"><code>input&lt;-read_lines(&quot;Day9Sample.txt&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkxNlNhbXBsZS50eHRcIilcbmBgYCJ9 -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day16Sample.txt&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
-<p>First, build out the path for the head of the rope, it will need to
-be step by step because of the way that the head pulls the tail:</p>
+<p>Start by reformating the input</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbImhlYWRwYXRoPC1saXN0KGMoMCwwKSkiLCJmb3IoaSBpbiAxOmxlbmd0aChpbnB1dCkpe1xuICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLFwiIFwiKSlcbiAgZGlyPC1pbnN0WzFdO3N0PC1hcy5udW1lcmljKGluc3RbMl0pXG4gIGZvcihqIGluIDE6c3Qpe1xuICAgIHByZXY8LXVubGlzdCh0YWlsKGhlYWRwYXRoLDEpKVxuICAgIHN3aXRjaChkaXIsXG4gICAgICAgICAgIFwiUlwiPW54dDwtcHJlditjKDEsMCksXG4gICAgICAgICAgIFwiTFwiPW54dDwtcHJldi1jKDEsMCksXG4gICAgICAgICAgIFwiVVwiPW54dDwtcHJldi1jKDAsMSksXG4gICAgICAgICAgIFwiRFwiPW54dDwtcHJlditjKDAsMSksXG4gICAgICAgICAgIGNhdChcInNvbWV0aGluZyBpcyB3cm9uZ1xcblwiKSlcbiAgICBoZWFkcGF0aDwtYXBwZW5kKGhlYWRwYXRoLGxpc3QoYyhueHQpKSl9fSJdfQ== -->
-<pre class="r"><code>headpath&lt;-list(c(0,0))
-for(i in 1:length(input)){
-  inst&lt;-unlist(str_split(input[i],&quot; &quot;))
-  dir&lt;-inst[1];st&lt;-as.numeric(inst[2])
-  for(j in 1:st){
-    prev&lt;-unlist(tail(headpath,1))
-    switch(dir,
-           &quot;R&quot;=nxt&lt;-prev+c(1,0),
-           &quot;L&quot;=nxt&lt;-prev-c(1,0),
-           &quot;U&quot;=nxt&lt;-prev-c(0,1),
-           &quot;D&quot;=nxt&lt;-prev+c(0,1),
-           cat(&quot;something is wrong\n&quot;))
-    headpath&lt;-append(headpath,list(c(nxt)))}}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudmFsdmVsaXN0PC1sYXBwbHkoaW5wdXQsZnVuY3Rpb24oeCl7XG4gIHg8LXN0cl9yZXBsYWNlKHgsXCJWYWx2ZSBcIixcIlwiKVxuICB4PC1zdHJfcmVwbGFjZSh4LFwiIGhhcyBmbG93IHJhdGU9XCIsXCIgXCIpXG4gIHg8LXN0cl9yZXBsYWNlKHgsXCI7IHR1bm5lbHMgbGVhZCB0byB2YWx2ZXMgXCIsXCIgXCIpXG4gIHg8LXN0cl9yZXBsYWNlKHgsXCI7IHR1bm5lbCBsZWFkcyB0byB2YWx2ZSBcIixcIiBcIilcbiAgeDwtc3RyX3JlcGxhY2VfYWxsKHgsXCIsIFwiLFwiLFwiKVxuICB4PC11bmxpc3Qoc3RyX3NwbGl0KHgsXCIgXCIpKVxuICB4fSlcbmBgYCJ9 -->
+<pre class="r"><code>valvelist&lt;-lapply(input,function(x){
+  x&lt;-str_replace(x,&quot;Valve &quot;,&quot;&quot;)
+  x&lt;-str_replace(x,&quot; has flow rate=&quot;,&quot; &quot;)
+  x&lt;-str_replace(x,&quot;; tunnels lead to valves &quot;,&quot; &quot;)
+  x&lt;-str_replace(x,&quot;; tunnel leads to valve &quot;,&quot; &quot;)
+  x&lt;-str_replace_all(x,&quot;, &quot;,&quot;,&quot;)
+  x&lt;-unlist(str_split(x,&quot; &quot;))
+  x})</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Now find the tailpath, for this treat x &amp; y separately. If the
-tail is within 1 of the head, don’t move. Otherwise, if the tail is 2
-away from the head in the x direction, move in that direction by 1, move
-y to match the head’s y. Do the same for</p>
+<p>In the interest of making this a little less onerous, make this graph
+a little smaller by removing the broken valves (no need to stop there),
+except for the starting point (AA)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoidGFpbHBhdGg8LWZ1bmN0aW9uKGhwKXtcbiAgdHA8LWxpc3QoYygwLDApKVxuICBmb3IoaSBpbiAyOmxlbmd0aChocCkpe1xuICAgIGhlYWRwb3M8LWhwW1tpXV1cbiAgICB0YWlscG9zPC11bmxpc3QodGFpbCh0cCwxKSlcbiAgICBkPC1hYnMoaGVhZHBvcy10YWlscG9zKVxuICAgICMjIyB0aGUgaGVhZCBpcyB3aXRoaW4gb25lIG9mIHRoZSB0YWlsXG4gICAgaWYoYWxsKGQ8PTEpKXtuZXd4PC10YWlscG9zWzFdXG4gICAgbmV3eTwtdGFpbHBvc1syXVxuICAgICMjIyBpZiB0aGUgaGVhZCBoYXMgbW92ZWQgdXAgdG8gdHdvIGF3YXkgaW4gdGhlIHggZGlyZWN0aW9uIC0gYnV0IG5vdCB0aGUgeVxuICAgIH1lbHNlIGlmKGRbMV09PTImJmRbMl08Mil7XG4gICAgICBuZXd4PC1tZWFuKGMoaGVhZHBvc1sxXSx0YWlscG9zWzFdKSlcbiAgICAgIG5ld3k8LWhlYWRwb3NbMl1cbiAgICAjIyMgaWYgdGhlIGhlYWQgaGFzIG1vdmVkIHVwIHRvIHR3byBhd2F5IGluIHRoZSB5IGRpcmVjdGlvbiwgYnV0IG5vdCB0aGUgeCAgXG4gICAgfWVsc2UgaWYoZFsyXT09MiYmZFsxXTwyKXtcbiAgICAgIG5ld3k8LW1lYW4oYyhoZWFkcG9zWzJdLHRhaWxwb3NbMl0pKVxuICAgICAgbmV3eDwtaGVhZHBvc1sxXVxuICAgICMjIyBpZiB0aGUgaGVhZCBpcyB0d28gYXdheSBpbiBib3RoIGRpcmVjdGlvbnMgIFxuICAgIH1lbHNlIGlmKGRbMV09PTImJmRbMl09PTIpe1xuICAgICAgbmV3eDwtbWVhbihjKGhlYWRwb3NbMV0sdGFpbHBvc1sxXSkpXG4gICAgICBuZXd5PC1tZWFuKGMoaGVhZHBvc1syXSx0YWlscG9zWzJdKSlcbiAgICB9ZWxzZXtjYXQoXCJzb21ldGhpbmcgd2VudCB3cm9uZ1xcblwiKX1cbiAgICB0cDwtYXBwZW5kKHRwLGxpc3QoYyhuZXd4LG5ld3kpKSl9XG4gIHRwfSJ9 -->
-<pre class="r"><code>tailpath&lt;-function(hp){
-  tp&lt;-list(c(0,0))
-  for(i in 2:length(hp)){
-    headpos&lt;-hp[[i]]
-    tailpos&lt;-unlist(tail(tp,1))
-    d&lt;-abs(headpos-tailpos)
-    ### the head is within one of the tail
-    if(all(d&lt;=1)){newx&lt;-tailpos[1]
-    newy&lt;-tailpos[2]
-    ### if the head has moved up to two away in the x direction - but not the y
-    }else if(d[1]==2&amp;&amp;d[2]&lt;2){
-      newx&lt;-mean(c(headpos[1],tailpos[1]))
-      newy&lt;-headpos[2]
-    ### if the head has moved up to two away in the y direction, but not the x  
-    }else if(d[2]==2&amp;&amp;d[1]&lt;2){
-      newy&lt;-mean(c(headpos[2],tailpos[2]))
-      newx&lt;-headpos[1]
-    ### if the head is two away in both directions  
-    }else if(d[1]==2&amp;&amp;d[2]==2){
-      newx&lt;-mean(c(headpos[1],tailpos[1]))
-      newy&lt;-mean(c(headpos[2],tailpos[2]))
-    }else{cat(&quot;something went wrong\n&quot;)}
-    tp&lt;-append(tp,list(c(newx,newy)))}
-  tp}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIGNyZWF0ZSB0aGUgZGljdGlvbmFyeSBmb3IgdGhlIHZhbHZlcyBcbmZsb3dkaWN0PC1kaWN0KClcbmZvcihpIGluIDE6bGVuZ3RoKHZhbHZlbGlzdCkpe1xuICBmbG93ZGljdCRzZXQodmFsdmVsaXN0W1tpXV1bMV0sYXMubnVtZXJpYyh2YWx2ZWxpc3RbW2ldXVsyXSkpfVxuXG4jIyMgY3JlYXRlIHRoZSBsYXJnZSBtYXBcbiMjIyBlZGdlbGlzdFxuZWw8LWFzLmRhdGEuZnJhbWUobWF0cml4KG5jb2w9Myxucm93PTApKVxuIyMjIGxpc3Qgb2YgdmFsdmVzIGZvciBsYXRlciAtIG5lZWQgQUEgJiB0aGUgd29ya2luZyB2YWx2ZXNcbndvcmtpbmd2YWx2ZXM8LWMoXCJBQVwiKVxuZm9yKGkgaW4gMTpsZW5ndGgodmFsdmVsaXN0KSl7XG4gIGY8LXZhbHZlbGlzdFtbaV1dWzFdXG4gIHQ8LXVubGlzdChzdHJfc3BsaXQodmFsdmVsaXN0W1tpXV1bM10sXCIsXCIpKVxuICBuPC1hcy5udW1lcmljKHZhbHZlbGlzdFtbaV1dWzJdKVxuICBmb3IoaiBpbiAxOmxlbmd0aCh0KSl7XG4gICAgZWw8LXJiaW5kKGVsLGxpc3QoZj1mLHQ9dFtqXSxkPW4pKX1cbiAgaWYobj4wKXt3b3JraW5ndmFsdmVzPC1jKHdvcmtpbmd2YWx2ZXMsZil9fVxuXG52YWx2ZW1hcDwtc2ltcGxpZnkoZ3JhcGhfZnJvbV9lZGdlbGlzdChhcy5tYXRyaXgoZWxbLDE6Ml0pLGRpcmVjdGVkPUZBTFNFKSlcblxuIyMjIGEgcXVpY2sgZ3JhcGggdG8gc2VlIHdoYXQgdGhpcyBsb29rcyBsaWtlXG5nZ3JhcGgodmFsdmVtYXAsbGF5b3V0PVwic3RyZXNzXCIpK1xuICBnZW9tX25vZGVfdGV4dChhZXMobGFiZWw9bmFtZSkpK1xuICBnZW9tX2VkZ2VfZmFuKHN0YXJ0X2NhcCA9IGNpcmNsZSgzLCAnbW0nKSxcbiAgICAgICAgICAgICAgICBlbmRfY2FwID0gY2lyY2xlKDMsICdtbScpKVxuXG5gYGAifQ== -->
+<pre class="r"><code>### create the dictionary for the valves 
+flowdict&lt;-dict()
+for(i in 1:length(valvelist)){
+  flowdict$set(valvelist[[i]][1],as.numeric(valvelist[[i]][2]))}
+
+### create the large map
+### edgelist
+el&lt;-as.data.frame(matrix(ncol=3,nrow=0))
+### list of valves for later - need AA &amp; the working valves
+workingvalves&lt;-c(&quot;AA&quot;)
+for(i in 1:length(valvelist)){
+  f&lt;-valvelist[[i]][1]
+  t&lt;-unlist(str_split(valvelist[[i]][3],&quot;,&quot;))
+  n&lt;-as.numeric(valvelist[[i]][2])
+  for(j in 1:length(t)){
+    el&lt;-rbind(el,list(f=f,t=t[j],d=n))}
+  if(n&gt;0){workingvalves&lt;-c(workingvalves,f)}}
+
+valvemap&lt;-simplify(graph_from_edgelist(as.matrix(el[,1:2]),directed=FALSE))
+
+### a quick graph to see what this looks like
+ggraph(valvemap,layout=&quot;stress&quot;)+
+  geom_node_text(aes(label=name))+
+  geom_edge_fan(start_cap = circle(3, &#39;mm&#39;),
+                end_cap = circle(3, &#39;mm&#39;))
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
+<p><img src="data:image/png;base64,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" /></p>
+<!-- rnb-plot-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>find the abbreviated graph &amp; distances between all of the nodes
+with values &amp; AA</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjZ2V0IHRoZSBtZWFuaW5nZnVsIGRpc3RhbmNlc1xuZHM8LWRpc3RhbmNlcyh2YWx2ZW1hcCx2PXdvcmtpbmd2YWx2ZXMsdG89d29ya2luZ3ZhbHZlcyxtb2RlPWFsbClcbmRzPC1tZWx0KGRzKVxuY29sbmFtZXMoZHMpPC1jKFwiZlwiLFwidFwiLFwiZFwiKVxuZHMkZjwtYXMuY2hhcmFjdGVyKGRzJGYpXG5kcyR0PC1hcy5jaGFyYWN0ZXIoZHMkdClcbiMjIyBuZXZlciBnb2luZyBiYWNrIHRvIEFBLCBzbyByZW1vdmUgdGhhdC4gIEFuZCBhZGQgMSBhY2NvdW50IGZvciB0aGUgdGltZSB0byB0dXJuIG9uIHRoZSB2YWx2ZVxuZHM8LWRzICU+JSB1bmdyb3VwICU+JSBmaWx0ZXIodCE9XCJBQVwiKSAlPiUgcm93d2lzZSAlPiVcbiAgbXV0YXRlKGZsb3c9Zmxvd2RpY3QkZ2V0KHQpLGQ9ZCsxKVxuXG5gYGAifQ== -->
+<pre class="r"><code>###get the meaningful distances
+ds&lt;-distances(valvemap,v=workingvalves,to=workingvalves,mode=all)
+ds&lt;-melt(ds)
+colnames(ds)&lt;-c(&quot;f&quot;,&quot;t&quot;,&quot;d&quot;)
+ds$f&lt;-as.character(ds$f)
+ds$t&lt;-as.character(ds$t)
+### never going back to AA, so remove that.  And add 1 account for the time to turn on the valve
+ds&lt;-ds %&gt;% ungroup %&gt;% filter(t!=&quot;AA&quot;) %&gt;% rowwise %&gt;%
+  mutate(flow=flowdict$get(t),d=d+1)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>From there - search the way through:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudm9sY2Fub3ZhbHZlczwtZnVuY3Rpb24obWF4dGltZSx2YWx2ZWZyYW1lKXtcbiAgdmFsdmVzdGFjazwtc3RhY2soKVxuICAjIyBrZWVwIHRyYWNrIG9mIHRoZSBjdXJyZW50IHBvc2l0aW9uLCB2aXNpdGVkIHBvc2l0aW9ucywgdGltZSBsZWZ0LCBhbmQgZmxvd1xuICBzdHJ0PC1saXN0KFwiQUFcIixjKFwiQUFcIiksbWF4dGltZSwwKVxuICB2YWx2ZXN0YWNrJHB1c2goc3RydClcbiAgIyMjIHdpbGwga2VlcCBhIGNvcHkgb2YgZXZlcnkgc3RlcCBhbG9uZyB0aGUgd2F5IC0gZm9yIHBhcnQgMlxuICBydG48LWxpc3QoKVxuICB3aGlsZSh2YWx2ZXN0YWNrJHNpemUoKT4wKXtcbiAgIGN1cnI8LXZhbHZlc3RhY2skcG9wKClcbiAgIHBvczwtY3VycltbMV1dXG4gICBwdGg8LWN1cnJbWzJdXVxuICAgdGxlZnQ8LWFzLm51bWVyaWMoY3VycltbM11dKVxuICAgZmw8LWFzLm51bWVyaWMoY3VycltbNF1dKVxuICAgIyMgaWYgdGhlcmUncyBubyB0aW1lIGxlZnQsIGdvIHRvIHRoZSBuZXh0IG9uZVxuXG4gICAgICBpZih0bGVmdDwwKXtuZXh0XG4gICB9ZWxzZXtcbiAgICAgIyMgb3RoZXJ3aXNlLCBhZGQgdGhpcyB0byBvbmUgb2YgdGhlIHZhbGlkIG91dGNvbWVzXG4gICAgIHJ0bjwtYXBwZW5kKHJ0bixsaXN0KGN1cnIpKVxuICAgICAjIyBjaGVjayB0byBzZWUgaWYgdGhlcmUncyBhbnl3aGVyZSBlbHNlIHRvIGdvLCBpZiBzbywgYWRkIHRoYXQgdG8gdGhlIHN0YWNrICBcbiAgICAgbmRmPC12YWx2ZWZyYW1lICU+JSBmaWx0ZXIoZj09cG9zLCEodCVpbiVwdGgpKVxuICAgICBpZihucm93KG5kZj4wKSl7XG4gICAgICAgZm9yKGkgaW4gMTpucm93KG5kZikpe1xuICAgICAgICAgeDwtbmRmW2ksXVxuICAgICAgICAgbnh0PC1saXN0KHgkdCxjKHB0aCx4JHQpLHRsZWZ0LXgkZCxmbCsoeCRmbG93Kih0bGVmdC14JGQpKSlcbiAgICAgICAgIHZhbHZlc3RhY2skcHVzaChueHQpfX19fVxuICBydG59XG5gYGAifQ== -->
+<pre class="r"><code>volcanovalves&lt;-function(maxtime,valveframe){
+  valvestack&lt;-stack()
+  ## keep track of the current position, visited positions, time left, and flow
+  strt&lt;-list(&quot;AA&quot;,c(&quot;AA&quot;),maxtime,0)
+  valvestack$push(strt)
+  ### will keep a copy of every step along the way - for part 2
+  rtn&lt;-list()
+  while(valvestack$size()&gt;0){
+   curr&lt;-valvestack$pop()
+   pos&lt;-curr[[1]]
+   pth&lt;-curr[[2]]
+   tleft&lt;-as.numeric(curr[[3]])
+   fl&lt;-as.numeric(curr[[4]])
+   ## if there&#39;s no time left, go to the next one
+
+      if(tleft&lt;0){next
+   }else{
+     ## otherwise, add this to one of the valid outcomes
+     rtn&lt;-append(rtn,list(curr))
+     ## check to see if there&#39;s anywhere else to go, if so, add that to the stack  
+     ndf&lt;-valveframe %&gt;% filter(f==pos,!(t%in%pth))
+     if(nrow(ndf&gt;0)){
+       for(i in 1:nrow(ndf)){
+         x&lt;-ndf[i,]
+         nxt&lt;-list(x$t,c(pth,x$t),tleft-x$d,fl+(x$flow*(tleft-x$d)))
+         valvestack$push(nxt)}}}}
+  rtn}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQxPC10YWlscGF0aChoZWFkcGF0aCkiLCJwYXJ0MTwtbGVuZ3RoKHVuaXF1ZShwYXJ0MSkpIiwicGFydDEiXX0= -->
-<pre class="r"><code>part1&lt;-tailpath(headpath)
-part1&lt;-length(unique(part1))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LXZvbGNhbm92YWx2ZXMoMzAsZHMpXG4jIyMgZmluZCB0aGUgZmxvdyBmcm9tIGVhY2ggcG9zc2liaWxpdHkuICB0aGUgbWF4IGlzIHRoZSBhbnN3ZXIgdG8gcGFydCAxXG5wYXJ0MTwtbWF4KHNhcHBseShwYXJ0MSxmdW5jdGlvbih4KXt4W1s0XV19KSlcbnBhcnQxXG5gYGAifQ== -->
+<pre class="r"><code>part1&lt;-volcanovalves(30,ds)
+### find the flow from each possibility.  the max is the answer to part 1
+part1&lt;-max(sapply(part1,function(x){x[[4]]}))
 part1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzXG4ifQ== -->
-<pre><code>[1] 13</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE2NTFcbiJ9 -->
+<pre><code>[1] 1651</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 <div id="part-2" class="section level2">
 <h2>Part 2</h2>
-<p>Repeat this with 10 knots (or in other words, 9 times.) This needs
-new data</p>
-<p>With the original data:</p>
+<p>For part 2, first - run with 26 minutes</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbImxvdHNrbm90czwtaGVhZHBhdGgiLCJmb3IoaSBpbiAxOjkpe1xuICBsb3Rza25vdHM8LXRhaWxwYXRoKGxvdHNrbm90cyl9IiwiIiwicGFydDI8LWxlbmd0aCh1bmlxdWUobG90c2tub3RzKSkiLCJwYXJ0MiAgIl19 -->
-<pre class="r"><code>lotsknots&lt;-headpath
-for(i in 1:9){
-  lotsknots&lt;-tailpath(lotsknots)}
-
-part2&lt;-length(unique(lotsknots))
-part2  </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWxlcGhhbnQ8LXZvbGNhbm92YWx2ZXMoMjYsZHMpXG5gYGAifQ== -->
+<pre class="r"><code>elephant&lt;-volcanovalves(26,ds)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDFcbiJ9 -->
-<pre><code>[1] 1</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>or for a second sample:</p>
+<p>then find combinations where two paths do not overlap (except for at
+“AA”) and add their flows. The max is the answer for part 2. To get that
+(relatively) quickly - sort elephant by the flow and start with the
+combinations. Don’t even bother if the combination will (obviously) be
+too small</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjpbIiMjIGxvbmdlciBpbnB1dCIsImlucHV0PC1yZWFkX2xpbmVzKFwiRGF5OVNhbXBsZTIudHh0XCIpIiwiIiwiIyMgbmV3IGhlYWRwYXRoIiwicDJwYXRoPC1saXN0KGMoMCwwKSkiLCJmb3IoaSBpbiAxOmxlbmd0aChpbnB1dCkpe1xuICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0W2ldLFwiIFwiKSlcbiAgZGlyPC1pbnN0WzFdO3N0PC1hcy5udW1lcmljKGluc3RbMl0pXG4gIGZvcihqIGluIDE6c3Qpe1xuICAgIHByZXY8LXVubGlzdCh0YWlsKHAycGF0aCwxKSlcbiAgICBzd2l0Y2goZGlyLFxuICAgICAgICAgICBcIlJcIj1ueHQ8LXByZXYrYygxLDApLFxuICAgICAgICAgICBcIkxcIj1ueHQ8LXByZXYtYygxLDApLFxuICAgICAgICAgICBcIlVcIj1ueHQ8LXByZXYtYygwLDEpLFxuICAgICAgICAgICBcIkRcIj1ueHQ8LXByZXYrYygwLDEpLFxuICAgICAgICAgICBjYXQoXCJzb21ldGhpbmcgaXMgd3JvbmdcXG5cIikpXG4gICAgcDJwYXRoPC1hcHBlbmQocDJwYXRoLGxpc3QoYyhueHQpKSl9fSIsIiIsIiMjIHJlcnVuIiwiZm9yKGkgaW4gMTo5KXtcbiAgcDJwYXRoPC10YWlscGF0aChwMnBhdGgpfSIsIiIsInBhcnQyPC1sZW5ndGgodW5pcXVlKHAycGF0aCkpIiwicGFydDIiXX0= -->
-<pre class="r"><code>## longer input
-input&lt;-read_lines(&quot;Day9Sample2.txt&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWxlcGhhbnQ8LWVsZXBoYW50W29yZGVyKC1zYXBwbHkoZWxlcGhhbnQsZnVuY3Rpb24oeCl7eFtbNF1dfSkpXVxucGFydDI8LTBcbmk8LTFcbndoaWxlKGk8bGVuZ3RoKGVsZXBoYW50KSl7XG4gICMjIyBpZiB0aGUgZmxvdyBpcyBsZXNzIHRoYW4gdHdpY2UgdGhlIGN1cnJlbnQgbWF4IGZsb3csIG5vIHJlYXNvbiB0byBrZWVwIGdvaW5nXG4gIGlmKDIqZWxlcGhhbnRbW2ldXVtbNF1dPHBhcnQyKXtuZXh0XG4gIH1lbHNle1xuICAgIGo8LWkrMVxuICAgIHdoaWxlKGo8PWxlbmd0aChlbGVwaGFudCkpe1xuICAgICAgIyMgaWYgaStqPCBjdXJyZW50IG1heCwgbm8gcmVhc29uIHRvIGtlZXAgZ29pbmcgd2l0aCB0aGlzIGlcbiAgICAgIGlmKGVsZXBoYW50W1tpXV1bWzRdXStlbGVwaGFudFtbal1dW1s0XV08cGFydDIpe1xuICAgICAgICBpPC1pKzFcbiAgICAgICAgajwtaSsxXG4gICAgICAgIG5leHRcbiAgICAgIH1lbHNle1xuICAgICAgICAjIyMgaWYgdGhlcmUncyBubyBvdmVybGFwIGJldHdlZW4gdGhlIHR3byBncm91cHMsXG4gICAgICAgICMjIyB0aGUgbmV3IHBhcnQgMiBpcyB0aGUgY29tYmluYXRpb24gb2YgdGhlaXIgZmxvd3MuXG4gICAgICAgIGlmKCEoYW55KGVsZXBoYW50W1tpXV1bWzJdXVstMV0laW4lZWxlcGhhbnRbW2pdXVtbMl1dWy0xXSkpKXtcbiAgICAgICAgICBwYXJ0MjwtZWxlcGhhbnRbW2ldXVtbNF1dK2VsZXBoYW50W1tqXV1bWzRdXX1cbiAgICAgICAgajwtaisxfX19XG4gIGk8LWkrMX1cblxucGFydDJcbmBgYCJ9 -->
+<pre class="r"><code>elephant&lt;-elephant[order(-sapply(elephant,function(x){x[[4]]}))]
+part2&lt;-0
+i&lt;-1
+while(i&lt;length(elephant)){
+  ### if the flow is less than twice the current max flow, no reason to keep going
+  if(2*elephant[[i]][[4]]&lt;part2){next
+  }else{
+    j&lt;-i+1
+    while(j&lt;=length(elephant)){
+      ## if i+j&lt; current max, no reason to keep going with this i
+      if(elephant[[i]][[4]]+elephant[[j]][[4]]&lt;part2){
+        i&lt;-i+1
+        j&lt;-i+1
+        next
+      }else{
+        ### if there&#39;s no overlap between the two groups,
+        ### the new part 2 is the combination of their flows.
+        if(!(any(elephant[[i]][[2]][-1]%in%elephant[[j]][[2]][-1]))){
+          part2&lt;-elephant[[i]][[4]]+elephant[[j]][[4]]}
+        j&lt;-j+1}}}
+  i&lt;-i+1}
 
-## new headpath
-p2path&lt;-list(c(0,0))
-for(i in 1:length(input)){
-  inst&lt;-unlist(str_split(input[i],&quot; &quot;))
-  dir&lt;-inst[1];st&lt;-as.numeric(inst[2])
-  for(j in 1:st){
-    prev&lt;-unlist(tail(p2path,1))
-    switch(dir,
-           &quot;R&quot;=nxt&lt;-prev+c(1,0),
-           &quot;L&quot;=nxt&lt;-prev-c(1,0),
-           &quot;U&quot;=nxt&lt;-prev-c(0,1),
-           &quot;D&quot;=nxt&lt;-prev+c(0,1),
-           cat(&quot;something is wrong\n&quot;))
-    p2path&lt;-append(p2path,list(c(nxt)))}}
-
-## rerun
-for(i in 1:9){
-  p2path&lt;-tailpath(p2path)}
-
-part2&lt;-length(unique(p2path))
 part2</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM2XG4ifQ== -->
-<pre><code>[1] 36</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE3MDdcbiJ9 -->
+<pre><code>[1] 1707</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSA5IE5vdGVib29rIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KGtuaXRyKQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkoc3RyaW5ncikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShyZWFkcikNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCmBgYHtyfQ0KaW5wdXQ8LXJlYWRfbGluZXMoIkRheTlTYW1wbGUudHh0IikNCmBgYA0KDQojIyBQYXJ0IDENCg0KRmlyc3QsIGJ1aWxkIG91dCB0aGUgcGF0aCBmb3IgdGhlIGhlYWQgb2YgdGhlIHJvcGUsIGl0IHdpbGwgbmVlZCB0byBiZSBzdGVwIGJ5IHN0ZXAgYmVjYXVzZSBvZiB0aGUgd2F5IHRoYXQgdGhlIGhlYWQgcHVsbHMgdGhlIHRhaWw6DQoNCmBgYHtyfQ0KaGVhZHBhdGg8LWxpc3QoYygwLDApKQ0KZm9yKGkgaW4gMTpsZW5ndGgoaW5wdXQpKXsNCiAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnB1dFtpXSwiICIpKQ0KICBkaXI8LWluc3RbMV07c3Q8LWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgZm9yKGogaW4gMTpzdCl7DQogICAgcHJldjwtdW5saXN0KHRhaWwoaGVhZHBhdGgsMSkpDQogICAgc3dpdGNoKGRpciwNCiAgICAgICAgICAgIlIiPW54dDwtcHJlditjKDEsMCksDQogICAgICAgICAgICJMIj1ueHQ8LXByZXYtYygxLDApLA0KICAgICAgICAgICAiVSI9bnh0PC1wcmV2LWMoMCwxKSwNCiAgICAgICAgICAgIkQiPW54dDwtcHJlditjKDAsMSksDQogICAgICAgICAgIGNhdCgic29tZXRoaW5nIGlzIHdyb25nXG4iKSkNCiAgICBoZWFkcGF0aDwtYXBwZW5kKGhlYWRwYXRoLGxpc3QoYyhueHQpKSl9fQ0KYGBgDQoNCk5vdyBmaW5kIHRoZSB0YWlscGF0aCwgZm9yIHRoaXMgdHJlYXQgeCAmIHkgc2VwYXJhdGVseS4NCklmIHRoZSB0YWlsIGlzIHdpdGhpbiAxIG9mIHRoZSBoZWFkLCBkb24ndCBtb3ZlLg0KT3RoZXJ3aXNlLCBpZiB0aGUgdGFpbCBpcyAyIGF3YXkgZnJvbSB0aGUgaGVhZCBpbiB0aGUgeCBkaXJlY3Rpb24sIG1vdmUgaW4gdGhhdCBkaXJlY3Rpb24gYnkgMSwgbW92ZSB5IHRvIG1hdGNoIHRoZSBoZWFkJ3MgeS4gRG8gdGhlIHNhbWUgZm9yIA0KDQpgYGB7cn0NCnRhaWxwYXRoPC1mdW5jdGlvbihocCl7DQogIHRwPC1saXN0KGMoMCwwKSkNCiAgZm9yKGkgaW4gMjpsZW5ndGgoaHApKXsNCiAgICBoZWFkcG9zPC1ocFtbaV1dDQogICAgdGFpbHBvczwtdW5saXN0KHRhaWwodHAsMSkpDQogICAgZDwtYWJzKGhlYWRwb3MtdGFpbHBvcykNCiAgICAjIyMgdGhlIGhlYWQgaXMgd2l0aGluIG9uZSBvZiB0aGUgdGFpbA0KICAgIGlmKGFsbChkPD0xKSl7bmV3eDwtdGFpbHBvc1sxXQ0KICAgIG5ld3k8LXRhaWxwb3NbMl0NCiAgICAjIyMgaWYgdGhlIGhlYWQgaGFzIG1vdmVkIHVwIHRvIHR3byBhd2F5IGluIHRoZSB4IGRpcmVjdGlvbiAtIGJ1dCBub3QgdGhlIHkNCiAgICB9ZWxzZSBpZihkWzFdPT0yJiZkWzJdPDIpew0KICAgICAgbmV3eDwtbWVhbihjKGhlYWRwb3NbMV0sdGFpbHBvc1sxXSkpDQogICAgICBuZXd5PC1oZWFkcG9zWzJdDQogICAgIyMjIGlmIHRoZSBoZWFkIGhhcyBtb3ZlZCB1cCB0byB0d28gYXdheSBpbiB0aGUgeSBkaXJlY3Rpb24sIGJ1dCBub3QgdGhlIHggIA0KICAgIH1lbHNlIGlmKGRbMl09PTImJmRbMV08Mil7DQogICAgICBuZXd5PC1tZWFuKGMoaGVhZHBvc1syXSx0YWlscG9zWzJdKSkNCiAgICAgIG5ld3g8LWhlYWRwb3NbMV0NCiAgICAjIyMgaWYgdGhlIGhlYWQgaXMgdHdvIGF3YXkgaW4gYm90aCBkaXJlY3Rpb25zICANCiAgICB9ZWxzZSBpZihkWzFdPT0yJiZkWzJdPT0yKXsNCiAgICAgIG5ld3g8LW1lYW4oYyhoZWFkcG9zWzFdLHRhaWxwb3NbMV0pKQ0KICAgICAgbmV3eTwtbWVhbihjKGhlYWRwb3NbMl0sdGFpbHBvc1syXSkpDQogICAgfWVsc2V7Y2F0KCJzb21ldGhpbmcgd2VudCB3cm9uZ1xuIil9DQogICAgdHA8LWFwcGVuZCh0cCxsaXN0KGMobmV3eCxuZXd5KSkpfQ0KICB0cH0NCmBgYA0KDQpgYGB7cn0NCnBhcnQxPC10YWlscGF0aChoZWFkcGF0aCkNCnBhcnQxPC1sZW5ndGgodW5pcXVlKHBhcnQxKSkNCnBhcnQxDQpgYGANCiMjIFBhcnQgMg0KUmVwZWF0IHRoaXMgd2l0aCAxMCBrbm90cyAob3IgaW4gb3RoZXIgd29yZHMsIDkgdGltZXMuKSAgVGhpcyBuZWVkcyBuZXcgZGF0YQ0KDQpXaXRoIHRoZSBvcmlnaW5hbCBkYXRhOg0KYGBge3J9DQpsb3Rza25vdHM8LWhlYWRwYXRoDQpmb3IoaSBpbiAxOjkpew0KICBsb3Rza25vdHM8LXRhaWxwYXRoKGxvdHNrbm90cyl9DQoNCnBhcnQyPC1sZW5ndGgodW5pcXVlKGxvdHNrbm90cykpDQpwYXJ0MiAgDQpgYGANCm9yIGZvciBhIHNlY29uZCBzYW1wbGU6DQoNCmBgYHtyfQ0KIyMgbG9uZ2VyIGlucHV0DQppbnB1dDwtcmVhZF9saW5lcygiRGF5OVNhbXBsZTIudHh0IikNCg0KIyMgbmV3IGhlYWRwYXRoDQpwMnBhdGg8LWxpc3QoYygwLDApKQ0KZm9yKGkgaW4gMTpsZW5ndGgoaW5wdXQpKXsNCiAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnB1dFtpXSwiICIpKQ0KICBkaXI8LWluc3RbMV07c3Q8LWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgZm9yKGogaW4gMTpzdCl7DQogICAgcHJldjwtdW5saXN0KHRhaWwocDJwYXRoLDEpKQ0KICAgIHN3aXRjaChkaXIsDQogICAgICAgICAgICJSIj1ueHQ8LXByZXYrYygxLDApLA0KICAgICAgICAgICAiTCI9bnh0PC1wcmV2LWMoMSwwKSwNCiAgICAgICAgICAgIlUiPW54dDwtcHJldi1jKDAsMSksDQogICAgICAgICAgICJEIj1ueHQ8LXByZXYrYygwLDEpLA0KICAgICAgICAgICBjYXQoInNvbWV0aGluZyBpcyB3cm9uZ1xuIikpDQogICAgcDJwYXRoPC1hcHBlbmQocDJwYXRoLGxpc3QoYyhueHQpKSl9fQ0KDQojIyByZXJ1bg0KZm9yKGkgaW4gMTo5KXsNCiAgcDJwYXRoPC10YWlscGF0aChwMnBhdGgpfQ0KDQpwYXJ0MjwtbGVuZ3RoKHVuaXF1ZShwMnBhdGgpKQ0KcGFydDINCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxNiBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KGNvbGxlY3Rpb25zKQ0KbGlicmFyeShyZXNoYXBlMikNCmxpYnJhcnkoc3RyaW5ncikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShpZ3JhcGgpDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KHJnbCkNCmxpYnJhcnkoZ2dyYXBoKQ0KbGlicmFyeShyZWFkcikNCmxpYnJhcnkoZHM0cHN5KQ0KbGlicmFyeShudW1iZXJzKQ0Kb3B0aW9ucyhzY2lwZW4gPSA5OTkpDQpgYGANCg0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCJEYXkxNlNhbXBsZS50eHQiKQ0KYGBgDQoNCiMjIFBhcnQgMQ0KU3RhcnQgYnkgcmVmb3JtYXRpbmcgdGhlIGlucHV0DQpgYGB7cn0NCnZhbHZlbGlzdDwtbGFwcGx5KGlucHV0LGZ1bmN0aW9uKHgpew0KICB4PC1zdHJfcmVwbGFjZSh4LCJWYWx2ZSAiLCIiKQ0KICB4PC1zdHJfcmVwbGFjZSh4LCIgaGFzIGZsb3cgcmF0ZT0iLCIgIikNCiAgeDwtc3RyX3JlcGxhY2UoeCwiOyB0dW5uZWxzIGxlYWQgdG8gdmFsdmVzICIsIiAiKQ0KICB4PC1zdHJfcmVwbGFjZSh4LCI7IHR1bm5lbCBsZWFkcyB0byB2YWx2ZSAiLCIgIikNCiAgeDwtc3RyX3JlcGxhY2VfYWxsKHgsIiwgIiwiLCIpDQogIHg8LXVubGlzdChzdHJfc3BsaXQoeCwiICIpKQ0KICB4fSkNCmBgYA0KDQpJbiB0aGUgaW50ZXJlc3Qgb2YgbWFraW5nIHRoaXMgYSBsaXR0bGUgbGVzcyBvbmVyb3VzLCBtYWtlIHRoaXMgZ3JhcGggYSBsaXR0bGUgc21hbGxlciBieSByZW1vdmluZyB0aGUgYnJva2VuIHZhbHZlcyAobm8gbmVlZCB0byBzdG9wIHRoZXJlKSwgZXhjZXB0IGZvciB0aGUgc3RhcnRpbmcgcG9pbnQgKEFBKQ0KDQpgYGB7cn0NCiMjIyBjcmVhdGUgdGhlIGRpY3Rpb25hcnkgZm9yIHRoZSB2YWx2ZXMgDQpmbG93ZGljdDwtZGljdCgpDQpmb3IoaSBpbiAxOmxlbmd0aCh2YWx2ZWxpc3QpKXsNCiAgZmxvd2RpY3Qkc2V0KHZhbHZlbGlzdFtbaV1dWzFdLGFzLm51bWVyaWModmFsdmVsaXN0W1tpXV1bMl0pKX0NCg0KIyMjIGNyZWF0ZSB0aGUgbGFyZ2UgbWFwDQojIyMgZWRnZWxpc3QNCmVsPC1hcy5kYXRhLmZyYW1lKG1hdHJpeChuY29sPTMsbnJvdz0wKSkNCiMjIyBsaXN0IG9mIHZhbHZlcyBmb3IgbGF0ZXIgLSBuZWVkIEFBICYgdGhlIHdvcmtpbmcgdmFsdmVzDQp3b3JraW5ndmFsdmVzPC1jKCJBQSIpDQpmb3IoaSBpbiAxOmxlbmd0aCh2YWx2ZWxpc3QpKXsNCiAgZjwtdmFsdmVsaXN0W1tpXV1bMV0NCiAgdDwtdW5saXN0KHN0cl9zcGxpdCh2YWx2ZWxpc3RbW2ldXVszXSwiLCIpKQ0KICBuPC1hcy5udW1lcmljKHZhbHZlbGlzdFtbaV1dWzJdKQ0KICBmb3IoaiBpbiAxOmxlbmd0aCh0KSl7DQogICAgZWw8LXJiaW5kKGVsLGxpc3QoZj1mLHQ9dFtqXSxkPW4pKX0NCiAgaWYobj4wKXt3b3JraW5ndmFsdmVzPC1jKHdvcmtpbmd2YWx2ZXMsZil9fQ0KDQp2YWx2ZW1hcDwtc2ltcGxpZnkoZ3JhcGhfZnJvbV9lZGdlbGlzdChhcy5tYXRyaXgoZWxbLDE6Ml0pLGRpcmVjdGVkPUZBTFNFKSkNCg0KIyMjIGEgcXVpY2sgZ3JhcGggdG8gc2VlIHdoYXQgdGhpcyBsb29rcyBsaWtlDQpnZ3JhcGgodmFsdmVtYXAsbGF5b3V0PSJzdHJlc3MiKSsNCiAgZ2VvbV9ub2RlX3RleHQoYWVzKGxhYmVsPW5hbWUpKSsNCiAgZ2VvbV9lZGdlX2ZhbihzdGFydF9jYXAgPSBjaXJjbGUoMywgJ21tJyksDQogICAgICAgICAgICAgICAgZW5kX2NhcCA9IGNpcmNsZSgzLCAnbW0nKSkNCg0KYGBgDQpmaW5kIHRoZSBhYmJyZXZpYXRlZCBncmFwaCAmIGRpc3RhbmNlcyBiZXR3ZWVuIGFsbCBvZiB0aGUgbm9kZXMgd2l0aCB2YWx1ZXMgJiBBQQ0KYGBge3J9DQojIyNnZXQgdGhlIG1lYW5pbmdmdWwgZGlzdGFuY2VzDQpkczwtZGlzdGFuY2VzKHZhbHZlbWFwLHY9d29ya2luZ3ZhbHZlcyx0bz13b3JraW5ndmFsdmVzLG1vZGU9YWxsKQ0KZHM8LW1lbHQoZHMpDQpjb2xuYW1lcyhkcyk8LWMoImYiLCJ0IiwiZCIpDQpkcyRmPC1hcy5jaGFyYWN0ZXIoZHMkZikNCmRzJHQ8LWFzLmNoYXJhY3RlcihkcyR0KQ0KIyMjIG5ldmVyIGdvaW5nIGJhY2sgdG8gQUEsIHNvIHJlbW92ZSB0aGF0LiAgQW5kIGFkZCAxIGFjY291bnQgZm9yIHRoZSB0aW1lIHRvIHR1cm4gb24gdGhlIHZhbHZlDQpkczwtZHMgJT4lIHVuZ3JvdXAgJT4lIGZpbHRlcih0IT0iQUEiKSAlPiUgcm93d2lzZSAlPiUNCiAgbXV0YXRlKGZsb3c9Zmxvd2RpY3QkZ2V0KHQpLGQ9ZCsxKQ0KDQpgYGANCg0KRnJvbSB0aGVyZSAtIHNlYXJjaCB0aGUgd2F5IHRocm91Z2g6DQoNCmBgYHtyfQ0Kdm9sY2Fub3ZhbHZlczwtZnVuY3Rpb24obWF4dGltZSx2YWx2ZWZyYW1lKXsNCiAgdmFsdmVzdGFjazwtc3RhY2soKQ0KICAjIyBrZWVwIHRyYWNrIG9mIHRoZSBjdXJyZW50IHBvc2l0aW9uLCB2aXNpdGVkIHBvc2l0aW9ucywgdGltZSBsZWZ0LCBhbmQgZmxvdw0KICBzdHJ0PC1saXN0KCJBQSIsYygiQUEiKSxtYXh0aW1lLDApDQogIHZhbHZlc3RhY2skcHVzaChzdHJ0KQ0KICAjIyMgd2lsbCBrZWVwIGEgY29weSBvZiBldmVyeSBzdGVwIGFsb25nIHRoZSB3YXkgLSBmb3IgcGFydCAyDQogIHJ0bjwtbGlzdCgpDQogIHdoaWxlKHZhbHZlc3RhY2skc2l6ZSgpPjApew0KICAgY3VycjwtdmFsdmVzdGFjayRwb3AoKQ0KICAgcG9zPC1jdXJyW1sxXV0NCiAgIHB0aDwtY3VycltbMl1dDQogICB0bGVmdDwtYXMubnVtZXJpYyhjdXJyW1szXV0pDQogICBmbDwtYXMubnVtZXJpYyhjdXJyW1s0XV0pDQogICAjIyBpZiB0aGVyZSdzIG5vIHRpbWUgbGVmdCwgZ28gdG8gdGhlIG5leHQgb25lDQoNCiAgICAgIGlmKHRsZWZ0PDApe25leHQNCiAgIH1lbHNlew0KICAgICAjIyBvdGhlcndpc2UsIGFkZCB0aGlzIHRvIG9uZSBvZiB0aGUgdmFsaWQgb3V0Y29tZXMNCiAgICAgcnRuPC1hcHBlbmQocnRuLGxpc3QoY3VycikpDQogICAgICMjIGNoZWNrIHRvIHNlZSBpZiB0aGVyZSdzIGFueXdoZXJlIGVsc2UgdG8gZ28sIGlmIHNvLCBhZGQgdGhhdCB0byB0aGUgc3RhY2sgIA0KICAgICBuZGY8LXZhbHZlZnJhbWUgJT4lIGZpbHRlcihmPT1wb3MsISh0JWluJXB0aCkpDQogICAgIGlmKG5yb3cobmRmPjApKXsNCiAgICAgICBmb3IoaSBpbiAxOm5yb3cobmRmKSl7DQogICAgICAgICB4PC1uZGZbaSxdDQogICAgICAgICBueHQ8LWxpc3QoeCR0LGMocHRoLHgkdCksdGxlZnQteCRkLGZsKyh4JGZsb3cqKHRsZWZ0LXgkZCkpKQ0KICAgICAgICAgdmFsdmVzdGFjayRwdXNoKG54dCl9fX19DQogIHJ0bn0NCmBgYA0KDQoNCg0KYGBge3J9DQpwYXJ0MTwtdm9sY2Fub3ZhbHZlcygzMCxkcykNCiMjIyBmaW5kIHRoZSBmbG93IGZyb20gZWFjaCBwb3NzaWJpbGl0eS4gIHRoZSBtYXggaXMgdGhlIGFuc3dlciB0byBwYXJ0IDENCnBhcnQxPC1tYXgoc2FwcGx5KHBhcnQxLGZ1bmN0aW9uKHgpe3hbWzRdXX0pKQ0KcGFydDENCmBgYA0KIyMgUGFydCAyDQoNCkZvciBwYXJ0IDIsIGZpcnN0IC0gcnVuIHdpdGggMjYgbWludXRlcw0KDQpgYGB7cn0NCmVsZXBoYW50PC12b2xjYW5vdmFsdmVzKDI2LGRzKQ0KYGBgDQoNCnRoZW4gZmluZCBjb21iaW5hdGlvbnMgd2hlcmUgdHdvIHBhdGhzIGRvIG5vdCBvdmVybGFwIChleGNlcHQgZm9yIGF0ICJBQSIpIGFuZCBhZGQgdGhlaXIgZmxvd3MuICAgVGhlIG1heCBpcyB0aGUgYW5zd2VyIGZvciBwYXJ0IDIuICBUbyBnZXQgdGhhdCAocmVsYXRpdmVseSkgcXVpY2tseSAtIHNvcnQgZWxlcGhhbnQgYnkgdGhlIGZsb3cgYW5kIHN0YXJ0IHdpdGggdGhlIGNvbWJpbmF0aW9ucy4gIERvbid0IGV2ZW4gYm90aGVyIGlmIHRoZSBjb21iaW5hdGlvbiB3aWxsIChvYnZpb3VzbHkpIGJlIHRvbyBzbWFsbA0KYGBge3J9DQplbGVwaGFudDwtZWxlcGhhbnRbb3JkZXIoLXNhcHBseShlbGVwaGFudCxmdW5jdGlvbih4KXt4W1s0XV19KSldDQpwYXJ0MjwtMA0KaTwtMQ0Kd2hpbGUoaTxsZW5ndGgoZWxlcGhhbnQpKXsNCiAgIyMjIGlmIHRoZSBmbG93IGlzIGxlc3MgdGhhbiB0d2ljZSB0aGUgY3VycmVudCBtYXggZmxvdywgbm8gcmVhc29uIHRvIGtlZXAgZ29pbmcNCiAgaWYoMiplbGVwaGFudFtbaV1dW1s0XV08cGFydDIpe25leHQNCiAgfWVsc2V7DQogICAgajwtaSsxDQogICAgd2hpbGUoajw9bGVuZ3RoKGVsZXBoYW50KSl7DQogICAgICAjIyBpZiBpK2o8IGN1cnJlbnQgbWF4LCBubyByZWFzb24gdG8ga2VlcCBnb2luZyB3aXRoIHRoaXMgaQ0KICAgICAgaWYoZWxlcGhhbnRbW2ldXVtbNF1dK2VsZXBoYW50W1tqXV1bWzRdXTxwYXJ0Mil7DQogICAgICAgIGk8LWkrMQ0KICAgICAgICBqPC1pKzENCiAgICAgICAgbmV4dA0KICAgICAgfWVsc2V7DQogICAgICAgICMjIyBpZiB0aGVyZSdzIG5vIG92ZXJsYXAgYmV0d2VlbiB0aGUgdHdvIGdyb3VwcywNCiAgICAgICAgIyMjIHRoZSBuZXcgcGFydCAyIGlzIHRoZSBjb21iaW5hdGlvbiBvZiB0aGVpciBmbG93cy4NCiAgICAgICAgaWYoIShhbnkoZWxlcGhhbnRbW2ldXVtbMl1dWy0xXSVpbiVlbGVwaGFudFtbal1dW1syXV1bLTFdKSkpew0KICAgICAgICAgIHBhcnQyPC1lbGVwaGFudFtbaV1dW1s0XV0rZWxlcGhhbnRbW2pdXVtbNF1dfQ0KICAgICAgICBqPC1qKzF9fX0NCiAgaTwtaSsxfQ0KDQpwYXJ0Mg0KYGBgDQo=</div>
 
 
 
@@ -1935,7 +1977,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Day9.Rmd");
+  window.initializeSourceEmbed("Day16.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

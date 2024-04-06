@@ -11,7 +11,7 @@
 
 
 
-<title>Day XX Notebook</title>
+<title>Day 25 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day XX Notebook</h1>
+<h1 class="title toc-ignore">Day 25 Notebook</h1>
 
 </div>
 
@@ -1754,12 +1754,83 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
-<div id="part-1" class="section level2">
-<h2>Part 1</h2>
 <!-- rnb-text-end -->
-</div>
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkyNVNhbXBsZS50eHRcIikifQ== -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day25Sample.txt&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>All that needs doing is 1. transforming these into numbers (“-” to -1
+&amp; “=” to -2 ) 2. adding them 3. transforming them back will work</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIm13PC1tYXgobmNoYXIoaW5wdXQpKSIsInNuYWZ1PC1sYXBwbHkoaW5wdXQsZnVuY3Rpb24oeCl7XG4gICAgICAgICAgICAgIG48LXVubGlzdChzdHJfc3BsaXQoeCxcIlwiKSlcbiAgICAgICAgICAgICAgblt3aGljaChuPT1cIj1cIildPC0gLTJcbiAgICAgICAgICAgICAgblt3aGljaChuPT1cIi1cIildPC0gLTFcbiAgICAgICAgICAgICAgbjwtYyhyZXAoMCxtdy0obGVuZ3RoKG4pKSksbilcbiAgICAgICAgICAgICAgbjwtYXMubnVtZXJpYyhuKVxuICAgICAgICAgICAgICBufSkiLCIiLCIjIyMgdHJhbnNmb3JtIGludG8gYSBtYXRyaXgiLCJzbmFmdSA8LSBtYXRyaXgodW5saXN0KHNuYWZ1KSwgbmNvbCA9IG13LCBieXJvdyA9IFRSVUUpIiwic25hZnU8LWNvbFN1bXMoc25hZnUpIiwic25hZnUiXX0= -->
+<pre class="r"><code>mw&lt;-max(nchar(input))
+snafu&lt;-lapply(input,function(x){
+              n&lt;-unlist(str_split(x,&quot;&quot;))
+              n[which(n==&quot;=&quot;)]&lt;- -2
+              n[which(n==&quot;-&quot;)]&lt;- -1
+              n&lt;-c(rep(0,mw-(length(n))),n)
+              n&lt;-as.numeric(n)
+              n})
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg==</div>
+### transform into a matrix
+snafu &lt;- matrix(unlist(snafu), ncol = mw, byrow = TRUE)
+snafu&lt;-colSums(snafu)
+snafu</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdICAxICAyICA0IC0yIDExIDEwXG4ifQ== -->
+<pre><code>[1]  1  2  4 -2 11 10</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now - to transform it back:</p>
+<p>first, flip right to left:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoic25hZnU8LXJldihzbmFmdSkifQ== -->
+<pre class="r"><code>snafu&lt;-rev(snafu)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Then, for each, the number needs to be -2,-1,0,1, or 2</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIng8LTEiLCJ3aGlsZSh4PD1sZW5ndGgoc25hZnUpKXtcbiAgIyMgY2FycnkgaXMgdGhlIG11bHRpcGxlcyBvZiA1LlxuICBjYXJyeTwtc25hZnVbeF0lLyU1XG4gICMjIGtlZXAgaXMgd2hhdCByZW1haW5zXG4gIGtlZXBpdDwtc25hZnVbeF0tKDUqY2FycnkpXG4gICMjIGlmIGtlZXAgaXMgMyBvciA0LCBhZGQgMSB0byBjYXJyeSAmIHN1YnRyYWN0IGZvciBrZWVwaXRcbiAgaWYoa2VlcGl0Pj0zKXtcbiAgICBjYXJyeTwtY2FycnkrMVxuICAgIGtlZXBpdDwta2VlcGl0LTV9XG4gIHNuYWZ1W3hdPC1rZWVwaXRcbiAgIyMjIGlmIHRoZXJlJ3Mgc29tZXRoaW5nIHRvIGNhcnJ5XG4gIGlmKGNhcnJ5IT0wKXtcbiAgICAjIyMgZmluZCBvdXQgaWYgdGhlcmUncyBzb21ld2hlcmUgdG8gY2FycnkgaXRcbiAgICBpZih4PT1sZW5ndGgoc25hZnUpKXtzbmFmdVt4KzFdPC1jYXJyeX1lbHNle3NuYWZ1W3grMV08LXNuYWZ1W3grMV0rY2Fycnl9fVxuICB4PC14KzF9IiwiIyMjIHJldmVyc2UgaXQgYmFjayIsInNuYWZ1PC1hcy5jaGFyYWN0ZXIocmV2KHNuYWZ1KSkiLCIjIyMgY2hhbmdlIHRoZSAtMSB0byBcIi1cIiBhbmQgdGhlIC0yIHRvIFwiPVwiIiwic25hZnU8LXN0cl9mbGF0dGVuKHN0cl9yZXBsYWNlKHN0cl9yZXBsYWNlKHNuYWZ1LFwiLTFcIixcIi1cIiksXCItMlwiLFwiPVwiKSkiLCJzbmFmdSJdfQ== -->
+<pre class="r"><code>x&lt;-1
+while(x&lt;=length(snafu)){
+  ## carry is the multiples of 5.
+  carry&lt;-snafu[x]%/%5
+  ## keep is what remains
+  keepit&lt;-snafu[x]-(5*carry)
+  ## if keep is 3 or 4, add 1 to carry &amp; subtract for keepit
+  if(keepit&gt;=3){
+    carry&lt;-carry+1
+    keepit&lt;-keepit-5}
+  snafu[x]&lt;-keepit
+  ### if there&#39;s something to carry
+  if(carry!=0){
+    ### find out if there&#39;s somewhere to carry it
+    if(x==length(snafu)){snafu[x+1]&lt;-carry}else{snafu[x+1]&lt;-snafu[x+1]+carry}}
+  x&lt;-x+1}
+### reverse it back
+snafu&lt;-as.character(rev(snafu))
+### change the -1 to &quot;-&quot; and the -2 to &quot;=&quot;
+snafu&lt;-str_flatten(str_replace(str_replace(snafu,&quot;-1&quot;,&quot;-&quot;),&quot;-2&quot;,&quot;=&quot;))
+snafu</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiMj0tMT0wXCJcbiJ9 -->
+<pre><code>[1] &quot;2=-1=0&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMj0tMT0wXG4ifQ== -->
+<pre><code>2=-1=0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAyNSBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KYGBge3J9DQppbnB1dDwtcmVhZF9saW5lcygiRGF5MjVTYW1wbGUudHh0IikNCmBgYA0KDQpBbGwgdGhhdCBuZWVkcyBkb2luZyBpcyANCjEuIHRyYW5zZm9ybWluZyB0aGVzZSBpbnRvIG51bWJlcnMgKCItIiB0byAtMSAmICI9IiB0byAtMiApDQoyLiBhZGRpbmcgdGhlbQ0KMy4gdHJhbnNmb3JtaW5nIHRoZW0gYmFjaw0Kd2lsbCB3b3JrDQoNCmBgYHtyfQ0KbXc8LW1heChuY2hhcihpbnB1dCkpDQpzbmFmdTwtbGFwcGx5KGlucHV0LGZ1bmN0aW9uKHgpew0KICAgICAgICAgICAgICBuPC11bmxpc3Qoc3RyX3NwbGl0KHgsIiIpKQ0KICAgICAgICAgICAgICBuW3doaWNoKG49PSI9IildPC0gLTINCiAgICAgICAgICAgICAgblt3aGljaChuPT0iLSIpXTwtIC0xDQogICAgICAgICAgICAgIG48LWMocmVwKDAsbXctKGxlbmd0aChuKSkpLG4pDQogICAgICAgICAgICAgIG48LWFzLm51bWVyaWMobikNCiAgICAgICAgICAgICAgbn0pDQoNCiMjIyB0cmFuc2Zvcm0gaW50byBhIG1hdHJpeA0Kc25hZnUgPC0gbWF0cml4KHVubGlzdChzbmFmdSksIG5jb2wgPSBtdywgYnlyb3cgPSBUUlVFKQ0Kc25hZnU8LWNvbFN1bXMoc25hZnUpDQpzbmFmdQ0KYGBgDQpOb3cgLSB0byB0cmFuc2Zvcm0gaXQgYmFjazoNCg0KZmlyc3QsIGZsaXAgcmlnaHQgdG8gbGVmdDoNCg0KYGBge3J9DQpzbmFmdTwtcmV2KHNuYWZ1KQ0KYGBgDQoNClRoZW4sIGZvciBlYWNoLCB0aGUgbnVtYmVyIG5lZWRzIHRvIGJlIC0yLC0xLDAsMSwgb3IgMg0KDQpgYGB7cn0NCng8LTENCndoaWxlKHg8PWxlbmd0aChzbmFmdSkpew0KICAjIyBjYXJyeSBpcyB0aGUgbXVsdGlwbGVzIG9mIDUuDQogIGNhcnJ5PC1zbmFmdVt4XSUvJTUNCiAgIyMga2VlcCBpcyB3aGF0IHJlbWFpbnMNCiAga2VlcGl0PC1zbmFmdVt4XS0oNSpjYXJyeSkNCiAgIyMgaWYga2VlcCBpcyAzIG9yIDQsIGFkZCAxIHRvIGNhcnJ5ICYgc3VidHJhY3QgZm9yIGtlZXBpdA0KICBpZihrZWVwaXQ+PTMpew0KICAgIGNhcnJ5PC1jYXJyeSsxDQogICAga2VlcGl0PC1rZWVwaXQtNX0NCiAgc25hZnVbeF08LWtlZXBpdA0KICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgdG8gY2FycnkNCiAgaWYoY2FycnkhPTApew0KICAgICMjIyBmaW5kIG91dCBpZiB0aGVyZSdzIHNvbWV3aGVyZSB0byBjYXJyeSBpdA0KICAgIGlmKHg9PWxlbmd0aChzbmFmdSkpe3NuYWZ1W3grMV08LWNhcnJ5fWVsc2V7c25hZnVbeCsxXTwtc25hZnVbeCsxXStjYXJyeX19DQogIHg8LXgrMX0NCiMjIyByZXZlcnNlIGl0IGJhY2sNCnNuYWZ1PC1hcy5jaGFyYWN0ZXIocmV2KHNuYWZ1KSkNCiMjIyBjaGFuZ2UgdGhlIC0xIHRvICItIiBhbmQgdGhlIC0yIHRvICI9Ig0Kc25hZnU8LXN0cl9mbGF0dGVuKHN0cl9yZXBsYWNlKHN0cl9yZXBsYWNlKHNuYWZ1LCItMSIsIi0iKSwiLTIiLCI9IikpDQpzbmFmdQ0KYGBgDQoNCg==</div>
 
 
 

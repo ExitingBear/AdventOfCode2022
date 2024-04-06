@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 22 Notebook"
 output: html_notebook
 ---
 
@@ -20,4 +20,502 @@ options(scipen = 999)
 
 
 ## Part 1
+Read in data - break in two: the map & the directions
+```{r}
+input<-read_lines("Day22Sample.txt")
 
+blnk<-which(input=="")
+route<-input[(blnk+1)]
+boardmap<-matrix(NA,ncol=max(nchar(input)),nrow=(length(input)-2))
+for(i in 1:(length(input)-2)){
+  for(j in 1:nchar(input[i])){
+    if(str_sub(input[i],j,j) !=" "){boardmap[i,j]<-str_sub(input[i],j,j)}}}
+
+```
+
+Find the path
+
+Process:
+1. Start with a position and direction:
+2. Find how many steps you're going to take & where you turn at the end of your walk
+3. Figure out where your next step *should* be - 
+3.a either it's right in front of you, or
+3.b it's around the edge
+4. Find out if there's a rock there:
+  4.a if there's a rock, stop moving
+  4.b if there's no rock, step there and go back to step 3 if you have more steps
+5. Make this your new starting point
+6. Find your new direction based on your turn
+  6.a if you have a new direction, go back to step 2.
+  6.b if you are at the end of the walk, stop - report where you are and where you're facing.
+
+
+```{r}
+quickpath<-function(rte=route,bm=boardmap){
+  counter<-1
+  
+  ### find the starting point
+  currp<-c((min(which(!(is.na(bm[1,]))))),1)
+  currd<-"E"
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff<-str_locate(rte,"[RL]")[1]
+    if(is.na(cutoff)){currrte<-rte}else{currrte<-str_sub(rte,1,cutoff)}
+    rte<-str_sub(rte,cutoff+1)
+    if(str_sub(currrte,-1)%in%(c("R","L"))){
+      stps<-as.numeric(str_sub(currrte,end=-2))
+      nxtd<-str_sub(currrte,-1)}else{stps<-as.numeric(currrte)
+      nxtd<-"stop"}
+    ### take steps
+    switch(currd,
+           "N"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]
+             nxty<-currp[2]-1
+             if(nxty<1||is.na(bm[nxty,nxtx])){nxty<-max(which(!is.na(bm[,nxtx])))}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){break}else{currp<-c(nxtx,nxty)}
+             s<-s+1}
+           if(nxtd=="L"){currd<-"W"}else if(nxtd=="R"){currd<-"E"}},
+           "E"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]+1
+             nxty<-currp[2]
+             if(nxtx>ncol(bm)||is.na(bm[nxty,nxtx])){nxtx<-min(which(!is.na(bm[nxty,])))}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){break}else{currp<-c(nxtx,nxty)}
+             s<-s+1}
+           if(nxtd=="L"){currd<-"N"}else if(nxtd=="R"){currd<-"S"}},
+           "S"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]
+             nxty<-currp[2]+1
+             if(nxty>nrow(bm)||is.na(bm[nxty,nxtx])){nxty<-min(which(!is.na(bm[,nxtx])))}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){break}else{currp<-c(nxtx,nxty)}
+             s<-s+1}
+           if(nxtd=="L"){currd<-"E"}else if(nxtd=="R") {currd<-"W"}},
+           "W"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]-1
+             nxty<-currp[2]
+             if(nxtx<1||is.na(bm[nxty,nxtx])){nxtx<-max(which(!is.na(bm[nxty,])))}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){break}else{currp<-c(nxtx,nxty)}
+             s<-s+1}
+           if(nxtd=="L"){currd<-"S"}else if(nxtd=="R"){currd<-"N"}},
+           cat("no direction\n"))
+    ### end of while
+    counter<-counter+1
+  }### outside of the while
+  cat(counter,currp,currd,"\n")
+  psswd<-
+    switch(currd,
+           "N"=3,
+           "W"=2,
+           "E"=0,
+           "S"=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}
+```
+
+```{r}
+### quick stuff
+
+
+```
+
+
+```{r}
+part1<-quickpath()
+part1
+
+# 46 162 W 
+# [1] 162186
+
+```
+### Part 2
+
+First, doing this with just the flat map to make sure the idea works - but there's a slight change in process:
+
+Process:
+1. Start with a position and direction:
+2. Find how many steps you're going to take & where you turn at the end of your walk (*tell the world you are not falling off of a cliff*)
+3. Figure out where your next step *should* be - 
+  3.a either it's right in front of you, or
+  3.b *you are about to fall off a cliff* - let everyone know about the cliff & wraparound to find the next step.
+4. Find out if there's a rock there:
+  4.a if there's a rock, stop moving - *and let everyone know you are not falling off a cliff* whether or not that was a possibility.
+  4.b if there's no rock, step there
+    4.b.i if you did not fall off a cliff, go back to step 3 if you have more steps
+    4.b.ii *reattach the remainder of your steps & the turn to the route list* you are not taking any more steps until the whole cliff thing is worked out.
+5. Make this your new starting point (either way)
+6. 
+  6.a *If you did not fall off of a cliff* Find your new direction based on your turn - go back to step 2.
+  6.b *if you did fall off a cliff* keep your current direction - go to step 2 for the rest of the steps before the cliff fall
+  6.c if you are at the end of the walk, stop - report where you are and where you're facing.
+
+```{r}
+flatpath<-function(rte=route,bm=boardmap){
+  counter<-1
+  ### find the starting point
+  currp<-c((min(which(!(is.na(bm[1,]))))),1)
+  currd<-"E"
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff<-str_locate(rte,"[RL]")[1]
+    if(is.na(cutoff)){currrte<-rte}else{currrte<-str_sub(rte,1,cutoff)}
+    rte<-str_sub(rte,cutoff+1)
+    regroup<-FALSE
+    if(str_sub(currrte,-1)%in%(c("R","L"))){
+      stps<-as.numeric(str_sub(currrte,end=-2))
+      nxtd<-str_sub(currrte,-1)}else{stps<-as.numeric(currrte)
+      nxtd<-"stop"}
+    ### take steps
+    switch(currd,
+           "N"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]
+             nxty<-currp[2]-1
+             if(nxty<1||is.na(bm[nxty,nxtx])){nxty<-max(which(!is.na(bm[,nxtx])))
+             ### add fla for regroup
+             regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(!regroup){if(nxtd=="L"){currd<-"W"}else if(nxtd=="R"){currd<-"E"}}},
+           "E"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]+1
+             nxty<-currp[2]
+             ### wrap around position
+             if(nxtx>ncol(bm)||is.na(bm[nxty,nxtx])){nxtx<-min(which(!is.na(bm[nxty,])))
+             ####Add a flag to say that we should stop & start if we have to drive off the cliff. 
+             regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{
+                 currp<-c(nxtx,nxty)}
+             ### add the lines to 
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           #### make sure that we don't change things if there's a regroup
+           if(!regroup){if(nxtd=="L"){currd<-"N"}else if(nxtd=="R"){currd<-"S"}}},
+           "S"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]
+             nxty<-currp[2]+1
+             if(nxty>nrow(bm)||is.na(bm[nxty,nxtx])){nxty<-min(which(!is.na(bm[,nxtx])))
+             ###regroup
+             regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(!regroup){if(nxtd=="L"){currd<-"E"}else if(nxtd=="R") {currd<-"W"}}},
+           "W"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]-1
+             nxty<-currp[2]
+             if(nxtx<1||is.na(bm[nxty,nxtx])){nxtx<-max(which(!is.na(bm[nxty,])))
+             regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(!regroup){if(nxtd=="L"){currd<-"S"}else if(nxtd=="R"){currd<-"N"}}},
+           cat("no direction\n"))
+    ### end of while
+    counter<-counter+1
+  }### outside of the while
+  cat(counter,currp,currd,"\n")
+  psswd<-
+    switch(currd,
+           "N"=3,
+           "W"=2,
+           "E"=0,
+           "S"=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}
+```
+
+
+
+```{r}
+part1<-flatpath()
+part1
+
+```
+Now do the same thing with the cube - (this is not a general solution, it is specific for the shape of the input.)
+
+
+Process:
+1. Start with a position and direction:
+2. Find how many steps you're going to take & where you turn at the end of your walk (*tell the world you are not falling off of a cliff*)
+3. Figure out where your next step *should* be - 
+  3.a either it's right in front of you, or
+  3.b *you are about to fall off a cliff* - let everyone know about the cliff & **follow some extremely complicated instructions to find your next step based on your current & next position**
+4. Find out if there's a rock there:
+  4.a if there's a rock, stop moving - *and let everyone know you are not falling off a cliff* whether or not that was a possibility.
+  4.b if there's no rock, step there
+    4.b.i if you did not fall off a cliff, go back to step 3 if you have more steps
+    4.b.ii *reattach the remainder of your steps & the turn to the route list* you are not taking any more steps until the whole cliff thing is worked out.
+5. Make this your new starting point (either way)
+6. 
+  6.a *If you did not fall off of a cliff* Find your new direction based on your turn - go back to step 2.
+  6.b *if you did fall off a cliff* **again, follow some complicated instructions to find your next direction** - go to step 2 for the rest of the steps before the cliff fall
+  6.c if you are at the end of the walk, stop - report where you are and where you're facing.
+
+
+direction is based on the flat map.
+
+And what are the complicated instructions?
+If you were heading North:
+a. for 1<=x<=50:    head E - x=51, y=old x+50 (opposite m)
+b. for 51=x<=100:   head E - x=1, y=old x+100 (opposite o)
+c. for 101<=x<=150: head N - x=old x - 100, y=200   (opposite h)
+
+If you were heading East:
+d. for 1<=y<=50:    head W - x=1, y=151-old y (opposite f)
+e. for 51=y<=100:   head N - x=oldy+50,   y=50 (opposite j)
+f. for 101<=y<=150: head W - x=150 y=  y=151-old y  (opposite d) 
+g. for 151<=y<=200: head N - y=150, x=oldy-100  (opposite i)
+
+If you were heading South:
+h. for 1<=x<=50:     head S - y=1, x=oldx+100 (opposite c)
+i. for 51=x<=100:    head W, x=150, y=oldx+100 (opposite g)
+j. for 101<=x<=150:  head W, x=100, y=oldx-50 (opposite e) 
+
+If you were heading West:
+l. for 1<=y<=50:   head E - x=1, y=151-oldy (opposite n)
+m. for 51=y<=100:  head S - x=oldy-50, y=101 (opposite a) 
+n. for 101<=y<=150:head E - x=51, y=151-oldy (opposite l)
+o. for 151<=y<=200:head S - x=oldy-100, y=1   (opposite b) 
+
+
+```{r}
+cubepath<-function(rte=route,bm=boardmap){
+  counter<-1
+  
+  ### find the starting point
+  currp<-c((min(which(!(is.na(bm[1,]))))),1)
+  currd<-"E"
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff<-str_locate(rte,"[RL]")[1]
+    if(is.na(cutoff)){currrte<-rte}else{currrte<-str_sub(rte,1,cutoff)}
+    rte<-str_sub(rte,cutoff+1)
+    regroup<-FALSE
+    if(str_sub(currrte,-1)%in%(c("R","L"))){
+      stps<-as.numeric(str_sub(currrte,end=-2))
+      nxtd<-str_sub(currrte,-1)}else{stps<-as.numeric(currrte)
+      nxtd<-"stop"}
+    ### take steps
+    switch(currd,
+           "N"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             nxtx<-currp[1]
+             nxty<-currp[2]-1
+             if(nxty<1||is.na(bm[nxty,nxtx])){
+               if(currp[1]<=50){
+                 nxtx<-51
+                 nxty<-currp[1]+50
+                 cliffd<-"E"
+               }else if(currp[1]>=51&&currp[1]<=100){
+                 nxtx<-1
+                 nxty<-currp[1]+100
+                 cliffd<-"E"
+               } else{
+                 nxtx<-currp[1]-100
+                 nxty<-200
+                 cliffd<-"N"}
+               ### add flag for regroup
+               regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(regroup){currd<-cliffd
+           } else {if(nxtd=="L"){currd<-"W"}else if(nxtd=="R"){currd<-"E"}}},
+           "E"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]+1
+             nxty<-currp[2]
+             ### cliff position & direction
+             if(nxtx>ncol(bm)||is.na(bm[nxty,nxtx])){
+               if(currp[2]<=50){
+                 nxtx<-100
+                 nxty<-151-currp[2]
+                 cliffd<-"W"
+               }else if(currp[2]>=51&&currp[2]<=100){
+                 nxtx<-currp[2]+50
+                 nxty<-50
+                 cliffd<-"N"
+               } else if(currp[2]>=101&&currp[2]<=150){
+                 nxtx<-150
+                 nxty<-151-currp[2]
+                 cliffd<-"W"
+               }else{
+                 nxtx<-currp[2]-100
+                 nxty<-150
+                 cliffd<-"N"} 
+               ####Add a flag to say that we should stop & start if we have to drive off the cliff. 
+               regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{
+                 currp<-c(nxtx,nxty)}
+             ### add the lines to 
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           #### if not at stop, change directions.
+           if(regroup){currd<-cliffd
+           } else {if(nxtd=="L"){currd<-"N"}else if(nxtd=="R"){currd<-"S"}}},
+           "S"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]
+             nxty<-currp[2]+1
+             if(nxty>nrow(bm)||is.na(bm[nxty,nxtx])){
+               if(currp[1]<=50){
+                 nxtx<-currp[1]+100
+                 nxty<-1
+                 cliffd<-"S"
+               }else if(currp[1]>=51&&currp[1]<=100){
+                 nxtx<-50
+                 nxty<-currp[1]+100
+                 cliffd<-"W"
+               } else{
+                 nxtx<-100
+                 nxty<-currp[1]-50
+                 cliffd<-"W"}           
+               ###regroup
+               regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(regroup){currd<-cliffd
+           } else {if(nxtd=="L"){currd<-"E"}else if(nxtd=="R"){currd<-"W"}}},
+           "W"={s<-1
+           while(s<=stps){
+             #find next step (wrap around if needed)
+             nxtx<-currp[1]-1
+             nxty<-currp[2]
+             ### cliff position & direction
+             if(nxtx<1||is.na(bm[nxty,nxtx])){
+               if(currp[2]<=50){
+                 nxtx<-1
+                 nxty<-151-currp[2]
+                 cliffd<-"E"
+               }else if(currp[2]>=51&&currp[2]<=100){
+                 nxtx<-currp[2]-50
+                 nxty<-101
+                 cliffd<-"S"
+               } else if(currp[2]>=101&&currp[2]<=150){
+                 nxtx<-51
+                 nxty<-151-currp[2]
+                 cliffd<-"E"
+               }else{
+                 nxtx<-currp[2]-100
+                 nxty<-1
+                 cliffd<-"S"}  
+               regroup<-TRUE}
+             #find if it's a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am & break
+             if(bm[nxty,nxtx]=="#"){
+               regroup<-FALSE
+               break}else{currp<-c(nxtx,nxty)}
+             if(regroup){rte<-str_c(stps-s,nxtd,rte)
+             break}
+             s<-s+1}
+           if(regroup){currd<-cliffd
+           } else {if(nxtd=="L"){currd<-"S"}else if(nxtd=="R"){currd<-"N"}}},
+           cat("no direction\n"))
+    ### end of while
+    counter<-counter+1
+  }### outside of the while
+  cat(counter, currp,currd,"\n")
+  psswd<-
+    switch(currd,
+           "N"=3,
+           "W"=2,
+           "E"=0,
+           "S"=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}
+```
+
+Because the sample is a different shape an dimensions to the solution, it won't work.
+
+```{r,eval=FALSE,message=FALSE}
+part2<-cubepath()
+part2
+```

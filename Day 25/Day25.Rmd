@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 25 Notebook"
 output: html_notebook
 ---
 
@@ -19,5 +19,62 @@ options(scipen = 999)
 ```
 
 
-## Part 1
+```{r}
+input<-read_lines("Day25Sample.txt")
+```
+
+All that needs doing is 
+1. transforming these into numbers ("-" to -1 & "=" to -2 )
+2. adding them
+3. transforming them back
+will work
+
+```{r}
+mw<-max(nchar(input))
+snafu<-lapply(input,function(x){
+              n<-unlist(str_split(x,""))
+              n[which(n=="=")]<- -2
+              n[which(n=="-")]<- -1
+              n<-c(rep(0,mw-(length(n))),n)
+              n<-as.numeric(n)
+              n})
+
+### transform into a matrix
+snafu <- matrix(unlist(snafu), ncol = mw, byrow = TRUE)
+snafu<-colSums(snafu)
+snafu
+```
+Now - to transform it back:
+
+first, flip right to left:
+
+```{r}
+snafu<-rev(snafu)
+```
+
+Then, for each, the number needs to be -2,-1,0,1, or 2
+
+```{r}
+x<-1
+while(x<=length(snafu)){
+  ## carry is the multiples of 5.
+  carry<-snafu[x]%/%5
+  ## keep is what remains
+  keepit<-snafu[x]-(5*carry)
+  ## if keep is 3 or 4, add 1 to carry & subtract for keepit
+  if(keepit>=3){
+    carry<-carry+1
+    keepit<-keepit-5}
+  snafu[x]<-keepit
+  ### if there's something to carry
+  if(carry!=0){
+    ### find out if there's somewhere to carry it
+    if(x==length(snafu)){snafu[x+1]<-carry}else{snafu[x+1]<-snafu[x+1]+carry}}
+  x<-x+1}
+### reverse it back
+snafu<-as.character(rev(snafu))
+### change the -1 to "-" and the -2 to "="
+snafu<-str_flatten(str_replace(str_replace(snafu,"-1","-"),"-2","="))
+snafu
+```
 

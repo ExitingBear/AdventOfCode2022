@@ -9,15 +9,132 @@ library(dplyr)
 library(stringr)
 library(tidyverse)
 library(igraph)
-library(ggplot2)
-library(rgl)
 library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
 
 ## Part 1
+
+```{r}
+input <- read_lines("Day21Sample.txt")
+
+```
+
+Going to be lazy and just run it through until root has a value
+
+```{r}
+rootfinder<-function(numberyell=input){
+  done<-FALSE
+  ### set up a dictionary
+  mnk<-dict()
+  while(done==FALSE){
+    ### run through all of the lines of input
+    i<-1
+    while(i<=length(numberyell)){
+      ### pull apart the line into "words"
+      yell<-unlist(str_split(str_replace_all(numberyell[i],":","")," "))
+      ### if only two things, then
+      if(length(yell)==2){
+        ### add it to the dictionary
+        mnk$set(key=yell[1],value=as.numeric(yell[2]))
+        ###remove it from the list because there's no reason to re-run this.
+        numberyell<-numberyell[-i]
+        ## check if the monkey has enough information to do anything
+      }else{if(mnk$has(yell[2])&&mnk$has(yell[4])){
+        ### if so find its value and remove it from the list
+        switch(yell[3],
+               "+"=mnk$set(key=yell[1],value=mnk$get(yell[2])+mnk$get(yell[4])),
+               "-"=mnk$set(key=yell[1],value=mnk$get(yell[2])-mnk$get(yell[4])),
+               "*"=mnk$set(key=yell[1],value=mnk$get(yell[2])*mnk$get(yell[4])),
+               "/"=mnk$set(key=yell[1],value=mnk$get(yell[2])/mnk$get(yell[4])),
+               cat("no operator\n"))
+        numberyell<-numberyell[-i]
+        ### otherwise, increase i & do the next line
+      }else{i<-i+1}}
+      if(mnk$has("root")){done<-TRUE}}}
+    mnk$get("root")}
+
+```
+
+```{r}
+part1<-rootfinder()
+part1
+```
+## Part 2
+I'm going to try just searching for it
+
+```{r}
+### remove humn
+nohuman<-input[-which(str_detect(input,"humn:"))]
+### because I know root is a plus, change it to a minus
+nohuman[which(str_detect(nohuman,"root:"))]<-str_replace(nohuman[which(str_detect(nohuman,"root:"))],"\\+","-")
+
+
+
+humanfinder<-function(numberyell=input,human){
+  done<-FALSE
+  ### set up a dictionary
+  mnk<-dict()
+  mnk$set(key="humn",value=human)
+  while(done==FALSE){
+    ### run through all of the lines of input
+    i<-1
+    while(i<=length(numberyell)){
+      ### pull apart the line into "words"
+      yell<-unlist(str_split(str_replace_all(numberyell[i],":","")," "))
+      ### if only two things, then
+      if(length(yell)==2){
+        ### add it to the dictionary
+        mnk$set(key=yell[1],value=as.numeric(yell[2]))
+        ###remove it from the list because there's no reason to re-run this.
+        numberyell<-numberyell[-i]
+        ## check if the monkey has enough information to do anything
+      }else{if(mnk$has(yell[2])&&mnk$has(yell[4])){
+        ### if so find its value and remove it from the list
+        switch(yell[3],
+               "+"=mnk$set(key=yell[1],value=mnk$get(yell[2])+mnk$get(yell[4])),
+               "-"=mnk$set(key=yell[1],value=mnk$get(yell[2])-mnk$get(yell[4])),
+               "*"=mnk$set(key=yell[1],value=mnk$get(yell[2])*mnk$get(yell[4])),
+               "/"=mnk$set(key=yell[1],value=mnk$get(yell[2])/mnk$get(yell[4])),
+               cat("no operator\n"))
+        numberyell<-numberyell[-i]
+        ### otherwise, increase i & do the next line
+      }else{i<-i+1}}
+      if(mnk$has("root")){done<-TRUE}}}
+    mnk$get("root")}
+```
+
+
+try running this with powers of 10 to see if it approaches (or doesn't, 0)
+
+```{r}
+i<-0:15
+i<-10^i
+
+sapply(i,function(x){humanfinder(nohuman,x)})
+
+```
+based on this observation, I'm going to assume that if the number is too high, root is positive, if it is too low, root is negative. This is a huge assumption but if true, then it can be narrowed down to the right number.
+
+Also, that the answer is less than 10^15
+
+```{r}
+human<-0
+for(i in 15:0){
+  try<-(0:9*10^i)+human
+  cat(try,"\n")
+  outs<-sapply(try,function(x){humanfinder(nohuman,x)})
+  cat(outs,"\n")
+  x<-max(which(outs<=0))
+#  x<-max(which(outs>=0))  ### needed for real data.
+  human<-try[x]
+  cat("human = ",human,"\n")}
+
+part2<-human
+part2
+```
+
 

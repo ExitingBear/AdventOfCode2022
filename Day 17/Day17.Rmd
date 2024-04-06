@@ -19,5 +19,127 @@ options(scipen = 999)
 ```
 
 
-## Part 1
+```{r}
+input<-read_lines("Day17Sample.txt")
+jets<-unlist(str_split(input,""))
+```
 
+Set up the shapes
+
+```{r}
+shapes<-list(list(c(0,0),c(1,0),c(2,0),c(3,0)), # -
+list(c(1,0),c(0,1),c(1,1),c(2,1),c(1,2)), # +
+list(c(0,0),c(1,0),c(2,0),c(2,1),c(2,2)), # backwards "L"
+list(c(0,0),c(0,1),c(0,2),c(0,3)), # |
+list(c(0,0),c(0,1),c(1,0),c(1,1))) # small square
+```
+
+
+
+
+## Part 1
+I'm not really sure how to do this.
+
+
+```{r}
+
+baseshaft<-matrix(NA,ncol=7,nrow=5*10000000)
+dropshapes<-function(shaft,dirlist,counter){
+  d<-1
+  ### highest point is 0, for the floor
+  highestpoint<-0
+  cnt<-1
+  while(cnt<=counter){
+    ### looking for patterns
+    #if(cnt%%5==1){cat(cnt,d,highestpoint,"\n")} ### this is to help gather data for part 2
+    ### spawn a shape at the right place
+    nowshape<-shapes[[((cnt-1)%%5)+1]]
+    ###start with three blank rows (or 4 above the highest point)
+    ###and two blank columns, so the shapes "0" goes to 3
+    nowshape<-lapply(nowshape,function(x){x+c(3,(highestpoint+4))})
+    keepgoing<-TRUE
+    while(keepgoing==TRUE){
+      lr<-dirlist[d]
+      if(lr==("<")){
+        moveleft<-lapply(nowshape,function(x){x-c(1,0)})
+        ## check through maybe.  if any are 0 then false.
+        ## if any are in spaces that are already occupied then false
+        ## if all are true, then shape<-maybe
+        chk<-sapply(moveleft,function(x){
+          if(x[1]==0){FALSE
+          }else if(!is.na(shaft[x[2],x[1]])){FALSE}else{TRUE}})
+        if(all(chk)){nowshape<-moveleft}
+      }else{
+        moveright<-lapply(nowshape,function(x){x+c(1,0)})
+        ## check through maybe.  if any are 8 then false.
+        ## if any are in spaces that are already occupied then false
+        ## if all are true, then nowshape<-maybe
+        chk<-sapply(moveright,function(x){
+          if(x[1]==8){FALSE
+          }else if(!is.na(shaft[x[2],x[1]])){FALSE}else{TRUE}})
+        if(all(chk)){nowshape<-moveright}
+      }### try to drop the shape
+      allclear<-sapply(nowshape,function(x){
+        ## if on the floor then FALSE
+        if(x[2]==1){FALSE
+        }else{
+          ### if underneath is space, then TRUE, otherwise FALSE
+          x<-x-c(0,1)
+          if(is.na(shaft[x[2],x[1]])){TRUE}else{FALSE}}})
+      if(all(allclear)){
+        ### if everything below is clear, drop the shape down one
+        ### get the next direction
+        ### keep going
+        nowshape<-lapply(nowshape,function(x){x-c(0,1)})
+        d<-d+1
+        if(d>length(dirlist)){d<-1}
+      }else{
+        ### add to the bottom of the shaft
+        for(p in 1:length(nowshape)){
+          shaft[nowshape[[p]][2],nowshape[[p]][1]]<-cnt}
+        ### find the highest point
+        nhigh<-max(sapply(nowshape,function(x)x[2]))
+        highestpoint<-max(highestpoint,nhigh)
+        d<-d+1
+        if(d>length(dirlist)){d<-1}
+        keepgoing<-FALSE}}
+      cnt<-cnt+1}
+    list(highestpoint,shaft)}
+```
+
+
+```{r}
+part1<-dropshapes(baseshaft,jets,2022)[[1]]
+part1
+```
+
+##Part 2
+
+As, obviously, there's no way to drop a trillion of these, there has to be a pattern of some sort.
+
+For my real data - in excel, I can figure out that every 1700 stones the highest point grows 2600.
+(this was through looking at the highest point for the beginning of each cycle and seeing that it repeated every every 340 cycles (or 1700 stones))
+
+The cycle for the sample data is different, the highest point increases 53 every 35 stones
+
+```{r}
+## real data is commented out
+##1000000000000%/%1700
+##1000000000000%%1700
+
+1000000000000%/%35
+1000000000000%%35
+```
+
+
+```{r}
+#So, if I find out where it is at 1900 (it takes a while to balance out, so start from 1900 rather than 200), then 
+##take that, add 588235293*2660, it should be right.
+##basecycle<-dropshapes(baseshaft,jets,1900)[[1]]
+##part2<-basecycle+(588235293*2660)
+##part2
+
+basecycle<-dropshapes(baseshaft,jets,50)[[1]]
+part2<-basecycle+(28571428570*53)
+part2
+```
