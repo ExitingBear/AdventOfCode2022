@@ -23,10 +23,10 @@ Code and notebooks from [Advent of Code 2022](https://adventofcode.com/2022).
 | 16 | *Proboscidea Volcanium* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-16.nb.html) | [Notebook](<Day 16/Day16.Rmd>) | [Files](<Day 16>) |
 | 17 | *Pyroclastic Flow* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-17.nb.html) | [Notebook](<Day 17/Day17.Rmd>) | [Files](<Day 17>) |
 | 18 | *Boiling Boulders* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-18.nb.html) | [Notebook](<Day 18/Day18.Rmd>) | [Files](<Day 18>) |
-| 19 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-19.nb.html) | [Notebook](<Day 19/Day19.Rmd>) | [Files](<Day 19>) |
-| 20 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-20.nb.html) | [Notebook](<Day 20/Day20.Rmd>) | [Files](<Day 20>) |
-| 21 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-21.nb.html) | [Notebook](<Day 21/Day21.Rmd>) | [Files](<Day 21>) |
-| 22 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-22.nb.html) | [Notebook](<Day 22/Day22.Rmd>) | [Files](<Day 22>) |
-| 23 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-23.nb.html) | [Notebook](<Day 23/Day23.Rmd>) | [Files](<Day 23>) |
-| 24 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-24.nb.html) | [Notebook](<Day 24/Day24.Rmd>) | [Files](<Day 24>) |
-| 25 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-25.nb.html) | [Notebook](<Day 25/Day25.Rmd>) | [Files](<Day 25>) |
+| 19 | *Not Enough Minerals* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-19.nb.html) | [Notebook](<Day 19/Day19.Rmd>) | [Files](<Day 19>) |
+| 20 | *Grove Positioning System* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-20.nb.html) | [Notebook](<Day 20/Day20.Rmd>) | [Files](<Day 20>) |
+| 21 | *Monkey Math* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-21.nb.html) | [Notebook](<Day 21/Day21.Rmd>) | [Files](<Day 21>) |
+| 22 | *Monkey Map* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-22.nb.html) | [Notebook](<Day 22/Day22.Rmd>) | [Files](<Day 22>) |
+| 23 | *Unstable Diffusion* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-23.nb.html) | [Notebook](<Day 23/Day23.Rmd>) | [Files](<Day 23>) |
+| 24 | *Blizzard Basin* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-24.nb.html) | [Notebook](<Day 24/Day24.Rmd>) | [Files](<Day 24>) |
+| 25 | *Full of Hot Air* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-25.nb.html) | [Notebook](<Day 25/Day25.Rmd>) | [Files](<Day 25>) |
