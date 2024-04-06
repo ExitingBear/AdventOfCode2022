@@ -1,11 +1,13 @@
 ---
-title: "Day XX Notebook"
+title: "Day 16 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 library(dplyr)
+library(collections)
+library(reshape2)
 library(stringr)
 library(tidyverse)
 library(igraph)
@@ -19,5 +21,138 @@ options(scipen = 999)
 ```
 
 
-## Part 1
+```{r}
+input<-read_lines("Day16Sample.txt")
+```
 
+## Part 1
+Start by reformating the input
+```{r}
+valvelist<-lapply(input,function(x){
+  x<-str_replace(x,"Valve ","")
+  x<-str_replace(x," has flow rate="," ")
+  x<-str_replace(x,"; tunnels lead to valves "," ")
+  x<-str_replace(x,"; tunnel leads to valve "," ")
+  x<-str_replace_all(x,", ",",")
+  x<-unlist(str_split(x," "))
+  x})
+```
+
+In the interest of making this a little less onerous, make this graph a little smaller by removing the broken valves (no need to stop there), except for the starting point (AA)
+
+```{r}
+### create the dictionary for the valves 
+flowdict<-dict()
+for(i in 1:length(valvelist)){
+  flowdict$set(valvelist[[i]][1],as.numeric(valvelist[[i]][2]))}
+
+### create the large map
+### edgelist
+el<-as.data.frame(matrix(ncol=3,nrow=0))
+### list of valves for later - need AA & the working valves
+workingvalves<-c("AA")
+for(i in 1:length(valvelist)){
+  f<-valvelist[[i]][1]
+  t<-unlist(str_split(valvelist[[i]][3],","))
+  n<-as.numeric(valvelist[[i]][2])
+  for(j in 1:length(t)){
+    el<-rbind(el,list(f=f,t=t[j],d=n))}
+  if(n>0){workingvalves<-c(workingvalves,f)}}
+
+valvemap<-simplify(graph_from_edgelist(as.matrix(el[,1:2]),directed=FALSE))
+
+### a quick graph to see what this looks like
+ggraph(valvemap,layout="stress")+
+  geom_node_text(aes(label=name))+
+  geom_edge_fan(start_cap = circle(3, 'mm'),
+                end_cap = circle(3, 'mm'))
+
+```
+find the abbreviated graph & distances between all of the nodes with values & AA
+```{r}
+###get the meaningful distances
+ds<-distances(valvemap,v=workingvalves,to=workingvalves,mode=all)
+ds<-melt(ds)
+colnames(ds)<-c("f","t","d")
+ds$f<-as.character(ds$f)
+ds$t<-as.character(ds$t)
+### never going back to AA, so remove that.  And add 1 account for the time to turn on the valve
+ds<-ds %>% ungroup %>% filter(t!="AA") %>% rowwise %>%
+  mutate(flow=flowdict$get(t),d=d+1)
+
+```
+
+From there - search the way through:
+
+```{r}
+volcanovalves<-function(maxtime,valveframe){
+  valvestack<-stack()
+  ## keep track of the current position, visited positions, time left, and flow
+  strt<-list("AA",c("AA"),maxtime,0)
+  valvestack$push(strt)
+  ### will keep a copy of every step along the way - for part 2
+  rtn<-list()
+  while(valvestack$size()>0){
+   curr<-valvestack$pop()
+   pos<-curr[[1]]
+   pth<-curr[[2]]
+   tleft<-as.numeric(curr[[3]])
+   fl<-as.numeric(curr[[4]])
+   ## if there's no time left, go to the next one
+
+      if(tleft<0){next
+   }else{
+     ## otherwise, add this to one of the valid outcomes
+     rtn<-append(rtn,list(curr))
+     ## check to see if there's anywhere else to go, if so, add that to the stack  
+     ndf<-valveframe %>% filter(f==pos,!(t%in%pth))
+     if(nrow(ndf>0)){
+       for(i in 1:nrow(ndf)){
+         x<-ndf[i,]
+         nxt<-list(x$t,c(pth,x$t),tleft-x$d,fl+(x$flow*(tleft-x$d)))
+         valvestack$push(nxt)}}}}
+  rtn}
+```
+
+
+
+```{r}
+part1<-volcanovalves(30,ds)
+### find the flow from each possibility.  the max is the answer to part 1
+part1<-max(sapply(part1,function(x){x[[4]]}))
+part1
+```
+## Part 2
+
+For part 2, first - run with 26 minutes
+
+```{r}
+elephant<-volcanovalves(26,ds)
+```
+
+then find combinations where two paths do not overlap (except for at "AA") and add their flows.   The max is the answer for part 2.  To get that (relatively) quickly - sort elephant by the flow and start with the combinations.  Don't even bother if the combination will (obviously) be too small
+```{r}
+elephant<-elephant[order(-sapply(elephant,function(x){x[[4]]}))]
+part2<-0
+i<-1
+while(i<length(elephant)){
+  ### if the flow is less than twice the current max flow, no reason to keep going
+  if(2*elephant[[i]][[4]]<part2){next
+  }else{
+    j<-i+1
+    while(j<=length(elephant)){
+      ## if i+j< current max, no reason to keep going with this i
+      if(elephant[[i]][[4]]+elephant[[j]][[4]]<part2){
+        i<-i+1
+        j<-i+1
+        next
+      }else{
+        ### if there's no overlap between the two groups,
+        ### the new part 2 is the combination of their flows.
+        if(!(any(elephant[[i]][[2]][-1]%in%elephant[[j]][[2]][-1]))){
+          part2<-elephant[[i]][[4]]+elephant[[j]][[4]]}
+        j<-j+1}}}
+  i<-i+1}
+
+part2
+```

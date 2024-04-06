@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 19 Notebook"
 output: html_notebook
 ---
 
@@ -15,9 +15,256 @@ library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
+library(collections)
 options(scipen = 999)
+```
+
+
+```{r,echo=FALSE,eval=FALSE}
+### For future
+# input<-read_lines(filename)
+# bp<-lapply(input,function(x){
+#   x<-unlist(str_split(x," "))
+#   x<-as.numeric(x[c(7,13,19,22,28,31)])})
+```
+
+```{r}
+bp<-list(c(4,2,3,14,2,7),c(2,3,3,8,3,12))
 ```
 
 
 ## Part 1
 
+Moving forward with the idea to do this as a search
+
+```{r}
+blueprintrun<-function(blprint){
+  pq<-priority_queue()
+  maxore<-max(blprint[c(1,2,3,5)])
+  ###orerobots,clayrobots,obsrobots,geoderobots,
+  ###ore,clay,obsidian,geodes,time
+  startline<-c(1,0,0,0,0,0,0,0,24,((24*25)/2))
+  ###priority=time*(time+1)/2+geodes+geoderobots*timeleft
+  pq$push(startline,priority=((24*25)/2))
+  i<-1
+  while(pq$size()>0){
+    x<-pq$pop()
+    ### if time is out, return number of geodes
+    if(x[9]==0){return(x)
+      break
+    }else{
+      #these are the numbers to add to the end
+      endadd<-x[1:4]
+      ### make ore bot next if you don't have enough orebots
+      if(x[1]<maxore){
+        ### find time to gather materials & make a robot
+        timeneeded<-if(x[5]>=blprint[1]){1}else{ceiling((blprint[1]-x[5])/x[1])+1}
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(1,0,0,0,-blprint[1],0,0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make clay bot nextif you don't have enough clay bots
+      if(x[2]<blprint[4]){
+        ### find time to gather materials & make a robot
+        timeneeded<-if(x[5]>=blprint[2]){1}else{ceiling((blprint[2]-x[5])/x[1])+1}
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,1,0,0,-blprint[2],0,0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make obs bot if you don't have enough obs bots - must have clay bots
+      ### ensure you have at least one clay bot; also stop when you have enough obsidian bots
+      if(x[3]<blprint[6]&&x[2]>0){
+        ### find time to gather materials & make a robot
+        ##ore
+        oretime<-if(x[5]>=blprint[3]){1}else{ceiling((blprint[3]-x[5])/x[1])+1}
+        ##clay
+        claytime<-if(x[6]>=blprint[4]){1}else{ceiling((blprint[4]-x[6])/x[2])+1}
+        timeneeded<-max(oretime,claytime)
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,0,1,0,-blprint[3],-blprint[4],0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make geode bot next - never have enough geode bots - must have obs bots)
+      if(x[3]>0){
+        ### find time to gather materials & make a robot
+        ##ore
+        oretime<-if(x[5]>=blprint[5]){1}else{ceiling((blprint[5]-x[5])/x[1])+1}
+        ##clay
+        obstime<-if(x[7]>=blprint[6]){1}else{ceiling((blprint[6]-x[7])/x[3])+1}
+        timeneeded<-max(oretime,obstime)
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,0,0,1,-blprint[5],0,-blprint[6],0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### stopmakingrobots
+        nxt<-x
+        timeleft<-nxt[9]
+        nxt[5:8]<-nxt[5:8]+(timeleft*endadd)
+        nxt[9]<-0
+        pri<-(nxt[8])
+        nxt[10]<-pri
+        pq$push(nxt,priority=pri)}
+    i<-i+1}
+NA}
+
+```
+
+```{r}
+qualitylevel<-sapply(bp,function(x){
+  y<-blueprintrun(x)
+  cat(y,"\n")
+  y[8]})
+part1<-qualitylevel*(1:length(bp))
+part1
+part1<-sum(part1)
+part1
+```
+## Part 2
+Small change, instead of 24 minutes, there's 32.  So, same, but will make the function a little different by not hardcoding the time
+
+```{r}
+blueprintrun_v<-function(blprint,tm){
+  pq<-priority_queue()
+  maxore<-max(blprint[c(1,2,3,5)])
+  ###orerobots,clayrobots,obsrobots,geoderobots,
+  ###ore,clay,obsidian,geodes,time
+  startline<-c(1,0,0,0,0,0,0,0,tm,((tm*(tm-1))/2))
+  ###priority=time*(time+1)/2+geodes+geoderobots*timeleft
+  pq$push(startline,priority=((tm*(tm-1))/2))
+  i<-1
+  while(pq$size()>0){
+    x<-pq$pop()
+    ### if time is out, return number of geodes
+    if(x[9]==0){return(x)
+      break
+    }else{
+      #these are the numbers to add to the end
+      endadd<-x[1:4]
+      ### make ore bot next if you don't have enough orebots
+      if(x[1]<maxore){
+        ### find time to gather materials & make a robot
+        timeneeded<-if(x[5]>=blprint[1]){1}else{ceiling((blprint[1]-x[5])/x[1])+1}
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(1,0,0,0,-blprint[1],0,0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make clay bot nextif you don't have enough clay bots
+      if(x[2]<blprint[4]){
+        ### find time to gather materials & make a robot
+        timeneeded<-if(x[5]>=blprint[2]){1}else{ceiling((blprint[2]-x[5])/x[1])+1}
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,1,0,0,-blprint[2],0,0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make obs bot if you don't have enough obs bots - must have clay bots
+      ### ensure you have at least one clay bot; also stop when you have enough obsidian bots
+      if(x[3]<blprint[6]&&x[2]>0){
+        ### find time to gather materials & make a robot
+        ##ore
+        oretime<-if(x[5]>=blprint[3]){1}else{ceiling((blprint[3]-x[5])/x[1])+1}
+        ##clay
+        claytime<-if(x[6]>=blprint[4]){1}else{ceiling((blprint[4]-x[6])/x[2])+1}
+        timeneeded<-max(oretime,claytime)
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,0,1,0,-blprint[3],-blprint[4],0,0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### make geode bot next - never have enough geode bots - must have obs bots)
+      if(x[3]>0){
+        ### find time to gather materials & make a robot
+        ##ore
+        oretime<-if(x[5]>=blprint[5]){1}else{ceiling((blprint[5]-x[5])/x[1])+1}
+        ##clay
+        obstime<-if(x[7]>=blprint[6]){1}else{ceiling((blprint[6]-x[7])/x[3])+1}
+        timeneeded<-max(oretime,obstime)
+        ### only go forward if timeneeded is <=time left
+        if(timeneeded<=x[9]){
+          ### add made during the wait time
+          nxt<-x
+          nxt[5:8]<-nxt[5:8]+(timeneeded*endadd)
+          ### add robot, subtract materials & time
+          nxt<-nxt+c(0,0,0,1,-blprint[5],0,-blprint[6],0,-timeneeded,0)
+          ### figure out the new priority
+          pri<-(nxt[9]*(nxt[9]-1)/2)+nxt[8]+(nxt[4]*nxt[9])
+          nxt[10]<-pri
+          ##push
+          pq$push(nxt,priority=pri)}}
+      ### stopmakingrobots
+        nxt<-x
+        timeleft<-nxt[9]
+        nxt[5:8]<-nxt[5:8]+(timeleft*endadd)
+        nxt[9]<-0
+        pri<-(nxt[8])
+        nxt[10]<-pri
+        pq$push(nxt,priority=pri)}
+    i<-i+1}
+NA}
+
+```
+
+
+```{r}
+shortrun<-sapply(bp[1:min(3,length(bp))],function(x){
+  y<-blueprintrun_v(x,32)
+  cat(y,"\n")
+  y[8]})
+shortrun
+part2<-prod(shortrun)
+part2
+```

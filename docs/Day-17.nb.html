@@ -1754,12 +1754,157 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImlucHV0PC1yZWFkX2xpbmVzKFwiRGF5MTdTYW1wbGUudHh0XCIpIiwiamV0czwtdW5saXN0KHN0cl9zcGxpdChpbnB1dCxcIlwiKSkiXX0= -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day17Sample.txt&quot;)
+jets&lt;-unlist(str_split(input,&quot;&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Set up the shapes</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoic2hhcGVzPC1saXN0KGxpc3QoYygwLDApLGMoMSwwKSxjKDIsMCksYygzLDApKSwgIyAtXG5saXN0KGMoMSwwKSxjKDAsMSksYygxLDEpLGMoMiwxKSxjKDEsMikpLCAjICtcbmxpc3QoYygwLDApLGMoMSwwKSxjKDIsMCksYygyLDEpLGMoMiwyKSksICMgYmFja3dhcmRzIFwiTFwiXG5saXN0KGMoMCwwKSxjKDAsMSksYygwLDIpLGMoMCwzKSksICMgfFxubGlzdChjKDAsMCksYygwLDEpLGMoMSwwKSxjKDEsMSkpKSAjIHNtYWxsIHNxdWFyZSJ9 -->
+<pre class="r"><code>shapes&lt;-list(list(c(0,0),c(1,0),c(2,0),c(3,0)), # -
+list(c(1,0),c(0,1),c(1,1),c(2,1),c(1,2)), # +
+list(c(0,0),c(1,0),c(2,0),c(2,1),c(2,2)), # backwards &quot;L&quot;
+list(c(0,0),c(0,1),c(0,2),c(0,3)), # |
+list(c(0,0),c(0,1),c(1,0),c(1,1))) # small square</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
+<p>I’m not really sure how to do this.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImJhc2VzaGFmdDwtbWF0cml4KE5BLG5jb2w9Nyxucm93PTUqMTAwMDAwMDApIiwiZHJvcHNoYXBlczwtZnVuY3Rpb24oc2hhZnQsZGlybGlzdCxjb3VudGVyKXtcbiAgZDwtMVxuICAjIyMgaGlnaGVzdCBwb2ludCBpcyAwLCBmb3IgdGhlIGZsb29yXG4gIGhpZ2hlc3Rwb2ludDwtMFxuICBjbnQ8LTFcbiAgd2hpbGUoY250PD1jb3VudGVyKXtcbiAgICAjIyMgbG9va2luZyBmb3IgcGF0dGVybnNcbiAgICAjaWYoY250JSU1PT0xKXtjYXQoY250LGQsaGlnaGVzdHBvaW50LFwiXFxuXCIpfSAjIyMgdGhpcyBpcyB0byBoZWxwIGdhdGhlciBkYXRhIGZvciBwYXJ0IDJcbiAgICAjIyMgc3Bhd24gYSBzaGFwZSBhdCB0aGUgcmlnaHQgcGxhY2VcbiAgICBub3dzaGFwZTwtc2hhcGVzW1soKGNudC0xKSUlNSkrMV1dXG4gICAgIyMjc3RhcnQgd2l0aCB0aHJlZSBibGFuayByb3dzIChvciA0IGFib3ZlIHRoZSBoaWdoZXN0IHBvaW50KVxuICAgICMjI2FuZCB0d28gYmxhbmsgY29sdW1ucywgc28gdGhlIHNoYXBlcyBcIjBcIiBnb2VzIHRvIDNcbiAgICBub3dzaGFwZTwtbGFwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpe3grYygzLChoaWdoZXN0cG9pbnQrNCkpfSlcbiAgICBrZWVwZ29pbmc8LVRSVUVcbiAgICB3aGlsZShrZWVwZ29pbmc9PVRSVUUpe1xuICAgICAgbHI8LWRpcmxpc3RbZF1cbiAgICAgIGlmKGxyPT0oXCI8XCIpKXtcbiAgICAgICAgbW92ZWxlZnQ8LWxhcHBseShub3dzaGFwZSxmdW5jdGlvbih4KXt4LWMoMSwwKX0pXG4gICAgICAgICMjIGNoZWNrIHRocm91Z2ggbWF5YmUuICBpZiBhbnkgYXJlIDAgdGhlbiBmYWxzZS5cbiAgICAgICAgIyMgaWYgYW55IGFyZSBpbiBzcGFjZXMgdGhhdCBhcmUgYWxyZWFkeSBvY2N1cGllZCB0aGVuIGZhbHNlXG4gICAgICAgICMjIGlmIGFsbCBhcmUgdHJ1ZSwgdGhlbiBzaGFwZTwtbWF5YmVcbiAgICAgICAgY2hrPC1zYXBwbHkobW92ZWxlZnQsZnVuY3Rpb24oeCl7XG4gICAgICAgICAgaWYoeFsxXT09MCl7RkFMU0VcbiAgICAgICAgICB9ZWxzZSBpZighaXMubmEoc2hhZnRbeFsyXSx4WzFdXSkpe0ZBTFNFfWVsc2V7VFJVRX19KVxuICAgICAgICBpZihhbGwoY2hrKSl7bm93c2hhcGU8LW1vdmVsZWZ0fVxuICAgICAgfWVsc2V7XG4gICAgICAgIG1vdmVyaWdodDwtbGFwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpe3grYygxLDApfSlcbiAgICAgICAgIyMgY2hlY2sgdGhyb3VnaCBtYXliZS4gIGlmIGFueSBhcmUgOCB0aGVuIGZhbHNlLlxuICAgICAgICAjIyBpZiBhbnkgYXJlIGluIHNwYWNlcyB0aGF0IGFyZSBhbHJlYWR5IG9jY3VwaWVkIHRoZW4gZmFsc2VcbiAgICAgICAgIyMgaWYgYWxsIGFyZSB0cnVlLCB0aGVuIG5vd3NoYXBlPC1tYXliZVxuICAgICAgICBjaGs8LXNhcHBseShtb3ZlcmlnaHQsZnVuY3Rpb24oeCl7XG4gICAgICAgICAgaWYoeFsxXT09OCl7RkFMU0VcbiAgICAgICAgICB9ZWxzZSBpZighaXMubmEoc2hhZnRbeFsyXSx4WzFdXSkpe0ZBTFNFfWVsc2V7VFJVRX19KVxuICAgICAgICBpZihhbGwoY2hrKSl7bm93c2hhcGU8LW1vdmVyaWdodH1cbiAgICAgIH0jIyMgdHJ5IHRvIGRyb3AgdGhlIHNoYXBlXG4gICAgICBhbGxjbGVhcjwtc2FwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpe1xuICAgICAgICAjIyBpZiBvbiB0aGUgZmxvb3IgdGhlbiBGQUxTRVxuICAgICAgICBpZih4WzJdPT0xKXtGQUxTRVxuICAgICAgICB9ZWxzZXtcbiAgICAgICAgICAjIyMgaWYgdW5kZXJuZWF0aCBpcyBzcGFjZSwgdGhlbiBUUlVFLCBvdGhlcndpc2UgRkFMU0VcbiAgICAgICAgICB4PC14LWMoMCwxKVxuICAgICAgICAgIGlmKGlzLm5hKHNoYWZ0W3hbMl0seFsxXV0pKXtUUlVFfWVsc2V7RkFMU0V9fX0pXG4gICAgICBpZihhbGwoYWxsY2xlYXIpKXtcbiAgICAgICAgIyMjIGlmIGV2ZXJ5dGhpbmcgYmVsb3cgaXMgY2xlYXIsIGRyb3AgdGhlIHNoYXBlIGRvd24gb25lXG4gICAgICAgICMjIyBnZXQgdGhlIG5leHQgZGlyZWN0aW9uXG4gICAgICAgICMjIyBrZWVwIGdvaW5nXG4gICAgICAgIG5vd3NoYXBlPC1sYXBwbHkobm93c2hhcGUsZnVuY3Rpb24oeCl7eC1jKDAsMSl9KVxuICAgICAgICBkPC1kKzFcbiAgICAgICAgaWYoZD5sZW5ndGgoZGlybGlzdCkpe2Q8LTF9XG4gICAgICB9ZWxzZXtcbiAgICAgICAgIyMjIGFkZCB0byB0aGUgYm90dG9tIG9mIHRoZSBzaGFmdFxuICAgICAgICBmb3IocCBpbiAxOmxlbmd0aChub3dzaGFwZSkpe1xuICAgICAgICAgIHNoYWZ0W25vd3NoYXBlW1twXV1bMl0sbm93c2hhcGVbW3BdXVsxXV08LWNudH1cbiAgICAgICAgIyMjIGZpbmQgdGhlIGhpZ2hlc3QgcG9pbnRcbiAgICAgICAgbmhpZ2g8LW1heChzYXBwbHkobm93c2hhcGUsZnVuY3Rpb24oeCl4WzJdKSlcbiAgICAgICAgaGlnaGVzdHBvaW50PC1tYXgoaGlnaGVzdHBvaW50LG5oaWdoKVxuICAgICAgICBkPC1kKzFcbiAgICAgICAgaWYoZD5sZW5ndGgoZGlybGlzdCkpe2Q8LTF9XG4gICAgICAgIGtlZXBnb2luZzwtRkFMU0V9fVxuICAgICAgY250PC1jbnQrMX1cbiAgICBsaXN0KGhpZ2hlc3Rwb2ludCxzaGFmdCl9Il19 -->
+<pre class="r"><code>baseshaft&lt;-matrix(NA,ncol=7,nrow=5*10000000)
+dropshapes&lt;-function(shaft,dirlist,counter){
+  d&lt;-1
+  ### highest point is 0, for the floor
+  highestpoint&lt;-0
+  cnt&lt;-1
+  while(cnt&lt;=counter){
+    ### looking for patterns
+    #if(cnt%%5==1){cat(cnt,d,highestpoint,&quot;\n&quot;)} ### this is to help gather data for part 2
+    ### spawn a shape at the right place
+    nowshape&lt;-shapes[[((cnt-1)%%5)+1]]
+    ###start with three blank rows (or 4 above the highest point)
+    ###and two blank columns, so the shapes &quot;0&quot; goes to 3
+    nowshape&lt;-lapply(nowshape,function(x){x+c(3,(highestpoint+4))})
+    keepgoing&lt;-TRUE
+    while(keepgoing==TRUE){
+      lr&lt;-dirlist[d]
+      if(lr==(&quot;&lt;&quot;)){
+        moveleft&lt;-lapply(nowshape,function(x){x-c(1,0)})
+        ## check through maybe.  if any are 0 then false.
+        ## if any are in spaces that are already occupied then false
+        ## if all are true, then shape&lt;-maybe
+        chk&lt;-sapply(moveleft,function(x){
+          if(x[1]==0){FALSE
+          }else if(!is.na(shaft[x[2],x[1]])){FALSE}else{TRUE}})
+        if(all(chk)){nowshape&lt;-moveleft}
+      }else{
+        moveright&lt;-lapply(nowshape,function(x){x+c(1,0)})
+        ## check through maybe.  if any are 8 then false.
+        ## if any are in spaces that are already occupied then false
+        ## if all are true, then nowshape&lt;-maybe
+        chk&lt;-sapply(moveright,function(x){
+          if(x[1]==8){FALSE
+          }else if(!is.na(shaft[x[2],x[1]])){FALSE}else{TRUE}})
+        if(all(chk)){nowshape&lt;-moveright}
+      }### try to drop the shape
+      allclear&lt;-sapply(nowshape,function(x){
+        ## if on the floor then FALSE
+        if(x[2]==1){FALSE
+        }else{
+          ### if underneath is space, then TRUE, otherwise FALSE
+          x&lt;-x-c(0,1)
+          if(is.na(shaft[x[2],x[1]])){TRUE}else{FALSE}}})
+      if(all(allclear)){
+        ### if everything below is clear, drop the shape down one
+        ### get the next direction
+        ### keep going
+        nowshape&lt;-lapply(nowshape,function(x){x-c(0,1)})
+        d&lt;-d+1
+        if(d&gt;length(dirlist)){d&lt;-1}
+      }else{
+        ### add to the bottom of the shaft
+        for(p in 1:length(nowshape)){
+          shaft[nowshape[[p]][2],nowshape[[p]][1]]&lt;-cnt}
+        ### find the highest point
+        nhigh&lt;-max(sapply(nowshape,function(x)x[2]))
+        highestpoint&lt;-max(highestpoint,nhigh)
+        d&lt;-d+1
+        if(d&gt;length(dirlist)){d&lt;-1}
+        keepgoing&lt;-FALSE}}
+      cnt&lt;-cnt+1}
+    list(highestpoint,shaft)}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQxPC1kcm9wc2hhcGVzKGJhc2VzaGFmdCxqZXRzLDIwMjIpW1sxXV0iLCJwYXJ0MSJdfQ== -->
+<pre class="r"><code>part1&lt;-dropshapes(baseshaft,jets,2022)[[1]]
+part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMwNjhcbiJ9 -->
+<pre><code>[1] 3068</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>##Part 2</p>
+<p>As, obviously, there’s no way to drop a trillion of these, there has
+to be a pattern of some sort.</p>
+<p>For my real data - in excel, I can figure out that every 1700 stones
+the highest point grows 2600. (this was through looking at the highest
+point for the beginning of each cycle and seeing that it repeated every
+every 340 cycles (or 1700 stones))</p>
+<p>The cycle for the sample data is different, the highest point
+increases 53 every 35 stones</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMjIHJlYWwgZGF0YSBpcyBjb21tZW50ZWQgb3V0IiwiIyMxMDAwMDAwMDAwMDAwJS8lMTcwMCIsIiMjMTAwMDAwMDAwMDAwMCUlMTcwMCIsIiIsIjEwMDAwMDAwMDAwMDAlLyUzNSJdfQ== -->
+<pre class="r"><code>## real data is commented out
+##1000000000000%/%1700
+##1000000000000%%1700
+
+1000000000000%/%35</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI4NTcxNDI4NTcxXG4ifQ== -->
+<pre><code>[1] 28571428571</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiMTAwMDAwMDAwMDAwMCUlMzUifQ== -->
+<pre class="r"><code>1000000000000%%35</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE1XG4ifQ== -->
+<pre><code>[1] 15</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiNTbywgaWYgSSBmaW5kIG91dCB3aGVyZSBpdCBpcyBhdCAxOTAwIChpdCB0YWtlcyBhIHdoaWxlIHRvIGJhbGFuY2Ugb3V0LCBzbyBzdGFydCBmcm9tIDE5MDAgcmF0aGVyIHRoYW4gMjAwKSwgdGhlbiAiLCIjI3Rha2UgdGhhdCwgYWRkIDU4ODIzNTI5MyoyNjYwLCBpdCBzaG91bGQgYmUgcmlnaHQuIiwiIyNiYXNlY3ljbGU8LWRyb3BzaGFwZXMoYmFzZXNoYWZ0LGpldHMsMTkwMClbWzFdXSIsIiMjcGFydDI8LWJhc2VjeWNsZSsoNTg4MjM1MjkzKjI2NjApIiwiIyNwYXJ0MiIsIiIsImJhc2VjeWNsZTwtZHJvcHNoYXBlcyhiYXNlc2hhZnQsamV0cyw1MClbWzFdXSIsInBhcnQyPC1iYXNlY3ljbGUrKDI4NTcxNDI4NTcwKjUzKSIsInBhcnQyIl19 -->
+<pre class="r"><code>#So, if I find out where it is at 1900 (it takes a while to balance out, so start from 1900 rather than 200), then 
+##take that, add 588235293*2660, it should be right.
+##basecycle&lt;-dropshapes(baseshaft,jets,1900)[[1]]
+##part2&lt;-basecycle+(588235293*2660)
+##part2
+
+basecycle&lt;-dropshapes(baseshaft,jets,50)[[1]]
+part2&lt;-basecycle+(28571428570*53)
+part2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE1MTQyODU3MTQyODhcbiJ9 -->
+<pre><code>[1] 1514285714288</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KYGBge3J9DQppbnB1dDwtcmVhZF9saW5lcygiRGF5MTdTYW1wbGUudHh0IikNCmpldHM8LXVubGlzdChzdHJfc3BsaXQoaW5wdXQsIiIpKQ0KYGBgDQoNClNldCB1cCB0aGUgc2hhcGVzDQoNCmBgYHtyfQ0Kc2hhcGVzPC1saXN0KGxpc3QoYygwLDApLGMoMSwwKSxjKDIsMCksYygzLDApKSwgIyAtDQpsaXN0KGMoMSwwKSxjKDAsMSksYygxLDEpLGMoMiwxKSxjKDEsMikpLCAjICsNCmxpc3QoYygwLDApLGMoMSwwKSxjKDIsMCksYygyLDEpLGMoMiwyKSksICMgYmFja3dhcmRzICJMIg0KbGlzdChjKDAsMCksYygwLDEpLGMoMCwyKSxjKDAsMykpLCAjIHwNCmxpc3QoYygwLDApLGMoMCwxKSxjKDEsMCksYygxLDEpKSkgIyBzbWFsbCBzcXVhcmUNCmBgYA0KDQoNCg0KDQojIyBQYXJ0IDENCkknbSBub3QgcmVhbGx5IHN1cmUgaG93IHRvIGRvIHRoaXMuDQoNCg0KYGBge3J9DQoNCmJhc2VzaGFmdDwtbWF0cml4KE5BLG5jb2w9Nyxucm93PTUqMTAwMDAwMDApDQpkcm9wc2hhcGVzPC1mdW5jdGlvbihzaGFmdCxkaXJsaXN0LGNvdW50ZXIpew0KICBkPC0xDQogICMjIyBoaWdoZXN0IHBvaW50IGlzIDAsIGZvciB0aGUgZmxvb3INCiAgaGlnaGVzdHBvaW50PC0wDQogIGNudDwtMQ0KICB3aGlsZShjbnQ8PWNvdW50ZXIpew0KICAgICMjIyBsb29raW5nIGZvciBwYXR0ZXJucw0KICAgICNpZihjbnQlJTU9PTEpe2NhdChjbnQsZCxoaWdoZXN0cG9pbnQsIlxuIil9ICMjIyB0aGlzIGlzIHRvIGhlbHAgZ2F0aGVyIGRhdGEgZm9yIHBhcnQgMg0KICAgICMjIyBzcGF3biBhIHNoYXBlIGF0IHRoZSByaWdodCBwbGFjZQ0KICAgIG5vd3NoYXBlPC1zaGFwZXNbWygoY250LTEpJSU1KSsxXV0NCiAgICAjIyNzdGFydCB3aXRoIHRocmVlIGJsYW5rIHJvd3MgKG9yIDQgYWJvdmUgdGhlIGhpZ2hlc3QgcG9pbnQpDQogICAgIyMjYW5kIHR3byBibGFuayBjb2x1bW5zLCBzbyB0aGUgc2hhcGVzICIwIiBnb2VzIHRvIDMNCiAgICBub3dzaGFwZTwtbGFwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpe3grYygzLChoaWdoZXN0cG9pbnQrNCkpfSkNCiAgICBrZWVwZ29pbmc8LVRSVUUNCiAgICB3aGlsZShrZWVwZ29pbmc9PVRSVUUpew0KICAgICAgbHI8LWRpcmxpc3RbZF0NCiAgICAgIGlmKGxyPT0oIjwiKSl7DQogICAgICAgIG1vdmVsZWZ0PC1sYXBwbHkobm93c2hhcGUsZnVuY3Rpb24oeCl7eC1jKDEsMCl9KQ0KICAgICAgICAjIyBjaGVjayB0aHJvdWdoIG1heWJlLiAgaWYgYW55IGFyZSAwIHRoZW4gZmFsc2UuDQogICAgICAgICMjIGlmIGFueSBhcmUgaW4gc3BhY2VzIHRoYXQgYXJlIGFscmVhZHkgb2NjdXBpZWQgdGhlbiBmYWxzZQ0KICAgICAgICAjIyBpZiBhbGwgYXJlIHRydWUsIHRoZW4gc2hhcGU8LW1heWJlDQogICAgICAgIGNoazwtc2FwcGx5KG1vdmVsZWZ0LGZ1bmN0aW9uKHgpew0KICAgICAgICAgIGlmKHhbMV09PTApe0ZBTFNFDQogICAgICAgICAgfWVsc2UgaWYoIWlzLm5hKHNoYWZ0W3hbMl0seFsxXV0pKXtGQUxTRX1lbHNle1RSVUV9fSkNCiAgICAgICAgaWYoYWxsKGNoaykpe25vd3NoYXBlPC1tb3ZlbGVmdH0NCiAgICAgIH1lbHNlew0KICAgICAgICBtb3ZlcmlnaHQ8LWxhcHBseShub3dzaGFwZSxmdW5jdGlvbih4KXt4K2MoMSwwKX0pDQogICAgICAgICMjIGNoZWNrIHRocm91Z2ggbWF5YmUuICBpZiBhbnkgYXJlIDggdGhlbiBmYWxzZS4NCiAgICAgICAgIyMgaWYgYW55IGFyZSBpbiBzcGFjZXMgdGhhdCBhcmUgYWxyZWFkeSBvY2N1cGllZCB0aGVuIGZhbHNlDQogICAgICAgICMjIGlmIGFsbCBhcmUgdHJ1ZSwgdGhlbiBub3dzaGFwZTwtbWF5YmUNCiAgICAgICAgY2hrPC1zYXBwbHkobW92ZXJpZ2h0LGZ1bmN0aW9uKHgpew0KICAgICAgICAgIGlmKHhbMV09PTgpe0ZBTFNFDQogICAgICAgICAgfWVsc2UgaWYoIWlzLm5hKHNoYWZ0W3hbMl0seFsxXV0pKXtGQUxTRX1lbHNle1RSVUV9fSkNCiAgICAgICAgaWYoYWxsKGNoaykpe25vd3NoYXBlPC1tb3ZlcmlnaHR9DQogICAgICB9IyMjIHRyeSB0byBkcm9wIHRoZSBzaGFwZQ0KICAgICAgYWxsY2xlYXI8LXNhcHBseShub3dzaGFwZSxmdW5jdGlvbih4KXsNCiAgICAgICAgIyMgaWYgb24gdGhlIGZsb29yIHRoZW4gRkFMU0UNCiAgICAgICAgaWYoeFsyXT09MSl7RkFMU0UNCiAgICAgICAgfWVsc2V7DQogICAgICAgICAgIyMjIGlmIHVuZGVybmVhdGggaXMgc3BhY2UsIHRoZW4gVFJVRSwgb3RoZXJ3aXNlIEZBTFNFDQogICAgICAgICAgeDwteC1jKDAsMSkNCiAgICAgICAgICBpZihpcy5uYShzaGFmdFt4WzJdLHhbMV1dKSl7VFJVRX1lbHNle0ZBTFNFfX19KQ0KICAgICAgaWYoYWxsKGFsbGNsZWFyKSl7DQogICAgICAgICMjIyBpZiBldmVyeXRoaW5nIGJlbG93IGlzIGNsZWFyLCBkcm9wIHRoZSBzaGFwZSBkb3duIG9uZQ0KICAgICAgICAjIyMgZ2V0IHRoZSBuZXh0IGRpcmVjdGlvbg0KICAgICAgICAjIyMga2VlcCBnb2luZw0KICAgICAgICBub3dzaGFwZTwtbGFwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpe3gtYygwLDEpfSkNCiAgICAgICAgZDwtZCsxDQogICAgICAgIGlmKGQ+bGVuZ3RoKGRpcmxpc3QpKXtkPC0xfQ0KICAgICAgfWVsc2V7DQogICAgICAgICMjIyBhZGQgdG8gdGhlIGJvdHRvbSBvZiB0aGUgc2hhZnQNCiAgICAgICAgZm9yKHAgaW4gMTpsZW5ndGgobm93c2hhcGUpKXsNCiAgICAgICAgICBzaGFmdFtub3dzaGFwZVtbcF1dWzJdLG5vd3NoYXBlW1twXV1bMV1dPC1jbnR9DQogICAgICAgICMjIyBmaW5kIHRoZSBoaWdoZXN0IHBvaW50DQogICAgICAgIG5oaWdoPC1tYXgoc2FwcGx5KG5vd3NoYXBlLGZ1bmN0aW9uKHgpeFsyXSkpDQogICAgICAgIGhpZ2hlc3Rwb2ludDwtbWF4KGhpZ2hlc3Rwb2ludCxuaGlnaCkNCiAgICAgICAgZDwtZCsxDQogICAgICAgIGlmKGQ+bGVuZ3RoKGRpcmxpc3QpKXtkPC0xfQ0KICAgICAgICBrZWVwZ29pbmc8LUZBTFNFfX0NCiAgICAgIGNudDwtY250KzF9DQogICAgbGlzdChoaWdoZXN0cG9pbnQsc2hhZnQpfQ0KYGBgDQoNCg0KYGBge3J9DQpwYXJ0MTwtZHJvcHNoYXBlcyhiYXNlc2hhZnQsamV0cywyMDIyKVtbMV1dDQpwYXJ0MQ0KYGBgDQoNCiMjUGFydCAyDQoNCkFzLCBvYnZpb3VzbHksIHRoZXJlJ3Mgbm8gd2F5IHRvIGRyb3AgYSB0cmlsbGlvbiBvZiB0aGVzZSwgdGhlcmUgaGFzIHRvIGJlIGEgcGF0dGVybiBvZiBzb21lIHNvcnQuDQoNCkZvciBteSByZWFsIGRhdGEgLSBpbiBleGNlbCwgSSBjYW4gZmlndXJlIG91dCB0aGF0IGV2ZXJ5IDE3MDAgc3RvbmVzIHRoZSBoaWdoZXN0IHBvaW50IGdyb3dzIDI2MDAuDQoodGhpcyB3YXMgdGhyb3VnaCBsb29raW5nIGF0IHRoZSBoaWdoZXN0IHBvaW50IGZvciB0aGUgYmVnaW5uaW5nIG9mIGVhY2ggY3ljbGUgYW5kIHNlZWluZyB0aGF0IGl0IHJlcGVhdGVkIGV2ZXJ5IGV2ZXJ5IDM0MCBjeWNsZXMgKG9yIDE3MDAgc3RvbmVzKSkNCg0KVGhlIGN5Y2xlIGZvciB0aGUgc2FtcGxlIGRhdGEgaXMgZGlmZmVyZW50LCB0aGUgaGlnaGVzdCBwb2ludCBpbmNyZWFzZXMgNTMgZXZlcnkgMzUgc3RvbmVzDQoNCmBgYHtyfQ0KIyMgcmVhbCBkYXRhIGlzIGNvbW1lbnRlZCBvdXQNCiMjMTAwMDAwMDAwMDAwMCUvJTE3MDANCiMjMTAwMDAwMDAwMDAwMCUlMTcwMA0KDQoxMDAwMDAwMDAwMDAwJS8lMzUNCjEwMDAwMDAwMDAwMDAlJTM1DQpgYGANCg0KDQpgYGB7cn0NCiNTbywgaWYgSSBmaW5kIG91dCB3aGVyZSBpdCBpcyBhdCAxOTAwIChpdCB0YWtlcyBhIHdoaWxlIHRvIGJhbGFuY2Ugb3V0LCBzbyBzdGFydCBmcm9tIDE5MDAgcmF0aGVyIHRoYW4gMjAwKSwgdGhlbiANCiMjdGFrZSB0aGF0LCBhZGQgNTg4MjM1MjkzKjI2NjAsIGl0IHNob3VsZCBiZSByaWdodC4NCiMjYmFzZWN5Y2xlPC1kcm9wc2hhcGVzKGJhc2VzaGFmdCxqZXRzLDE5MDApW1sxXV0NCiMjcGFydDI8LWJhc2VjeWNsZSsoNTg4MjM1MjkzKjI2NjApDQojI3BhcnQyDQoNCmJhc2VjeWNsZTwtZHJvcHNoYXBlcyhiYXNlc2hhZnQsamV0cyw1MClbWzFdXQ0KcGFydDI8LWJhc2VjeWNsZSsoMjg1NzE0Mjg1NzAqNTMpDQpwYXJ0Mg0KYGBgDQo=</div>
 
 
 

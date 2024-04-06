@@ -21,8 +21,8 @@ Code and notebooks from [Advent of Code 2022](https://adventofcode.com/2022).
 | 14 | *Regolith Reservoir* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-14.nb.html) | [Notebook](<Day 14/Day14.Rmd>) | [Files](<Day 14>) |
 | 15 | *Beacon Exclusion Zone* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-15.nb.html) | [Notebook](<Day 15/Day15.Rmd>) | [Files](<Day 15>) |
 | 16 | *Proboscidea Volcanium* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-16.nb.html) | [Notebook](<Day 16/Day16.Rmd>) | [Files](<Day 16>) |
-| 17 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-17.nb.html) | [Notebook](<Day 17/Day17.Rmd>) | [Files](<Day 17>) |
-| 18 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-18.nb.html) | [Notebook](<Day 18/Day18.Rmd>) | [Files](<Day 18>) |
+| 17 | *Pyroclastic Flow* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-17.nb.html) | [Notebook](<Day 17/Day17.Rmd>) | [Files](<Day 17>) |
+| 18 | *Boiling Boulders* | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-18.nb.html) | [Notebook](<Day 18/Day18.Rmd>) | [Files](<Day 18>) |
 | 19 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-19.nb.html) | [Notebook](<Day 19/Day19.Rmd>) | [Files](<Day 19>) |
 | 20 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-20.nb.html) | [Notebook](<Day 20/Day20.Rmd>) | [Files](<Day 20>) |
 | 21 |    | [HTML](https://exitingbear.github.io/AdventOfCode2022/Day-21.nb.html) | [Notebook](<Day 21/Day21.Rmd>) | [Files](<Day 21>) |

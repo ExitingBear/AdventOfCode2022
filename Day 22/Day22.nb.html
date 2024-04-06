@@ -11,7 +11,7 @@
 
 
 
-<title>Day 14 Notebook</title>
+<title>Day 22 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day 14 Notebook</h1>
+<h1 class="title toc-ignore">Day 22 Notebook</h1>
 
 </div>
 
@@ -1756,193 +1756,538 @@ display: none;
 <!-- rnb-text-begin -->
 <div id="part-1" class="section level2">
 <h2>Part 1</h2>
-<p>Start by building the walls</p>
+<p>Read in data - break in two: the map &amp; the directions</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXFxEYXkxNFNhbXBsZS50eHRcXClcblxucm9ja3M8LWFzLmRhdGEuZnJhbWUobWF0cml4KG5jb2w9NCxucm93PTApKVxuY29sbmFtZXMocm9ja3MpPC1jKFxceDFcXCxcXHkxXFwsXFx4MlxcLFxceTJcXClcbmZvcihpIGluIDE6bGVuZ3RoKGlucHV0KSl7XG4gIHg8LWFzLm51bWVyaWModW5saXN0KHN0cl9zcGxpdChzdHJfcmVwbGFjZShpbnB1dFtpXSxcXCBcXCxcXFxcKSxcXFstPlxuYGBgIn0= -->
-<pre class="r"><code>```r
-input&lt;-read_lines(\Day14Sample.txt\)
-
-rocks&lt;-as.data.frame(matrix(ncol=4,nrow=0))
-colnames(rocks)&lt;-c(\x1\,\y1\,\x2\,\y2\)
-for(i in 1:length(input)){
-  x&lt;-as.numeric(unlist(str_split(str_replace(input[i],\ \,\\),\[-&gt;</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkyMlNhbXBsZS50eHRcIilcbmJsbms8LXdoaWNoKGlucHV0PT1cIlwiKVxucm91dGU8LWlucHV0WyhibG5rKzEpXVxuYm9hcmRtYXA8LW1hdHJpeChOQSxuY29sPW1heChuY2hhcihpbnB1dCkpLG5yb3c9KGxlbmd0aChpbnB1dCktMikpXG5mb3IoaSBpbiAxOihsZW5ndGgoaW5wdXQpLTIpKXtcbiAgZm9yKGogaW4gMTpuY2hhcihpbnB1dFtpXSkpe1xuICAgIGlmKHN0cl9zdWIoaW5wdXRbaV0saixqKSAhPVwiIFwiKXtib2FyZG1hcFtpLGpdPC1zdHJfc3ViKGlucHV0W2ldLGosail9fX1cblxuYGBgIn0= -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day22Sample.txt&quot;)
+blnk&lt;-which(input==&quot;&quot;)
+route&lt;-input[(blnk+1)]
+boardmap&lt;-matrix(NA,ncol=max(nchar(input)),nrow=(length(input)-2))
+for(i in 1:(length(input)-2)){
+  for(j in 1:nchar(input[i])){
+    if(str_sub(input[i],j,j) !=&quot; &quot;){boardmap[i,j]&lt;-str_sub(input[i],j,j)}}}
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>So there’s less math, (hah), first, drop y by 1 because the matrices
-start at 1 rather than 0. And then because I know part 2, the matrix
-will be two more than the highest (new) y. And then, make it a little
-bit wider than it is tall on the right side.</p>
+<p>Find the path</p>
+<p>Process: 1. Start with a position and direction: 2. Find how many
+steps you’re going to take &amp; where you turn at the end of your walk
+3. Figure out where your next step <em>should</em> be - 3.a either it’s
+right in front of you, or 3.b it’s around the edge 4. Find out if
+there’s a rock there: 4.a if there’s a rock, stop moving 4.b if there’s
+no rock, step there and go back to step 3 if you have more steps 5. Make
+this your new starting point 6. Find your new direction based on your
+turn 6.a if you have a new direction, go back to step 2. 6.b if you are
+at the end of the walk, stop - report where you are and where you’re
+facing.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucm9ja3MkeTE8LXJvY2tzJHkxKzFcbnJvY2tzJHkyPC1yb2NrcyR5MisxXG5cbm14eTwtbWF4KG1heChyb2NrcyR5MSksbWF4KHJvY2tzJHkyKSlcbnNhbmRwaXQ8LW1hdHJpeChOQSxuY29sPTUwMCtteHkrNCxucm93PW14eSsyKVxuYGBgXG5gYGAifQ== -->
-<pre class="r"><code>```r
-rocks$y1&lt;-rocks$y1+1
-rocks$y2&lt;-rocks$y2+1
-
-mxy&lt;-max(max(rocks$y1),max(rocks$y2))
-sandpit&lt;-matrix(NA,ncol=500+mxy+4,nrow=mxy+2)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Then the rocks go into the pit
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5mb3IoaSBpbiAxOm5yb3cocm9ja3MpKXtcbiAgcm9ja3dhbGw8LXJvY2tzW2ksXVxuICBzYW5kcGl0W3JvY2t3YWxsJHkxOnJvY2t3YWxsJHkyLHJvY2t3YWxsJHgxOnJvY2t3YWxsJHgyXTwtXFxSXFx9XG4jIyMgY3JlYXRlIGEgYmFja3VwIGZvciBwYXJ0IDJcbnNwYms8LXNhbmRwaXRcblxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-
-for(i in 1:nrow(rocks)){
-  rockwall&lt;-rocks[i,]
-  sandpit[rockwall$y1:rockwall$y2,rockwall$x1:rockwall$x2]&lt;-\R\}
-### create a backup for part 2
-spbk&lt;-sandpit
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-finally - drop some sand:
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5cbnNhbmRjb3VudDwtMFxubmV3c2FuZDwtYyg1MDAsMSlcblxud2hpbGUobmV3c2FuZFsyXTxucm93KHNhbmRwaXQpKXtcbiAgIyMjIGlmIGl0IGhpdHMgdGhlIGJvdHRvbSBvZiB0aGUgbWF0cml4LCBnbyB0byB0aGUgbmV4dCBzYW5kXG4gIHdoaWxlKG5ld3NhbmRbMl08bnJvdyhzYW5kcGl0KSl7XG4gICAgIyMjIGlmIHRoZXJlJ3Mgbm90aGluZyBiZWxvdywgZHJvcCBvbmUsIGtlZXAgZ29pbmdcbiAgICBpZihpcy5uYShzYW5kcGl0W25ld3NhbmRbMl0rMSxuZXdzYW5kWzFdXSkpe1xuICAgICAgbmV3c2FuZFsyXTwtbmV3c2FuZFsyXSsxXG4gICAgICBuZXh0XG4gICAgICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgYmVsb3csIGJ1dCBub3RoaW5nIHRvIHRoZSBsZWZ0LCBcbiAgICB9ZWxzZSBpZihpcy5uYShzYW5kcGl0W25ld3NhbmRbMl0rMSxuZXdzYW5kWzFdLTFdKSl7XG4gICAgICBuZXdzYW5kWzJdPC1uZXdzYW5kWzJdKzFcbiAgICAgIG5ld3NhbmRbMV08LW5ld3NhbmRbMV0tMVxuICAgICAgbmV4dFxuICAgICAgIyMjIGlmIHRoZXJlJ3Mgc29tZXRoaW5nIGJlbG93ICYgdG8gdGhlIGxlZnQsIGNoZWNrIHRoZSByaWdodFxuICAgIH1lbHNlIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV0rMV0pKXtcbiAgICAgIG5ld3NhbmRbMl08LW5ld3NhbmRbMl0rMVxuICAgICAgbmV3c2FuZFsxXTwtbmV3c2FuZFsxXSsxXG4gICAgICBuZXh0XG4gICAgICAjIyMgZWxzZSwgdGhlIHNhbmQgcmVzdHMgYW5kIHN0YXJ0IHdpdGggdGhlIG5leHQgZ3JhaW5cbiAgICB9ZWxzZXtzYW5kcGl0W25ld3NhbmRbMl0sbmV3c2FuZFsxXV08LVxcU1xcXG4gICAgc2FuZGNvdW50PC1zYW5kY291bnQrMVxuICAgIG5ld3NhbmQ8LWMoNTAwLDEpXG4gICAgYnJlYWt9fX1cblxucGFydDE8LXNhbmRjb3VudFxucGFydDFcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-
-
-sandcount&lt;-0
-newsand&lt;-c(500,1)
-
-while(newsand[2]&lt;nrow(sandpit)){
-  ### if it hits the bottom of the matrix, go to the next sand
-  while(newsand[2]&lt;nrow(sandpit)){
-    ### if there&#39;s nothing below, drop one, keep going
-    if(is.na(sandpit[newsand[2]+1,newsand[1]])){
-      newsand[2]&lt;-newsand[2]+1
-      next
-      ### if there&#39;s something below, but nothing to the left, 
-    }else if(is.na(sandpit[newsand[2]+1,newsand[1]-1])){
-      newsand[2]&lt;-newsand[2]+1
-      newsand[1]&lt;-newsand[1]-1
-      next
-      ### if there&#39;s something below &amp; to the left, check the right
-    }else if(is.na(sandpit[newsand[2]+1,newsand[1]+1])){
-      newsand[2]&lt;-newsand[2]+1
-      newsand[1]&lt;-newsand[1]+1
-      next
-      ### else, the sand rests and start with the next grain
-    }else{sandpit[newsand[2],newsand[1]]&lt;-\S\
-    sandcount&lt;-sandcount+1
-    newsand&lt;-c(500,1)
-    break}}}
-
-part1&lt;-sandcount
-part1</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI0XG4ifQ== --&gt;
-</code></pre>
-<p>[1] 24</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-## Part 2
-
-For part 2, put a floor down.  This time, stop when there&#39;s a grain of sand at 500,1
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyMgcmVzdG9yZSBmcm9tIHRoZSBiYWNrdXBcbnNhbmRwaXQ8LXNwYmtcbiMjIyBhZGQgdGhlIGZsb29yXG5zYW5kcGl0W214eSsyLF08LVxcUlxcXG5zYW5kY291bnQ8LTBcbm5ld3NhbmQ8LWMoNTAwLDEpXG53aGlsZShpcy5uYShzYW5kcGl0WzEsNTAwXSkpe1xuICAjIyMgaWYgaXQgaGl0cyB0aGUgYm90dG9tIG9mIHRoZSBtYXRyaXgsIGdvIHRvIHRoZSBuZXh0IHNhbmRcbiAgd2hpbGUoaXMubmEoc2FuZHBpdFsxLDUwMF0pKXtcbiAgICAjIyMgaWYgdGhlcmUncyBub3RoaW5nIGJlbG93LCBkcm9wIG9uZSwga2VlcCBnb2luZ1xuICAgIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV1dKSl7XG4gICAgICBuZXdzYW5kWzJdPC1uZXdzYW5kWzJdKzFcbiAgICAgIG5leHRcbiAgICAgICMjIyBpZiB0aGVyZSdzIHNvbWV0aGluZyBiZWxvdywgYnV0IG5vdGhpbmcgdG8gdGhlIGxlZnQsIFxuICAgIH1lbHNlIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV0tMV0pKXtcbiAgICAgIG5ld3NhbmRbMl08LW5ld3NhbmRbMl0rMVxuICAgICAgbmV3c2FuZFsxXTwtbmV3c2FuZFsxXS0xXG4gICAgICBuZXh0XG4gICAgICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgYmVsb3cgJiB0byB0aGUgbGVmdCwgY2hlY2sgdGhlIHJpZ2h0XG4gICAgfWVsc2UgaWYoaXMubmEoc2FuZHBpdFtuZXdzYW5kWzJdKzEsbmV3c2FuZFsxXSsxXSkpe1xuICAgICAgbmV3c2FuZFsyXTwtbmV3c2FuZFsyXSsxXG4gICAgICBuZXdzYW5kWzFdPC1uZXdzYW5kWzFdKzFcbiAgICAgIG5leHRcbiAgICAgICMjIyBvdGhlcndpc2UsIGFkZCBhIGdyYWluIG9mIHNhbmQsIGFuZCByZXNldCBmb3IgdGhlIG5leHRcbiAgICB9ZWxzZXtzYW5kcGl0W25ld3NhbmRbMl0sbmV3c2FuZFsxXV08LVxcU1xcXG4gICAgc2FuZGNvdW50PC1zYW5kY291bnQrMVxuICAgIG5ld3NhbmQ8LWMoNTAwLDEpXG4gICAgYnJlYWt9fX1cblxucGFydDI8LXNhbmRjb3VudFxucGFydDJcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-
-### restore from the backup
-sandpit&lt;-spbk
-### add the floor
-sandpit[mxy+2,]&lt;-\R\
-sandcount&lt;-0
-newsand&lt;-c(500,1)
-while(is.na(sandpit[1,500])){
-  ### if it hits the bottom of the matrix, go to the next sand
-  while(is.na(sandpit[1,500])){
-    ### if there&#39;s nothing below, drop one, keep going
-    if(is.na(sandpit[newsand[2]+1,newsand[1]])){
-      newsand[2]&lt;-newsand[2]+1
-      next
-      ### if there&#39;s something below, but nothing to the left, 
-    }else if(is.na(sandpit[newsand[2]+1,newsand[1]-1])){
-      newsand[2]&lt;-newsand[2]+1
-      newsand[1]&lt;-newsand[1]-1
-      next
-      ### if there&#39;s something below &amp; to the left, check the right
-    }else if(is.na(sandpit[newsand[2]+1,newsand[1]+1])){
-      newsand[2]&lt;-newsand[2]+1
-      newsand[1]&lt;-newsand[1]+1
-      next
-      ### otherwise, add a grain of sand, and reset for the next
-    }else{sandpit[newsand[2],newsand[1]]&lt;-\S\
-    sandcount&lt;-sandcount+1
-    newsand&lt;-c(500,1)
-    break}}}
-
-part2&lt;-sandcount
-part2</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDkzXG4ifQ== --&gt;
-</code></pre>
-<p>[1] 93 ```</p>
-<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVpY2twYXRoPC1mdW5jdGlvbihydGU9cm91dGUsYm09Ym9hcmRtYXApe1xuICBjb3VudGVyPC0xXG4gIFxuICAjIyMgZmluZCB0aGUgc3RhcnRpbmcgcG9pbnRcbiAgY3VycnA8LWMoKG1pbih3aGljaCghKGlzLm5hKGJtWzEsXSkpKSkpLDEpXG4gIGN1cnJkPC1cIkVcIlxuICB3aGlsZSghaXMubmEocnRlKSl7XG4gICAgIyMjIHB1bGwgdGhlIGZpcnN0IHBsYWNlIGZyb20gdGhlIHJvdXRlbGlzdFxuICAgIGN1dG9mZjwtc3RyX2xvY2F0ZShydGUsXCJbUkxdXCIpWzFdXG4gICAgaWYoaXMubmEoY3V0b2ZmKSl7Y3VycnJ0ZTwtcnRlfWVsc2V7Y3VycnJ0ZTwtc3RyX3N1YihydGUsMSxjdXRvZmYpfVxuICAgIHJ0ZTwtc3RyX3N1YihydGUsY3V0b2ZmKzEpXG4gICAgaWYoc3RyX3N1YihjdXJycnRlLC0xKSVpbiUoYyhcIlJcIixcIkxcIikpKXtcbiAgICAgIHN0cHM8LWFzLm51bWVyaWMoc3RyX3N1YihjdXJycnRlLGVuZD0tMikpXG4gICAgICBueHRkPC1zdHJfc3ViKGN1cnJydGUsLTEpfWVsc2V7c3RwczwtYXMubnVtZXJpYyhjdXJycnRlKVxuICAgICAgbnh0ZDwtXCJzdG9wXCJ9XG4gICAgIyMjIHRha2Ugc3RlcHNcbiAgICBzd2l0Y2goY3VycmQsXG4gICAgICAgICAgIFwiTlwiPXtzPC0xXG4gICAgICAgICAgIHdoaWxlKHM8PXN0cHMpe1xuICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKVxuICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLlxuICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrXG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV1cbiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXS0xXG4gICAgICAgICAgICAgaWYobnh0eTwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eTwtbWF4KHdoaWNoKCFpcy5uYShibVssbnh0eF0pKSl9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7YnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYobnh0ZD09XCJMXCIpe2N1cnJkPC1cIldcIn1lbHNlIGlmKG54dGQ9PVwiUlwiKXtjdXJyZDwtXCJFXCJ9fSxcbiAgICAgICAgICAgXCJFXCI9e3M8LTFcbiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7XG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0rMVxuICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdXG4gICAgICAgICAgICAgaWYobnh0eD5uY29sKGJtKXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe254dHg8LW1pbih3aGljaCghaXMubmEoYm1bbnh0eSxdKSkpfVxuICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLlxuICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrXG4gICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09XCIjXCIpe2JyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX1cbiAgICAgICAgICAgICBzPC1zKzF9XG4gICAgICAgICAgIGlmKG54dGQ9PVwiTFwiKXtjdXJyZDwtXCJOXCJ9ZWxzZSBpZihueHRkPT1cIlJcIil7Y3VycmQ8LVwiU1wifX0sXG4gICAgICAgICAgIFwiU1wiPXtzPC0xXG4gICAgICAgICAgIHdoaWxlKHM8PXN0cHMpe1xuICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKVxuICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdXG4gICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0rMVxuICAgICAgICAgICAgIGlmKG54dHk+bnJvdyhibSl8fGlzLm5hKGJtW254dHksbnh0eF0pKXtueHR5PC1taW4od2hpY2goIWlzLm5hKGJtWyxueHR4XSkpKX1cbiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgI1xuICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS5cbiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVha1xuICAgICAgICAgICAgIGlmKGJtW254dHksbnh0eF09PVwiI1wiKXticmVha31lbHNle2N1cnJwPC1jKG54dHgsbnh0eSl9XG4gICAgICAgICAgICAgczwtcysxfVxuICAgICAgICAgICBpZihueHRkPT1cIkxcIil7Y3VycmQ8LVwiRVwifWVsc2UgaWYobnh0ZD09XCJSXCIpIHtjdXJyZDwtXCJXXCJ9fSxcbiAgICAgICAgICAgXCJXXCI9e3M8LTFcbiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7XG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0tMVxuICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdXG4gICAgICAgICAgICAgaWYobnh0eDwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eDwtbWF4KHdoaWNoKCFpcy5uYShibVtueHR5LF0pKSl9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7YnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYobnh0ZD09XCJMXCIpe2N1cnJkPC1cIlNcIn1lbHNlIGlmKG54dGQ9PVwiUlwiKXtjdXJyZDwtXCJOXCJ9fSxcbiAgICAgICAgICAgY2F0KFwibm8gZGlyZWN0aW9uXFxuXCIpKVxuICAgICMjIyBlbmQgb2Ygd2hpbGVcbiAgICBjb3VudGVyPC1jb3VudGVyKzFcbiAgfSMjIyBvdXRzaWRlIG9mIHRoZSB3aGlsZVxuICBjYXQoY291bnRlcixjdXJycCxjdXJyZCxcIlxcblwiKVxuICBwc3N3ZDwtXG4gICAgc3dpdGNoKGN1cnJkLFxuICAgICAgICAgICBcIk5cIj0zLFxuICAgICAgICAgICBcIldcIj0yLFxuICAgICAgICAgICBcIkVcIj0wLFxuICAgICAgICAgICBcIlNcIj0xLFxuICAgICAgICAgICAxMDAwMDAwMDAwKSsxMDAwKmN1cnJwWzJdKzQqY3VycnBbMV1cbiAgXG4gIHBzc3dkfVxuYGBgIn0= -->
+<pre class="r"><code>quickpath&lt;-function(rte=route,bm=boardmap){
+  counter&lt;-1
+  
+  ### find the starting point
+  currp&lt;-c((min(which(!(is.na(bm[1,]))))),1)
+  currd&lt;-&quot;E&quot;
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff&lt;-str_locate(rte,&quot;[RL]&quot;)[1]
+    if(is.na(cutoff)){currrte&lt;-rte}else{currrte&lt;-str_sub(rte,1,cutoff)}
+    rte&lt;-str_sub(rte,cutoff+1)
+    if(str_sub(currrte,-1)%in%(c(&quot;R&quot;,&quot;L&quot;))){
+      stps&lt;-as.numeric(str_sub(currrte,end=-2))
+      nxtd&lt;-str_sub(currrte,-1)}else{stps&lt;-as.numeric(currrte)
+      nxtd&lt;-&quot;stop&quot;}
+    ### take steps
+    switch(currd,
+           &quot;N&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]-1
+             if(nxty&lt;1||is.na(bm[nxty,nxtx])){nxty&lt;-max(which(!is.na(bm[,nxtx])))}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){break}else{currp&lt;-c(nxtx,nxty)}
+             s&lt;-s+1}
+           if(nxtd==&quot;L&quot;){currd&lt;-&quot;W&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;E&quot;}},
+           &quot;E&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]+1
+             nxty&lt;-currp[2]
+             if(nxtx&gt;ncol(bm)||is.na(bm[nxty,nxtx])){nxtx&lt;-min(which(!is.na(bm[nxty,])))}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){break}else{currp&lt;-c(nxtx,nxty)}
+             s&lt;-s+1}
+           if(nxtd==&quot;L&quot;){currd&lt;-&quot;N&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;S&quot;}},
+           &quot;S&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]+1
+             if(nxty&gt;nrow(bm)||is.na(bm[nxty,nxtx])){nxty&lt;-min(which(!is.na(bm[,nxtx])))}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){break}else{currp&lt;-c(nxtx,nxty)}
+             s&lt;-s+1}
+           if(nxtd==&quot;L&quot;){currd&lt;-&quot;E&quot;}else if(nxtd==&quot;R&quot;) {currd&lt;-&quot;W&quot;}},
+           &quot;W&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]-1
+             nxty&lt;-currp[2]
+             if(nxtx&lt;1||is.na(bm[nxty,nxtx])){nxtx&lt;-max(which(!is.na(bm[nxty,])))}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){break}else{currp&lt;-c(nxtx,nxty)}
+             s&lt;-s+1}
+           if(nxtd==&quot;L&quot;){currd&lt;-&quot;S&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;N&quot;}},
+           cat(&quot;no direction\n&quot;))
+    ### end of while
+    counter&lt;-counter+1
+  }### outside of the while
+  cat(counter,currp,currd,&quot;\n&quot;)
+  psswd&lt;-
+    switch(currd,
+           &quot;N&quot;=3,
+           &quot;W&quot;=2,
+           &quot;E&quot;=0,
+           &quot;S&quot;=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-plot-begin -->
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnYAAAGFCAMAAABHZE7hAAAAD1BMVEUAv8R/f3/r6+v4dm3////x+BOZAAAACXBIWXMAAA05AAANOQGumz/oAAAQgUlEQVR4nO2di3brKAxFzXD//5undvzABj+whY6As6erkzStA9K+IviBh3+EqDOgG0B6hNoRANSOAKB2BAC1IwCoHQFA7QgAakcAUDsCgNoRANSOAKB2BAC1IwCoHQFA7QgAakcAUDsCgNoRANSOAKB2BAC1IwCoHQFA7QgAakcAUDsCgNoRANSOAKB2BAC1IwCoHQFA7QgAakcAUDsCgNoRANSOAKB2BAC1IwCoHQFA7QiATbv/CCkOtSMAqB0BQO0IAGpHAFA7AoDaEQDUjgCgdgQAtSMAqB0BQO0IgBztHEkxDOgWWEVEO3QnjELrzqF2pRgGencKtSvEMGlH8dJQuzIMM+h2GIXaFWFYtaN4KahdCYYAdFtMQu0KMAz07hpqJ89w0I7iRVA7cYYIdIvsQe2kia1jvYugdsIkrGO9i6B2sqSto3cHqJ0oZ9ZxnN1D7QQ5lY717gC1k+PSOnoXQu3kuNOO4q1QOzFurGO9C6B2Utxbx3q3Qu2EeGAd690KtZPhmXX0bobaiXCpmuc4e4TaSXBtnd89RbfVBNROgENt8+u36f9H7SgetZNgX9rc33/Lt9//+fkugtp95s6peNjVb6M1qN1XjkpFUiW06148aveN2KmDVMEHPda7FWr3iYR1e6n8CsfZAGr3iXvtTuYVnY+z1O4Laes4r7iF2n3gzDrOK+6gdu85tW6Wyk9j7PhtWPcds95NULvXXFk3ShXOJtITC3QPcFC7t9xYN+xmE+shC46zE9TuJXfWbbUsfHL2O71B7d5xb91ay4Inp7/TG9TuFXfK/Q5MrLOJ35NhSByyQPcEA7V7w6116dlE8pAFui8QqN0LbsfXv5L2O/FpCE6Fmn4cH7LocpyldtncSrfJdHw4JLfQoXjULpdH1v0MSz/kgTJql89z7cJylnhI7ajdY55alwe6V9pQuzzKWNfdxztql4OAYNEFPYt4XUHtMhDwK76OrEvvqF0Gmdr5+4tmQ+16Eo/aPSfLuuCQxJ7zv0D3TxFq95g867Zzna6v1Q6160c8aveUTOtOLLr5k16gdg/Jti5pUf5ftAm1e0aObX471yl3K72Ms9TuEVnWbbOHF1uBdE8daveEHOvC05v2xevRX/dR76jdA7KsG4b4ZPasrYA6qQq1uyfXuv3pTflbwfVUDWp3S45v82wivCI7fysdjLPU7oYc6XZnra97iPM3Q+161y5Pl/3Hus+baRdqd80X7fJnE9tmGheP2l2S7cvH2cR+O+1C7a7I8eQwm1iOUozXaMeLyD7QrmnxqN0FedbtZxO/+cTpap5PxGsYanfOK01OjMm3rmnvqN0p7yz5PXywmueDDbYrHrU744UmLp5NvN5YaivtQO1OeCNJcOn1i5MA0ltsE2qX5pUlu6t23DqjeCvdJF6bULskr6TLvmanX++oXYpXguwv2HHp5YrztWtSPGoXI2rIN+laFY/aRXwxRHJjV5utHWoX8dKNcTCNCpOIddSuA+1e+bYubvJxW714R+0O5DuhoV1r4lG7HS+c85t20xkoH86yuxKvLahdSL516465bSfd64115B21C3mj3bxj7nfiUzivENauKfGoXUC+DN7vjv6HH/DEhAu23wzUbuOFCuERV7fTTsi1gJbqHbVbeaPC/jZO61Ou534DtVt4JcLhQP/X4/53oGMkBrWbeeeBtnatiEftfrz0QFm7ZuodtZt4a4G+dm2IR+1GXlugrl0j9Y7auS87OwDaNeEdtfu0i83v73eio10D4lG7Twost8leTmEXMusGdMi+0712ogpIOJX9pjVC7b4aMMht69WbVknv2kk4ILit/Detk861EzVAYmOP37Ru8frWTlIBpenE9q4107V2kgqo7Ds5vmm19KydoAEDQruKxetYO1kHlksqRLd696bV0q92wgZAtKtWvG61k1bAz8fHpLd7DTqKb+lVO3EBvF/MUwUdx5d0qp18/lHa1Slel9qVyD9Iu0rF61G7ItmHaVflQEvthAi04+e7WzrUrkzuN+14vOKe/rQrlHqodtWJ15t2xVKP1K6+eteZduUSj9WuNu+onRA/7aYviHZ1ideXdgXzLncDlJegY5tFV9qVzPp6P1n18z1nqqp3PWlXOu8q73LfgBroSDudtBd/l7sGVEE/2ilkfUi8jeaQW8842412OnkP3mZ3uwot0FF+Si/aKWU9eIzRrhLxOtFOIePHk9oh2tVS7/rQTiHd0bUUIO3q8K4L7TSybUe7GsTrQDudbJvRrop61752Srk2pF0F3lE7EfxBO4/Vzrx4zWunkmd/0M5jtbNf71rXTifLwcl2w1L6sNoZF69x7ZSyvJ5sN5/mCdfOer1rWzutHBvUzrZ3TWunlmKT2lkWr2Xt9FJ8oh3qwooZdPwvaFg7xQQb1c6ueO1qp5ng4Pqd6RIe8PU8K+gcnNKsdqrp9ReoNuQIOgtntKqdbnZ/1+8sl/AAbgd1htVxtk3tAPm10pCoYSbFa1I7SHqtNCRCOfiPoHZSyY3T69eGcF5xoEXtjKR3m01wXnGkQe2sZNeOdvbEa047O+k1o53BeteadobSu52BB9fOnHfUTjS7YX5NaWdMvMa0Q6fXqnbW6l1b2qFza1k7U+I1pR06tSNbem1pZ6vetaQdOq8zS3OsaWfJu4a0Q2d1Yal39rSzI1472qGTGvBrkDntDNW7ZrRDZzTk1yIbpxjvMFPvWtEOndA9U3rBd6pIg87TTCPaobMZ4YxqZ8S7NrRD5zLmr94Z1c6EeC1oh85kGmflOp4j6HSNNKAdOo1nmLmO5wg4XyPUrhjw+/KcYWCcrV87dBIvMNtEZL4mqtcOncErzDYRXu9q1w6dwGt+9+Xx2+KeZkDmzFWvHTp7t4y77yxOK8De1a0dOnf3OM4rUlStHTp1jzDbWFjaXN3aofP2gL+PdeNl2uO3wdpnPGS9q1g7dNru2dbh2dbjQbcpBJQ4V7N26Jw9wXqr9bM2U6126IzdMY2nbql0bv4ytjcFNs5Wqh06X7dsK965bbE758xNa0Hi1akdOllPqKUDSinbQ+3k8esMNhhkXfjE0rRWP3uuUu3QmbpmO93JBQ9d8sfoto6op8/VqR06TzdsJzytH+umCmd1bwri41192qGzdEkwvrpgfD2OuIdpLVo/3QSOVKcdOEPXJAfVk/HVGRprVTM4Qu0kCcbX5QYB26BqeG+K+jhbm3boBN1Ra5+k83RDZdqhs3NLrX1Srnd1aYdOzgOy8wefUMwUSdgZVWmHzswzMvu0rdADpkzO0tSkHTovD8mqd4Mh7RTFq0g7dFqek9UnM9pp1rt6tEPnJIOsPlnSTk28arRDpySLh/mbfteQdnr1rhbt0PnI5XmfTGmn5V0l2qGzkc2Dejf9nt+0M3GAVmmcrUI7aCLe8qhP2wHZ4LbbuDaPFM/mSA3aYdPwmid98ts9Z9eX0MNt6XSOULtiXI5X8++E2i2/DtdOQbwKtANn4QP3fdqd8zS/htZOo97Z1w6dgw/c92mv3e8PDGhXXDzz2qFT8ImT/G2/cDjDc3oVr135emddO3T8v3LTp+OJxePLFrQr7Z1x7dDR/0yi3oUvR9oNVrQrK55t7dDBl+CyT/FlFEa0K1zvTGuHjrwIl31KaGfmMFlJ8Sxrhw68ELv8HV7zwfoAy8ExI9oVrXeGtUNHXY7zPvkUiCYmKZRYZ1k7dMwFWetd9EpwyxQrx2QDyo2zVrVDR1yY8z7Z7nkp8Yxqhw63OOd9Mt7zAsl11E6Lv7Jx/NE8i9gXFETbLimQXGdVO3SsNdgmELY7Lp9dZ1Q7dKRVWGYTuw9Q6EYlKPLxzqJ26ECXZ1mPbFnX03bHpfPrTGqHjnJ54rXGbHdcOMHOonboGCuwjK/bup62Oy4/zprTDh1iHWrruGiKnT3t0PEtzu/I69jVwxqzVk4BSCJd74xphw5vccb5gz+Mr/PBMXTTrhFMsrOmHTq2GtTad7ksO2PaoSNbmHl89dH4+ptRmLlBShrRcdaSdujAFiZert0lHqFbeYFUnp0p7dBRLc35x7rgbinoRl4hWO/saIcOqgL3eUO38AaZTDtD2qEjqkPtQRBJtbOjHTqeZVnGTl97EKTGWRvaoaNZmG0xsau8Ydv4lO/JHjGhHTqUpQm0q3e/3cLnbI9Qu6L89sWF2i377aoNgsg4a0E7dCDLcbgGMby9YsVB+JpvZ0I7dBQL4v3uForr5YmxdtBmZiJQ7/DaoYNYEn88ke7X5Vg7WAvf8S3jzoB26AgWZfJr95Opz5F2oOa951PKHV47dPzKktBuzNhRO1DrPvB1nAVrhw5fYUa/jj9zkXaIln3mk3Vg7dCxK02wEPvKX6HYawdolwDf6h1UO3ToiuP9kFhJbK8duo2vqVU7dNzKk1xHbL/fDt3ED9SpHTpqCqyn2O1XEmvDui/jLEw7dMyUuE4NunVfeZX5EZR26IDp0XQQXlpH7Urx5BQ7aANFeDvOgrRDh6s44Sl2TQehJu3QsSrPgzM7sQ2U4l29g2iHDlVR4lPskqmBtlGUWrRDx6kkx2X+5wdNx6AO7dBRKsq6d255PnSgXb54+tqhg1SWeGHOn4BtB8G+dugIFcZHvZy1s70e+0ey6522dugAlSZeDnYZbtsOgm3t0NEpTrwc7LqsSdtBsKwdOjbliU4nDrQbWg5C3jirqR06MhrE53UGiziNqdFsjC454ilqhw6LCvFKYbuftB0EaoeC2hnTDh0THW60axx72qEjokTn2j0VT0k7dDzU8MPxqp2etHtc73S0QwdDj8TlOugm6ULtEOwu1Fnu3NkTz8ZZFe3QodCk685PWNEOHQdVjv/a0e3R50m9U9AOHQZtwrCj24LBgnboGADoue8TeO3QEUDQdedHbsfZ0tqhA4Bh7nxnk9gQrHbo3oOY/7WH+44746beldUO3Xkcy6qdfe68G8Fph+45lO4jgdIO3W8s3Ufiapwtpx2612CCRSjQTYEB0A7dZTDB7cXQTQFC7ZTZa9fhjGLidJwtpR26w2i2pU/WJ12iqx26t3Bm7X4XT/SsXVq8MtqhO4tnM80ftevMQT3t0D01wLl23ZU+Le3Q/bSA90tZo3YJ8Qpoh+6mCfx68U732qXqnbx26D7aYNbOr9pt1a9D7SLxxLVDd9EIP+38ql1Q/frTLq530tqh+2cFarenrHbo3pmB2u05jLOi2qH7Zghqd2QnnqR26I5ZgtrFULviXGvXp3lltEP3yhQn2q1PuqSEdug+2WI1bfqKn3TJ9vFOSjt0j6zhh+MNs8Mn6NbBENYO3R2DuHPQTQMiqZ13u8UE1xUF00++vaz3Th9fdm762r5tT0y1UzcbU7H3ItollhIk5ApqRwBQOwJAQjt6R/I4VylHO0KEoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEALUjACLtCFGD2hEA1I4AoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEALUjAKgdAUDtCABqRwBQOwKA2hEA1I4AoHYEwP8lSNk4p+tWnQAAAABJRU5ErkJggg==" /></p>
-<!-- rnb-plot-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIHF1aWNrIHN0dWZmXG5cblxuYGBgIn0= -->
+<pre class="r"><code>### quick stuff
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LXF1aWNrcGF0aCgpXG5gYGAifQ== -->
+<pre class="r"><code>part1&lt;-quickpath()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiOCA4IDYgRSBcbiJ9 -->
+<pre><code>8 8 6 E </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDFcbmBgYCJ9 -->
+<pre class="r"><code>part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDYwMzJcbiJ9 -->
+<pre><code>[1] 6032</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyA0NiAxNjIgVyBcbiMgWzFdIDE2MjE4NlxuXG5gYGAifQ== -->
+<pre class="r"><code># 46 162 W 
+# [1] 162186
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="part-2" class="section level3">
+<h3>Part 2</h3>
+<p>First, doing this with just the flat map to make sure the idea works
+- but there’s a slight change in process:</p>
+<p>Process: 1. Start with a position and direction: 2. Find how many
+steps you’re going to take &amp; where you turn at the end of your walk
+(<em>tell the world you are not falling off of a cliff</em>) 3. Figure
+out where your next step <em>should</em> be - 3.a either it’s right in
+front of you, or 3.b <em>you are about to fall off a cliff</em> - let
+everyone know about the cliff &amp; wraparound to find the next step. 4.
+Find out if there’s a rock there: 4.a if there’s a rock, stop moving -
+<em>and let everyone know you are not falling off a cliff</em> whether
+or not that was a possibility. 4.b if there’s no rock, step there 4.b.i
+if you did not fall off a cliff, go back to step 3 if you have more
+steps 4.b.ii <em>reattach the remainder of your steps &amp; the turn to
+the route list</em> you are not taking any more steps until the whole
+cliff thing is worked out. 5. Make this your new starting point (either
+way) 6. 6.a <em>If you did not fall off of a cliff</em> Find your new
+direction based on your turn - go back to step 2. 6.b <em>if you did
+fall off a cliff</em> keep your current direction - go to step 2 for the
+rest of the steps before the cliff fall 6.c if you are at the end of the
+walk, stop - report where you are and where you’re facing.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmxhdHBhdGg8LWZ1bmN0aW9uKHJ0ZT1yb3V0ZSxibT1ib2FyZG1hcCl7XG4gIGNvdW50ZXI8LTFcbiAgIyMjIGZpbmQgdGhlIHN0YXJ0aW5nIHBvaW50XG4gIGN1cnJwPC1jKChtaW4od2hpY2goIShpcy5uYShibVsxLF0pKSkpKSwxKVxuICBjdXJyZDwtXCJFXCJcbiAgd2hpbGUoIWlzLm5hKHJ0ZSkpe1xuICAgICMjIyBwdWxsIHRoZSBmaXJzdCBwbGFjZSBmcm9tIHRoZSByb3V0ZWxpc3RcbiAgICBjdXRvZmY8LXN0cl9sb2NhdGUocnRlLFwiW1JMXVwiKVsxXVxuICAgIGlmKGlzLm5hKGN1dG9mZikpe2N1cnJydGU8LXJ0ZX1lbHNle2N1cnJydGU8LXN0cl9zdWIocnRlLDEsY3V0b2ZmKX1cbiAgICBydGU8LXN0cl9zdWIocnRlLGN1dG9mZisxKVxuICAgIHJlZ3JvdXA8LUZBTFNFXG4gICAgaWYoc3RyX3N1YihjdXJycnRlLC0xKSVpbiUoYyhcIlJcIixcIkxcIikpKXtcbiAgICAgIHN0cHM8LWFzLm51bWVyaWMoc3RyX3N1YihjdXJycnRlLGVuZD0tMikpXG4gICAgICBueHRkPC1zdHJfc3ViKGN1cnJydGUsLTEpfWVsc2V7c3RwczwtYXMubnVtZXJpYyhjdXJycnRlKVxuICAgICAgbnh0ZDwtXCJzdG9wXCJ9XG4gICAgIyMjIHRha2Ugc3RlcHNcbiAgICBzd2l0Y2goY3VycmQsXG4gICAgICAgICAgIFwiTlwiPXtzPC0xXG4gICAgICAgICAgIHdoaWxlKHM8PXN0cHMpe1xuICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKVxuICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLlxuICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrXG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV1cbiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXS0xXG4gICAgICAgICAgICAgaWYobnh0eTwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eTwtbWF4KHdoaWNoKCFpcy5uYShibVssbnh0eF0pKSlcbiAgICAgICAgICAgICAjIyMgYWRkIGZsYSBmb3IgcmVncm91cFxuICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7XG4gICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRVxuICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIGlmKHJlZ3JvdXApe3J0ZTwtc3RyX2Moc3Rwcy1zLG54dGQscnRlKVxuICAgICAgICAgICAgIGJyZWFrfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYoIXJlZ3JvdXApe2lmKG54dGQ9PVwiTFwiKXtjdXJyZDwtXCJXXCJ9ZWxzZSBpZihueHRkPT1cIlJcIil7Y3VycmQ8LVwiRVwifX19LFxuICAgICAgICAgICBcIkVcIj17czwtMVxuICAgICAgICAgICB3aGlsZShzPD1zdHBzKXtcbiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZClcbiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXSsxXG4gICAgICAgICAgICAgbnh0eTwtY3VycnBbMl1cbiAgICAgICAgICAgICAjIyMgd3JhcCBhcm91bmQgcG9zaXRpb25cbiAgICAgICAgICAgICBpZihueHR4Pm5jb2woYm0pfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eDwtbWluKHdoaWNoKCFpcy5uYShibVtueHR5LF0pKSlcbiAgICAgICAgICAgICAjIyMjQWRkIGEgZmxhZyB0byBzYXkgdGhhdCB3ZSBzaG91bGQgc3RvcCAmIHN0YXJ0IGlmIHdlIGhhdmUgdG8gZHJpdmUgb2ZmIHRoZSBjbGlmZi4gXG4gICAgICAgICAgICAgcmVncm91cDwtVFJVRX1cbiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgI1xuICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS5cbiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVha1xuICAgICAgICAgICAgIGlmKGJtW254dHksbnh0eF09PVwiI1wiKXtcbiAgICAgICAgICAgICAgIHJlZ3JvdXA8LUZBTFNFXG4gICAgICAgICAgICAgICBicmVha31lbHNle1xuICAgICAgICAgICAgICAgICBjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgICMjIyBhZGQgdGhlIGxpbmVzIHRvIFxuICAgICAgICAgICAgIGlmKHJlZ3JvdXApe3J0ZTwtc3RyX2Moc3Rwcy1zLG54dGQscnRlKVxuICAgICAgICAgICAgIGJyZWFrfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgIyMjIyBtYWtlIHN1cmUgdGhhdCB3ZSBkb24ndCBjaGFuZ2UgdGhpbmdzIGlmIHRoZXJlJ3MgYSByZWdyb3VwXG4gICAgICAgICAgIGlmKCFyZWdyb3VwKXtpZihueHRkPT1cIkxcIil7Y3VycmQ8LVwiTlwifWVsc2UgaWYobnh0ZD09XCJSXCIpe2N1cnJkPC1cIlNcIn19fSxcbiAgICAgICAgICAgXCJTXCI9e3M8LTFcbiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7XG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV1cbiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXSsxXG4gICAgICAgICAgICAgaWYobnh0eT5ucm93KGJtKXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe254dHk8LW1pbih3aGljaCghaXMubmEoYm1bLG54dHhdKSkpXG4gICAgICAgICAgICAgIyMjcmVncm91cFxuICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7XG4gICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRVxuICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIGlmKHJlZ3JvdXApe3J0ZTwtc3RyX2Moc3Rwcy1zLG54dGQscnRlKVxuICAgICAgICAgICAgIGJyZWFrfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYoIXJlZ3JvdXApe2lmKG54dGQ9PVwiTFwiKXtjdXJyZDwtXCJFXCJ9ZWxzZSBpZihueHRkPT1cIlJcIikge2N1cnJkPC1cIldcIn19fSxcbiAgICAgICAgICAgXCJXXCI9e3M8LTFcbiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7XG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0tMVxuICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdXG4gICAgICAgICAgICAgaWYobnh0eDwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eDwtbWF4KHdoaWNoKCFpcy5uYShibVtueHR5LF0pKSlcbiAgICAgICAgICAgICByZWdyb3VwPC1UUlVFfVxuICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLlxuICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrXG4gICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09XCIjXCIpe1xuICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0VcbiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX1cbiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSlcbiAgICAgICAgICAgICBicmVha31cbiAgICAgICAgICAgICBzPC1zKzF9XG4gICAgICAgICAgIGlmKCFyZWdyb3VwKXtpZihueHRkPT1cIkxcIil7Y3VycmQ8LVwiU1wifWVsc2UgaWYobnh0ZD09XCJSXCIpe2N1cnJkPC1cIk5cIn19fSxcbiAgICAgICAgICAgY2F0KFwibm8gZGlyZWN0aW9uXFxuXCIpKVxuICAgICMjIyBlbmQgb2Ygd2hpbGVcbiAgICBjb3VudGVyPC1jb3VudGVyKzFcbiAgfSMjIyBvdXRzaWRlIG9mIHRoZSB3aGlsZVxuICBjYXQoY291bnRlcixjdXJycCxjdXJyZCxcIlxcblwiKVxuICBwc3N3ZDwtXG4gICAgc3dpdGNoKGN1cnJkLFxuICAgICAgICAgICBcIk5cIj0zLFxuICAgICAgICAgICBcIldcIj0yLFxuICAgICAgICAgICBcIkVcIj0wLFxuICAgICAgICAgICBcIlNcIj0xLFxuICAgICAgICAgICAxMDAwMDAwMDAwKSsxMDAwKmN1cnJwWzJdKzQqY3VycnBbMV1cbiAgXG4gIHBzc3dkfVxuYGBgIn0= -->
+<pre class="r"><code>flatpath&lt;-function(rte=route,bm=boardmap){
+  counter&lt;-1
+  ### find the starting point
+  currp&lt;-c((min(which(!(is.na(bm[1,]))))),1)
+  currd&lt;-&quot;E&quot;
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff&lt;-str_locate(rte,&quot;[RL]&quot;)[1]
+    if(is.na(cutoff)){currrte&lt;-rte}else{currrte&lt;-str_sub(rte,1,cutoff)}
+    rte&lt;-str_sub(rte,cutoff+1)
+    regroup&lt;-FALSE
+    if(str_sub(currrte,-1)%in%(c(&quot;R&quot;,&quot;L&quot;))){
+      stps&lt;-as.numeric(str_sub(currrte,end=-2))
+      nxtd&lt;-str_sub(currrte,-1)}else{stps&lt;-as.numeric(currrte)
+      nxtd&lt;-&quot;stop&quot;}
+    ### take steps
+    switch(currd,
+           &quot;N&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]-1
+             if(nxty&lt;1||is.na(bm[nxty,nxtx])){nxty&lt;-max(which(!is.na(bm[,nxtx])))
+             ### add fla for regroup
+             regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(!regroup){if(nxtd==&quot;L&quot;){currd&lt;-&quot;W&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;E&quot;}}},
+           &quot;E&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]+1
+             nxty&lt;-currp[2]
+             ### wrap around position
+             if(nxtx&gt;ncol(bm)||is.na(bm[nxty,nxtx])){nxtx&lt;-min(which(!is.na(bm[nxty,])))
+             ####Add a flag to say that we should stop &amp; start if we have to drive off the cliff. 
+             regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{
+                 currp&lt;-c(nxtx,nxty)}
+             ### add the lines to 
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           #### make sure that we don&#39;t change things if there&#39;s a regroup
+           if(!regroup){if(nxtd==&quot;L&quot;){currd&lt;-&quot;N&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;S&quot;}}},
+           &quot;S&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]+1
+             if(nxty&gt;nrow(bm)||is.na(bm[nxty,nxtx])){nxty&lt;-min(which(!is.na(bm[,nxtx])))
+             ###regroup
+             regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(!regroup){if(nxtd==&quot;L&quot;){currd&lt;-&quot;E&quot;}else if(nxtd==&quot;R&quot;) {currd&lt;-&quot;W&quot;}}},
+           &quot;W&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]-1
+             nxty&lt;-currp[2]
+             if(nxtx&lt;1||is.na(bm[nxty,nxtx])){nxtx&lt;-max(which(!is.na(bm[nxty,])))
+             regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(!regroup){if(nxtd==&quot;L&quot;){currd&lt;-&quot;S&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;N&quot;}}},
+           cat(&quot;no direction\n&quot;))
+    ### end of while
+    counter&lt;-counter+1
+  }### outside of the while
+  cat(counter,currp,currd,&quot;\n&quot;)
+  psswd&lt;-
+    switch(currd,
+           &quot;N&quot;=3,
+           &quot;W&quot;=2,
+           &quot;E&quot;=0,
+           &quot;S&quot;=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDE8LWZsYXRwYXRoKClcbmBgYCJ9 -->
+<pre class="r"><code>part1&lt;-flatpath()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMTAgOCA2IEUgXG4ifQ== -->
+<pre><code>10 8 6 E </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDFcbmBgYCJ9 -->
+<pre class="r"><code>part1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDYwMzJcbiJ9 -->
+<pre><code>[1] 6032</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now do the same thing with the cube - (this is not a general
+solution, it is specific for the shape of the input.)</p>
+<p>Process: 1. Start with a position and direction: 2. Find how many
+steps you’re going to take &amp; where you turn at the end of your walk
+(<em>tell the world you are not falling off of a cliff</em>) 3. Figure
+out where your next step <em>should</em> be - 3.a either it’s right in
+front of you, or 3.b <em>you are about to fall off a cliff</em> - let
+everyone know about the cliff &amp; <strong>follow some extremely
+complicated instructions to find your next step based on your current
+&amp; next position</strong> 4. Find out if there’s a rock there: 4.a if
+there’s a rock, stop moving - <em>and let everyone know you are not
+falling off a cliff</em> whether or not that was a possibility. 4.b if
+there’s no rock, step there 4.b.i if you did not fall off a cliff, go
+back to step 3 if you have more steps 4.b.ii <em>reattach the remainder
+of your steps &amp; the turn to the route list</em> you are not taking
+any more steps until the whole cliff thing is worked out. 5. Make this
+your new starting point (either way) 6. 6.a <em>If you did not fall off
+of a cliff</em> Find your new direction based on your turn - go back to
+step 2. 6.b <em>if you did fall off a cliff</em> <strong>again, follow
+some complicated instructions to find your next direction</strong> - go
+to step 2 for the rest of the steps before the cliff fall 6.c if you are
+at the end of the walk, stop - report where you are and where you’re
+facing.</p>
+<p>direction is based on the flat map.</p>
+<p>And what are the complicated instructions? If you were heading North:
+a. for 1&lt;=x&lt;=50: head E - x=51, y=old x+50 (opposite m) b. for
+51=x&lt;=100: head E - x=1, y=old x+100 (opposite o) c. for
+101&lt;=x&lt;=150: head N - x=old x - 100, y=200 (opposite h)</p>
+<p>If you were heading East: d. for 1&lt;=y&lt;=50: head W - x=1,
+y=151-old y (opposite f) e. for 51=y&lt;=100: head N - x=oldy+50, y=50
+(opposite j) f. for 101&lt;=y&lt;=150: head W - x=150 y= y=151-old y
+(opposite d) g. for 151&lt;=y&lt;=200: head N - y=150, x=oldy-100
+(opposite i)</p>
+<p>If you were heading South: h. for 1&lt;=x&lt;=50: head S - y=1,
+x=oldx+100 (opposite c) i. for 51=x&lt;=100: head W, x=150, y=oldx+100
+(opposite g) j. for 101&lt;=x&lt;=150: head W, x=100, y=oldx-50
+(opposite e)</p>
+<p>If you were heading West: l. for 1&lt;=y&lt;=50: head E - x=1,
+y=151-oldy (opposite n) m. for 51=y&lt;=100: head S - x=oldy-50, y=101
+(opposite a) n. for 101&lt;=y&lt;=150:head E - x=51, y=151-oldy
+(opposite l) o. for 151&lt;=y&lt;=200:head S - x=oldy-100, y=1 (opposite
+b)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3ViZXBhdGg8LWZ1bmN0aW9uKHJ0ZT1yb3V0ZSxibT1ib2FyZG1hcCl7XG4gIGNvdW50ZXI8LTFcbiAgXG4gICMjIyBmaW5kIHRoZSBzdGFydGluZyBwb2ludFxuICBjdXJycDwtYygobWluKHdoaWNoKCEoaXMubmEoYm1bMSxdKSkpKSksMSlcbiAgY3VycmQ8LVwiRVwiXG4gIHdoaWxlKCFpcy5uYShydGUpKXtcbiAgICAjIyMgcHVsbCB0aGUgZmlyc3QgcGxhY2UgZnJvbSB0aGUgcm91dGVsaXN0XG4gICAgY3V0b2ZmPC1zdHJfbG9jYXRlKHJ0ZSxcIltSTF1cIilbMV1cbiAgICBpZihpcy5uYShjdXRvZmYpKXtjdXJycnRlPC1ydGV9ZWxzZXtjdXJycnRlPC1zdHJfc3ViKHJ0ZSwxLGN1dG9mZil9XG4gICAgcnRlPC1zdHJfc3ViKHJ0ZSxjdXRvZmYrMSlcbiAgICByZWdyb3VwPC1GQUxTRVxuICAgIGlmKHN0cl9zdWIoY3VycnJ0ZSwtMSklaW4lKGMoXCJSXCIsXCJMXCIpKSl7XG4gICAgICBzdHBzPC1hcy5udW1lcmljKHN0cl9zdWIoY3VycnJ0ZSxlbmQ9LTIpKVxuICAgICAgbnh0ZDwtc3RyX3N1YihjdXJycnRlLC0xKX1lbHNle3N0cHM8LWFzLm51bWVyaWMoY3VycnJ0ZSlcbiAgICAgIG54dGQ8LVwic3RvcFwifVxuICAgICMjIyB0YWtlIHN0ZXBzXG4gICAgc3dpdGNoKGN1cnJkLFxuICAgICAgICAgICBcIk5cIj17czwtMVxuICAgICAgICAgICB3aGlsZShzPD1zdHBzKXtcbiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZClcbiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgI1xuICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS5cbiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVha1xuICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdXG4gICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0tMVxuICAgICAgICAgICAgIGlmKG54dHk8MXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe1xuICAgICAgICAgICAgICAgaWYoY3VycnBbMV08PTUwKXtcbiAgICAgICAgICAgICAgICAgbnh0eDwtNTFcbiAgICAgICAgICAgICAgICAgbnh0eTwtY3VycnBbMV0rNTBcbiAgICAgICAgICAgICAgICAgY2xpZmZkPC1cIkVcIlxuICAgICAgICAgICAgICAgfWVsc2UgaWYoY3VycnBbMV0+PTUxJiZjdXJycFsxXTw9MTAwKXtcbiAgICAgICAgICAgICAgICAgbnh0eDwtMVxuICAgICAgICAgICAgICAgICBueHR5PC1jdXJycFsxXSsxMDBcbiAgICAgICAgICAgICAgICAgY2xpZmZkPC1cIkVcIlxuICAgICAgICAgICAgICAgfSBlbHNle1xuICAgICAgICAgICAgICAgICBueHR4PC1jdXJycFsxXS0xMDBcbiAgICAgICAgICAgICAgICAgbnh0eTwtMjAwXG4gICAgICAgICAgICAgICAgIGNsaWZmZDwtXCJOXCJ9XG4gICAgICAgICAgICAgICAjIyMgYWRkIGZsYWcgZm9yIHJlZ3JvdXBcbiAgICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7XG4gICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRVxuICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIGlmKHJlZ3JvdXApe3J0ZTwtc3RyX2Moc3Rwcy1zLG54dGQscnRlKVxuICAgICAgICAgICAgIGJyZWFrfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYocmVncm91cCl7Y3VycmQ8LWNsaWZmZFxuICAgICAgICAgICB9IGVsc2Uge2lmKG54dGQ9PVwiTFwiKXtjdXJyZDwtXCJXXCJ9ZWxzZSBpZihueHRkPT1cIlJcIil7Y3VycmQ8LVwiRVwifX19LFxuICAgICAgICAgICBcIkVcIj17czwtMVxuICAgICAgICAgICB3aGlsZShzPD1zdHBzKXtcbiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZClcbiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXSsxXG4gICAgICAgICAgICAgbnh0eTwtY3VycnBbMl1cbiAgICAgICAgICAgICAjIyMgY2xpZmYgcG9zaXRpb24gJiBkaXJlY3Rpb25cbiAgICAgICAgICAgICBpZihueHR4Pm5jb2woYm0pfHxpcy5uYShibVtueHR5LG54dHhdKSl7XG4gICAgICAgICAgICAgICBpZihjdXJycFsyXTw9NTApe1xuICAgICAgICAgICAgICAgICBueHR4PC0xMDBcbiAgICAgICAgICAgICAgICAgbnh0eTwtMTUxLWN1cnJwWzJdXG4gICAgICAgICAgICAgICAgIGNsaWZmZDwtXCJXXCJcbiAgICAgICAgICAgICAgIH1lbHNlIGlmKGN1cnJwWzJdPj01MSYmY3VycnBbMl08PTEwMCl7XG4gICAgICAgICAgICAgICAgIG54dHg8LWN1cnJwWzJdKzUwXG4gICAgICAgICAgICAgICAgIG54dHk8LTUwXG4gICAgICAgICAgICAgICAgIGNsaWZmZDwtXCJOXCJcbiAgICAgICAgICAgICAgIH0gZWxzZSBpZihjdXJycFsyXT49MTAxJiZjdXJycFsyXTw9MTUwKXtcbiAgICAgICAgICAgICAgICAgbnh0eDwtMTUwXG4gICAgICAgICAgICAgICAgIG54dHk8LTE1MS1jdXJycFsyXVxuICAgICAgICAgICAgICAgICBjbGlmZmQ8LVwiV1wiXG4gICAgICAgICAgICAgICB9ZWxzZXtcbiAgICAgICAgICAgICAgICAgbnh0eDwtY3VycnBbMl0tMTAwXG4gICAgICAgICAgICAgICAgIG54dHk8LTE1MFxuICAgICAgICAgICAgICAgICBjbGlmZmQ8LVwiTlwifSBcbiAgICAgICAgICAgICAgICMjIyNBZGQgYSBmbGFnIHRvIHNheSB0aGF0IHdlIHNob3VsZCBzdG9wICYgc3RhcnQgaWYgd2UgaGF2ZSB0byBkcml2ZSBvZmYgdGhlIGNsaWZmLiBcbiAgICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7XG4gICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRVxuICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXtcbiAgICAgICAgICAgICAgICAgY3VycnA8LWMobnh0eCxueHR5KX1cbiAgICAgICAgICAgICAjIyMgYWRkIHRoZSBsaW5lcyB0byBcbiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSlcbiAgICAgICAgICAgICBicmVha31cbiAgICAgICAgICAgICBzPC1zKzF9XG4gICAgICAgICAgICMjIyMgaWYgbm90IGF0IHN0b3AsIGNoYW5nZSBkaXJlY3Rpb25zLlxuICAgICAgICAgICBpZihyZWdyb3VwKXtjdXJyZDwtY2xpZmZkXG4gICAgICAgICAgIH0gZWxzZSB7aWYobnh0ZD09XCJMXCIpe2N1cnJkPC1cIk5cIn1lbHNlIGlmKG54dGQ9PVwiUlwiKXtjdXJyZDwtXCJTXCJ9fX0sXG4gICAgICAgICAgIFwiU1wiPXtzPC0xXG4gICAgICAgICAgIHdoaWxlKHM8PXN0cHMpe1xuICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKVxuICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdXG4gICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0rMVxuICAgICAgICAgICAgIGlmKG54dHk+bnJvdyhibSl8fGlzLm5hKGJtW254dHksbnh0eF0pKXtcbiAgICAgICAgICAgICAgIGlmKGN1cnJwWzFdPD01MCl7XG4gICAgICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdKzEwMFxuICAgICAgICAgICAgICAgICBueHR5PC0xXG4gICAgICAgICAgICAgICAgIGNsaWZmZDwtXCJTXCJcbiAgICAgICAgICAgICAgIH1lbHNlIGlmKGN1cnJwWzFdPj01MSYmY3VycnBbMV08PTEwMCl7XG4gICAgICAgICAgICAgICAgIG54dHg8LTUwXG4gICAgICAgICAgICAgICAgIG54dHk8LWN1cnJwWzFdKzEwMFxuICAgICAgICAgICAgICAgICBjbGlmZmQ8LVwiV1wiXG4gICAgICAgICAgICAgICB9IGVsc2V7XG4gICAgICAgICAgICAgICAgIG54dHg8LTEwMFxuICAgICAgICAgICAgICAgICBueHR5PC1jdXJycFsxXS01MFxuICAgICAgICAgICAgICAgICBjbGlmZmQ8LVwiV1wifSAgICAgICAgICAgXG4gICAgICAgICAgICAgICAjIyNyZWdyb3VwXG4gICAgICAgICAgICAgICByZWdyb3VwPC1UUlVFfVxuICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLlxuICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrXG4gICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09XCIjXCIpe1xuICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0VcbiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX1cbiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSlcbiAgICAgICAgICAgICBicmVha31cbiAgICAgICAgICAgICBzPC1zKzF9XG4gICAgICAgICAgIGlmKHJlZ3JvdXApe2N1cnJkPC1jbGlmZmRcbiAgICAgICAgICAgfSBlbHNlIHtpZihueHRkPT1cIkxcIil7Y3VycmQ8LVwiRVwifWVsc2UgaWYobnh0ZD09XCJSXCIpe2N1cnJkPC1cIldcIn19fSxcbiAgICAgICAgICAgXCJXXCI9e3M8LTFcbiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7XG4gICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpXG4gICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0tMVxuICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdXG4gICAgICAgICAgICAgIyMjIGNsaWZmIHBvc2l0aW9uICYgZGlyZWN0aW9uXG4gICAgICAgICAgICAgaWYobnh0eDwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7XG4gICAgICAgICAgICAgICBpZihjdXJycFsyXTw9NTApe1xuICAgICAgICAgICAgICAgICBueHR4PC0xXG4gICAgICAgICAgICAgICAgIG54dHk8LTE1MS1jdXJycFsyXVxuICAgICAgICAgICAgICAgICBjbGlmZmQ8LVwiRVwiXG4gICAgICAgICAgICAgICB9ZWxzZSBpZihjdXJycFsyXT49NTEmJmN1cnJwWzJdPD0xMDApe1xuICAgICAgICAgICAgICAgICBueHR4PC1jdXJycFsyXS01MFxuICAgICAgICAgICAgICAgICBueHR5PC0xMDFcbiAgICAgICAgICAgICAgICAgY2xpZmZkPC1cIlNcIlxuICAgICAgICAgICAgICAgfSBlbHNlIGlmKGN1cnJwWzJdPj0xMDEmJmN1cnJwWzJdPD0xNTApe1xuICAgICAgICAgICAgICAgICBueHR4PC01MVxuICAgICAgICAgICAgICAgICBueHR5PC0xNTEtY3VycnBbMl1cbiAgICAgICAgICAgICAgICAgY2xpZmZkPC1cIkVcIlxuICAgICAgICAgICAgICAgfWVsc2V7XG4gICAgICAgICAgICAgICAgIG54dHg8LWN1cnJwWzJdLTEwMFxuICAgICAgICAgICAgICAgICBueHR5PC0xXG4gICAgICAgICAgICAgICAgIGNsaWZmZDwtXCJTXCJ9ICBcbiAgICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9XG4gICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICNcbiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuXG4gICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWtcbiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT1cIiNcIil7XG4gICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRVxuICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfVxuICAgICAgICAgICAgIGlmKHJlZ3JvdXApe3J0ZTwtc3RyX2Moc3Rwcy1zLG54dGQscnRlKVxuICAgICAgICAgICAgIGJyZWFrfVxuICAgICAgICAgICAgIHM8LXMrMX1cbiAgICAgICAgICAgaWYocmVncm91cCl7Y3VycmQ8LWNsaWZmZFxuICAgICAgICAgICB9IGVsc2Uge2lmKG54dGQ9PVwiTFwiKXtjdXJyZDwtXCJTXCJ9ZWxzZSBpZihueHRkPT1cIlJcIil7Y3VycmQ8LVwiTlwifX19LFxuICAgICAgICAgICBjYXQoXCJubyBkaXJlY3Rpb25cXG5cIikpXG4gICAgIyMjIGVuZCBvZiB3aGlsZVxuICAgIGNvdW50ZXI8LWNvdW50ZXIrMVxuICB9IyMjIG91dHNpZGUgb2YgdGhlIHdoaWxlXG4gIGNhdChjb3VudGVyLCBjdXJycCxjdXJyZCxcIlxcblwiKVxuICBwc3N3ZDwtXG4gICAgc3dpdGNoKGN1cnJkLFxuICAgICAgICAgICBcIk5cIj0zLFxuICAgICAgICAgICBcIldcIj0yLFxuICAgICAgICAgICBcIkVcIj0wLFxuICAgICAgICAgICBcIlNcIj0xLFxuICAgICAgICAgICAxMDAwMDAwMDAwKSsxMDAwKmN1cnJwWzJdKzQqY3VycnBbMV1cbiAgXG4gIHBzc3dkfVxuYGBgIn0= -->
+<pre class="r"><code>cubepath&lt;-function(rte=route,bm=boardmap){
+  counter&lt;-1
+  
+  ### find the starting point
+  currp&lt;-c((min(which(!(is.na(bm[1,]))))),1)
+  currd&lt;-&quot;E&quot;
+  while(!is.na(rte)){
+    ### pull the first place from the routelist
+    cutoff&lt;-str_locate(rte,&quot;[RL]&quot;)[1]
+    if(is.na(cutoff)){currrte&lt;-rte}else{currrte&lt;-str_sub(rte,1,cutoff)}
+    rte&lt;-str_sub(rte,cutoff+1)
+    regroup&lt;-FALSE
+    if(str_sub(currrte,-1)%in%(c(&quot;R&quot;,&quot;L&quot;))){
+      stps&lt;-as.numeric(str_sub(currrte,end=-2))
+      nxtd&lt;-str_sub(currrte,-1)}else{stps&lt;-as.numeric(currrte)
+      nxtd&lt;-&quot;stop&quot;}
+    ### take steps
+    switch(currd,
+           &quot;N&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]-1
+             if(nxty&lt;1||is.na(bm[nxty,nxtx])){
+               if(currp[1]&lt;=50){
+                 nxtx&lt;-51
+                 nxty&lt;-currp[1]+50
+                 cliffd&lt;-&quot;E&quot;
+               }else if(currp[1]&gt;=51&amp;&amp;currp[1]&lt;=100){
+                 nxtx&lt;-1
+                 nxty&lt;-currp[1]+100
+                 cliffd&lt;-&quot;E&quot;
+               } else{
+                 nxtx&lt;-currp[1]-100
+                 nxty&lt;-200
+                 cliffd&lt;-&quot;N&quot;}
+               ### add flag for regroup
+               regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(regroup){currd&lt;-cliffd
+           } else {if(nxtd==&quot;L&quot;){currd&lt;-&quot;W&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;E&quot;}}},
+           &quot;E&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]+1
+             nxty&lt;-currp[2]
+             ### cliff position &amp; direction
+             if(nxtx&gt;ncol(bm)||is.na(bm[nxty,nxtx])){
+               if(currp[2]&lt;=50){
+                 nxtx&lt;-100
+                 nxty&lt;-151-currp[2]
+                 cliffd&lt;-&quot;W&quot;
+               }else if(currp[2]&gt;=51&amp;&amp;currp[2]&lt;=100){
+                 nxtx&lt;-currp[2]+50
+                 nxty&lt;-50
+                 cliffd&lt;-&quot;N&quot;
+               } else if(currp[2]&gt;=101&amp;&amp;currp[2]&lt;=150){
+                 nxtx&lt;-150
+                 nxty&lt;-151-currp[2]
+                 cliffd&lt;-&quot;W&quot;
+               }else{
+                 nxtx&lt;-currp[2]-100
+                 nxty&lt;-150
+                 cliffd&lt;-&quot;N&quot;} 
+               ####Add a flag to say that we should stop &amp; start if we have to drive off the cliff. 
+               regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{
+                 currp&lt;-c(nxtx,nxty)}
+             ### add the lines to 
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           #### if not at stop, change directions.
+           if(regroup){currd&lt;-cliffd
+           } else {if(nxtd==&quot;L&quot;){currd&lt;-&quot;N&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;S&quot;}}},
+           &quot;S&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]
+             nxty&lt;-currp[2]+1
+             if(nxty&gt;nrow(bm)||is.na(bm[nxty,nxtx])){
+               if(currp[1]&lt;=50){
+                 nxtx&lt;-currp[1]+100
+                 nxty&lt;-1
+                 cliffd&lt;-&quot;S&quot;
+               }else if(currp[1]&gt;=51&amp;&amp;currp[1]&lt;=100){
+                 nxtx&lt;-50
+                 nxty&lt;-currp[1]+100
+                 cliffd&lt;-&quot;W&quot;
+               } else{
+                 nxtx&lt;-100
+                 nxty&lt;-currp[1]-50
+                 cliffd&lt;-&quot;W&quot;}           
+               ###regroup
+               regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(regroup){currd&lt;-cliffd
+           } else {if(nxtd==&quot;L&quot;){currd&lt;-&quot;E&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;W&quot;}}},
+           &quot;W&quot;={s&lt;-1
+           while(s&lt;=stps){
+             #find next step (wrap around if needed)
+             nxtx&lt;-currp[1]-1
+             nxty&lt;-currp[2]
+             ### cliff position &amp; direction
+             if(nxtx&lt;1||is.na(bm[nxty,nxtx])){
+               if(currp[2]&lt;=50){
+                 nxtx&lt;-1
+                 nxty&lt;-151-currp[2]
+                 cliffd&lt;-&quot;E&quot;
+               }else if(currp[2]&gt;=51&amp;&amp;currp[2]&lt;=100){
+                 nxtx&lt;-currp[2]-50
+                 nxty&lt;-101
+                 cliffd&lt;-&quot;S&quot;
+               } else if(currp[2]&gt;=101&amp;&amp;currp[2]&lt;=150){
+                 nxtx&lt;-51
+                 nxty&lt;-151-currp[2]
+                 cliffd&lt;-&quot;E&quot;
+               }else{
+                 nxtx&lt;-currp[2]-100
+                 nxty&lt;-1
+                 cliffd&lt;-&quot;S&quot;}  
+               regroup&lt;-TRUE}
+             #find if it&#39;s a #
+             #if it is clear, move there.
+             #if it is blocked stay where I am &amp; break
+             if(bm[nxty,nxtx]==&quot;#&quot;){
+               regroup&lt;-FALSE
+               break}else{currp&lt;-c(nxtx,nxty)}
+             if(regroup){rte&lt;-str_c(stps-s,nxtd,rte)
+             break}
+             s&lt;-s+1}
+           if(regroup){currd&lt;-cliffd
+           } else {if(nxtd==&quot;L&quot;){currd&lt;-&quot;S&quot;}else if(nxtd==&quot;R&quot;){currd&lt;-&quot;N&quot;}}},
+           cat(&quot;no direction\n&quot;))
+    ### end of while
+    counter&lt;-counter+1
+  }### outside of the while
+  cat(counter, currp,currd,&quot;\n&quot;)
+  psswd&lt;-
+    switch(currd,
+           &quot;N&quot;=3,
+           &quot;W&quot;=2,
+           &quot;E&quot;=0,
+           &quot;S&quot;=1,
+           1000000000)+1000*currp[2]+4*currp[1]
+  
+  psswd}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Because the sample is a different shape an dimensions to the
+solution, it won’t work.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInBhcnQyPC1jdWJlcGF0aCgpIiwicGFydDIiXX0= -->
+<pre class="r"><code>part2&lt;-cubepath()
+part2</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 </div>
+</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkoZ2dyYXBoKQ0KbGlicmFyeShyZWFkcikNCmxpYnJhcnkocmVzaGFwZTIpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQoNCiMjIFBhcnQgMQ0KU3RhcnQgYnkgYnVpbGRpbmcgdGhlIHdhbGxzDQoNCmBgYHtyfQ0KaW5wdXQ8LXJlYWRfbGluZXMoIkRheTE0U2FtcGxlLnR4dCIpDQoNCnJvY2tzPC1hcy5kYXRhLmZyYW1lKG1hdHJpeChuY29sPTQsbnJvdz0wKSkNCmNvbG5hbWVzKHJvY2tzKTwtYygieDEiLCJ5MSIsIngyIiwieTIiKQ0KZm9yKGkgaW4gMTpsZW5ndGgoaW5wdXQpKXsNCiAgeDwtYXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KHN0cl9yZXBsYWNlKGlucHV0W2ldLCIgIiwiIiksIlstPixdIikpKQ0KICBmb3IoaiBpbiBzZXEoZnJvbT0xLHRvPShsZW5ndGgoeCktMiksYnk9Mykpew0KICAgIHJvY2tzPC1yYmluZChyb2NrcyxsaXN0KHgxPXhbal0seTE9eFtqKzFdLHgyPXhbaiszXSx5Mj14W2orNF0pKX19DQpgYGANCg0KU28gdGhlcmUncyBsZXNzIG1hdGgsIChoYWgpLCBmaXJzdCwgZHJvcCB5IGJ5IDEgYmVjYXVzZSB0aGUgbWF0cmljZXMgc3RhcnQgYXQgMSByYXRoZXIgdGhhbiAwLg0KQW5kIHRoZW4gYmVjYXVzZSBJIGtub3cgcGFydCAyLCB0aGUgbWF0cml4IHdpbGwgYmUgdHdvIG1vcmUgdGhhbiB0aGUgaGlnaGVzdCAobmV3KSB5Lg0KQW5kIHRoZW4sIG1ha2UgaXQgYSBsaXR0bGUgYml0IHdpZGVyIHRoYW4gaXQgaXMgdGFsbCBvbiB0aGUgcmlnaHQgc2lkZS4NCmBgYHtyfQ0Kcm9ja3MkeTE8LXJvY2tzJHkxKzENCnJvY2tzJHkyPC1yb2NrcyR5MisxDQoNCm14eTwtbWF4KG1heChyb2NrcyR5MSksbWF4KHJvY2tzJHkyKSkNCnNhbmRwaXQ8LW1hdHJpeChOQSxuY29sPTUwMCtteHkrNCxucm93PW14eSsyKQ0KYGBgDQoNClRoZW4gdGhlIHJvY2tzIGdvIGludG8gdGhlIHBpdA0KDQpgYGB7cn0NCg0KZm9yKGkgaW4gMTpucm93KHJvY2tzKSl7DQogIHJvY2t3YWxsPC1yb2Nrc1tpLF0NCiAgc2FuZHBpdFtyb2Nrd2FsbCR5MTpyb2Nrd2FsbCR5Mixyb2Nrd2FsbCR4MTpyb2Nrd2FsbCR4Ml08LSJSIn0NCiMjIyBjcmVhdGUgYSBiYWNrdXAgZm9yIHBhcnQgMg0Kc3Biazwtc2FuZHBpdA0KDQpgYGANCg0KZmluYWxseSAtIGRyb3Agc29tZSBzYW5kOg0KYGBge3J9DQoNCg0Kc2FuZGNvdW50PC0wDQpuZXdzYW5kPC1jKDUwMCwxKQ0KDQp3aGlsZShuZXdzYW5kWzJdPG5yb3coc2FuZHBpdCkpew0KICAjIyMgaWYgaXQgaGl0cyB0aGUgYm90dG9tIG9mIHRoZSBtYXRyaXgsIGdvIHRvIHRoZSBuZXh0IHNhbmQNCiAgd2hpbGUobmV3c2FuZFsyXTxucm93KHNhbmRwaXQpKXsNCiAgICAjIyMgaWYgdGhlcmUncyBub3RoaW5nIGJlbG93LCBkcm9wIG9uZSwga2VlcCBnb2luZw0KICAgIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV1dKSl7DQogICAgICBuZXdzYW5kWzJdPC1uZXdzYW5kWzJdKzENCiAgICAgIG5leHQNCiAgICAgICMjIyBpZiB0aGVyZSdzIHNvbWV0aGluZyBiZWxvdywgYnV0IG5vdGhpbmcgdG8gdGhlIGxlZnQsIA0KICAgIH1lbHNlIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV0tMV0pKXsNCiAgICAgIG5ld3NhbmRbMl08LW5ld3NhbmRbMl0rMQ0KICAgICAgbmV3c2FuZFsxXTwtbmV3c2FuZFsxXS0xDQogICAgICBuZXh0DQogICAgICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgYmVsb3cgJiB0byB0aGUgbGVmdCwgY2hlY2sgdGhlIHJpZ2h0DQogICAgfWVsc2UgaWYoaXMubmEoc2FuZHBpdFtuZXdzYW5kWzJdKzEsbmV3c2FuZFsxXSsxXSkpew0KICAgICAgbmV3c2FuZFsyXTwtbmV3c2FuZFsyXSsxDQogICAgICBuZXdzYW5kWzFdPC1uZXdzYW5kWzFdKzENCiAgICAgIG5leHQNCiAgICAgICMjIyBlbHNlLCB0aGUgc2FuZCByZXN0cyBhbmQgc3RhcnQgd2l0aCB0aGUgbmV4dCBncmFpbg0KICAgIH1lbHNle3NhbmRwaXRbbmV3c2FuZFsyXSxuZXdzYW5kWzFdXTwtIlMiDQogICAgc2FuZGNvdW50PC1zYW5kY291bnQrMQ0KICAgIG5ld3NhbmQ8LWMoNTAwLDEpDQogICAgYnJlYWt9fX0NCg0KcGFydDE8LXNhbmRjb3VudA0KcGFydDENCmBgYA0KIyMgUGFydCAyDQoNCkZvciBwYXJ0IDIsIHB1dCBhIGZsb29yIGRvd24uICBUaGlzIHRpbWUsIHN0b3Agd2hlbiB0aGVyZSdzIGEgZ3JhaW4gb2Ygc2FuZCBhdCA1MDAsMQ0KYGBge3J9DQoNCiMjIyByZXN0b3JlIGZyb20gdGhlIGJhY2t1cA0Kc2FuZHBpdDwtc3Biaw0KIyMjIGFkZCB0aGUgZmxvb3INCnNhbmRwaXRbbXh5KzIsXTwtIlIiDQpzYW5kY291bnQ8LTANCm5ld3NhbmQ8LWMoNTAwLDEpDQp3aGlsZShpcy5uYShzYW5kcGl0WzEsNTAwXSkpew0KICAjIyMgaWYgaXQgaGl0cyB0aGUgYm90dG9tIG9mIHRoZSBtYXRyaXgsIGdvIHRvIHRoZSBuZXh0IHNhbmQNCiAgd2hpbGUoaXMubmEoc2FuZHBpdFsxLDUwMF0pKXsNCiAgICAjIyMgaWYgdGhlcmUncyBub3RoaW5nIGJlbG93LCBkcm9wIG9uZSwga2VlcCBnb2luZw0KICAgIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV1dKSl7DQogICAgICBuZXdzYW5kWzJdPC1uZXdzYW5kWzJdKzENCiAgICAgIG5leHQNCiAgICAgICMjIyBpZiB0aGVyZSdzIHNvbWV0aGluZyBiZWxvdywgYnV0IG5vdGhpbmcgdG8gdGhlIGxlZnQsIA0KICAgIH1lbHNlIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV0tMV0pKXsNCiAgICAgIG5ld3NhbmRbMl08LW5ld3NhbmRbMl0rMQ0KICAgICAgbmV3c2FuZFsxXTwtbmV3c2FuZFsxXS0xDQogICAgICBuZXh0DQogICAgICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgYmVsb3cgJiB0byB0aGUgbGVmdCwgY2hlY2sgdGhlIHJpZ2h0DQogICAgfWVsc2UgaWYoaXMubmEoc2FuZHBpdFtuZXdzYW5kWzJdKzEsbmV3c2FuZFsxXSsxXSkpew0KICAgICAgbmV3c2FuZFsyXTwtbmV3c2FuZFsyXSsxDQogICAgICBuZXdzYW5kWzFdPC1uZXdzYW5kWzFdKzENCiAgICAgIG5leHQNCiAgICAgICMjIyBvdGhlcndpc2UsIGFkZCBhIGdyYWluIG9mIHNhbmQsIGFuZCByZXNldCBmb3IgdGhlIG5leHQNCiAgICB9ZWxzZXtzYW5kcGl0W25ld3NhbmRbMl0sbmV3c2FuZFsxXV08LSJTIg0KICAgIHNhbmRjb3VudDwtc2FuZGNvdW50KzENCiAgICBuZXdzYW5kPC1jKDUwMCwxKQ0KICAgIGJyZWFrfX19DQoNCnBhcnQyPC1zYW5kY291bnQNCnBhcnQyDQpgYGANCg0KDQpgYGB7cixlY2hvPUZBTFNFLHdhcm5pbmc9RkFMU0UsbWVzc2FnZT1GQUxTRX0NCiMjIyBmb3IgdGhlIGdyYXBoDQppbnB1dDwtcmVhZF9saW5lcygiLi4vLi4vQW9DRGF0YS9BT0MyMDIyL0RheTE0LnR4dCIpDQoNCiMjIyByZWRvIHRoZSBpbnB1dCAmIHJvY2tzDQpyb2NrczwtYXMuZGF0YS5mcmFtZShtYXRyaXgobmNvbD00LG5yb3c9MCkpDQpjb2xuYW1lcyhyb2Nrcyk8LWMoIngxIiwieTEiLCJ4MiIsInkyIikNCmZvcihpIGluIDE6bGVuZ3RoKGlucHV0KSl7DQogIHg8LWFzLm51bWVyaWModW5saXN0KHN0cl9zcGxpdChzdHJfcmVwbGFjZShpbnB1dFtpXSwiICIsIiIpLCJbLT4sXSIpKSkNCiAgZm9yKGogaW4gc2VxKGZyb209MSx0bz0obGVuZ3RoKHgpLTIpLGJ5PTMpKXsNCiAgICByb2NrczwtcmJpbmQocm9ja3MsbGlzdCh4MT14W2pdLHkxPXhbaisxXSx4Mj14W2orM10seTI9eFtqKzRdKSl9fQ0Kcm9ja3MkeTE8LXJvY2tzJHkxKzENCnJvY2tzJHkyPC1yb2NrcyR5MisxDQojIyMgcmVjcmVhdGUgdGhlIHNhbmRwaXQNCm14eTwtbWF4KG1heChyb2NrcyR5MSksbWF4KHJvY2tzJHkyKSkNCnNhbmRwaXQ8LW1hdHJpeChOQSxuY29sPTUwMCtteHkrNCxucm93PW14eSsyKQ0KZm9yKGkgaW4gMTpucm93KHJvY2tzKSl7DQogIHJvY2t3YWxsPC1yb2Nrc1tpLF0NCiAgc2FuZHBpdFtyb2Nrd2FsbCR5MTpyb2Nrd2FsbCR5Mixyb2Nrd2FsbCR4MTpyb2Nrd2FsbCR4Ml08LSJSIn0NCiMjIyBjcmVhdGUgYSBiYWNrdXAgZm9yIHBhcnQgMg0Kc3Biazwtc2FuZHBpdA0KDQojIyMjIHJlcnVuIHRoZSBzYW5kDQpzYW5kcGl0W214eSsyLF08LSJSIg0Kc2FuZGNvdW50PC0wDQpuZXdzYW5kPC1jKDUwMCwxKQ0Kd2hpbGUoaXMubmEoc2FuZHBpdFsxLDUwMF0pKXsNCiAgIyMjIGlmIGl0IGhpdHMgdGhlIGJvdHRvbSBvZiB0aGUgbWF0cml4LCBnbyB0byB0aGUgbmV4dCBzYW5kDQogIHdoaWxlKGlzLm5hKHNhbmRwaXRbMSw1MDBdKSl7DQogICAgIyMjIGlmIHRoZXJlJ3Mgbm90aGluZyBiZWxvdywgZHJvcCBvbmUsIGtlZXAgZ29pbmcNCiAgICBpZihpcy5uYShzYW5kcGl0W25ld3NhbmRbMl0rMSxuZXdzYW5kWzFdXSkpew0KICAgICAgbmV3c2FuZFsyXTwtbmV3c2FuZFsyXSsxDQogICAgICBuZXh0DQogICAgICAjIyMgaWYgdGhlcmUncyBzb21ldGhpbmcgYmVsb3csIGJ1dCBub3RoaW5nIHRvIHRoZSBsZWZ0LCANCiAgICB9ZWxzZSBpZihpcy5uYShzYW5kcGl0W25ld3NhbmRbMl0rMSxuZXdzYW5kWzFdLTFdKSl7DQogICAgICBuZXdzYW5kWzJdPC1uZXdzYW5kWzJdKzENCiAgICAgIG5ld3NhbmRbMV08LW5ld3NhbmRbMV0tMQ0KICAgICAgbmV4dA0KICAgICAgIyMjIGlmIHRoZXJlJ3Mgc29tZXRoaW5nIGJlbG93ICYgdG8gdGhlIGxlZnQsIGNoZWNrIHRoZSByaWdodA0KICAgIH1lbHNlIGlmKGlzLm5hKHNhbmRwaXRbbmV3c2FuZFsyXSsxLG5ld3NhbmRbMV0rMV0pKXsNCiAgICAgIG5ld3NhbmRbMl08LW5ld3NhbmRbMl0rMQ0KICAgICAgbmV3c2FuZFsxXTwtbmV3c2FuZFsxXSsxDQogICAgICBuZXh0DQogICAgfWVsc2V7c2FuZHBpdFtuZXdzYW5kWzJdLG5ld3NhbmRbMV1dPC0iUyINCiAgICBzYW5kY291bnQ8LXNhbmRjb3VudCsxDQogICAgbmV3c2FuZDwtYyg1MDAsMSkNCiAgICBicmVha319fQ0KDQpia3BpdDwtc2FuZHBpdA0KDQojIyMgZmluZCB0aGUgbWluICYgbWF4IG9mIHRoZSBzYW5kcGl0DQpsb3d4PC1taW4od2hpY2goc2FuZHBpdFsobnJvdyhzYW5kcGl0KS0xKSxdPT0iUyIpKQ0KaGl4PC1tYXgod2hpY2goc2FuZHBpdFsobnJvdyhzYW5kcGl0KS0xKSxdPT0iUyIpKQ0Kc2FuZHBpdDwtc2FuZHBpdFssKGxvd3gtMik6KGhpeCsyKV0NCg0KbWVsdHNhbmQ8LW1lbHQoc2FuZHBpdCkNCg0KDQoNCmdncGxvdChtZWx0c2FuZCxhZXMoeD1WYXIyLHk9VmFyMSwgY29sb3VyPXZhbHVlKSkrZ2VvbV9wb2ludCgpKw0KICB0aGVtZShheGlzLnRleHQueCA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aWNrcy54ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRleHQueSA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aWNrcy55ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRpdGxlLnkgPSBlbGVtZW50X2JsYW5rKCksDQogICAgICAgIGF4aXMudGl0bGUueCA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5tYWpvciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5taW5vciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgbGVnZW5kLnBvc2l0aW9uPSJub25lIikrDQogIHNjYWxlX3lfcmV2ZXJzZSgpKw0KICBjb29yZF9maXhlZCgpDQpgYGANCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAyMiBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KIyMgUGFydCAxDQpSZWFkIGluIGRhdGEgLSBicmVhayBpbiB0d286IHRoZSBtYXAgJiB0aGUgZGlyZWN0aW9ucw0KYGBge3J9DQppbnB1dDwtcmVhZF9saW5lcygiRGF5MjJTYW1wbGUudHh0IikNCg0KYmxuazwtd2hpY2goaW5wdXQ9PSIiKQ0Kcm91dGU8LWlucHV0WyhibG5rKzEpXQ0KYm9hcmRtYXA8LW1hdHJpeChOQSxuY29sPW1heChuY2hhcihpbnB1dCkpLG5yb3c9KGxlbmd0aChpbnB1dCktMikpDQpmb3IoaSBpbiAxOihsZW5ndGgoaW5wdXQpLTIpKXsNCiAgZm9yKGogaW4gMTpuY2hhcihpbnB1dFtpXSkpew0KICAgIGlmKHN0cl9zdWIoaW5wdXRbaV0saixqKSAhPSIgIil7Ym9hcmRtYXBbaSxqXTwtc3RyX3N1YihpbnB1dFtpXSxqLGopfX19DQoNCmBgYA0KDQpGaW5kIHRoZSBwYXRoDQoNClByb2Nlc3M6DQoxLiBTdGFydCB3aXRoIGEgcG9zaXRpb24gYW5kIGRpcmVjdGlvbjoNCjIuIEZpbmQgaG93IG1hbnkgc3RlcHMgeW91J3JlIGdvaW5nIHRvIHRha2UgJiB3aGVyZSB5b3UgdHVybiBhdCB0aGUgZW5kIG9mIHlvdXIgd2Fsaw0KMy4gRmlndXJlIG91dCB3aGVyZSB5b3VyIG5leHQgc3RlcCAqc2hvdWxkKiBiZSAtIA0KMy5hIGVpdGhlciBpdCdzIHJpZ2h0IGluIGZyb250IG9mIHlvdSwgb3INCjMuYiBpdCdzIGFyb3VuZCB0aGUgZWRnZQ0KNC4gRmluZCBvdXQgaWYgdGhlcmUncyBhIHJvY2sgdGhlcmU6DQogIDQuYSBpZiB0aGVyZSdzIGEgcm9jaywgc3RvcCBtb3ZpbmcNCiAgNC5iIGlmIHRoZXJlJ3Mgbm8gcm9jaywgc3RlcCB0aGVyZSBhbmQgZ28gYmFjayB0byBzdGVwIDMgaWYgeW91IGhhdmUgbW9yZSBzdGVwcw0KNS4gTWFrZSB0aGlzIHlvdXIgbmV3IHN0YXJ0aW5nIHBvaW50DQo2LiBGaW5kIHlvdXIgbmV3IGRpcmVjdGlvbiBiYXNlZCBvbiB5b3VyIHR1cm4NCiAgNi5hIGlmIHlvdSBoYXZlIGEgbmV3IGRpcmVjdGlvbiwgZ28gYmFjayB0byBzdGVwIDIuDQogIDYuYiBpZiB5b3UgYXJlIGF0IHRoZSBlbmQgb2YgdGhlIHdhbGssIHN0b3AgLSByZXBvcnQgd2hlcmUgeW91IGFyZSBhbmQgd2hlcmUgeW91J3JlIGZhY2luZy4NCg0KDQpgYGB7cn0NCnF1aWNrcGF0aDwtZnVuY3Rpb24ocnRlPXJvdXRlLGJtPWJvYXJkbWFwKXsNCiAgY291bnRlcjwtMQ0KICANCiAgIyMjIGZpbmQgdGhlIHN0YXJ0aW5nIHBvaW50DQogIGN1cnJwPC1jKChtaW4od2hpY2goIShpcy5uYShibVsxLF0pKSkpKSwxKQ0KICBjdXJyZDwtIkUiDQogIHdoaWxlKCFpcy5uYShydGUpKXsNCiAgICAjIyMgcHVsbCB0aGUgZmlyc3QgcGxhY2UgZnJvbSB0aGUgcm91dGVsaXN0DQogICAgY3V0b2ZmPC1zdHJfbG9jYXRlKHJ0ZSwiW1JMXSIpWzFdDQogICAgaWYoaXMubmEoY3V0b2ZmKSl7Y3VycnJ0ZTwtcnRlfWVsc2V7Y3VycnJ0ZTwtc3RyX3N1YihydGUsMSxjdXRvZmYpfQ0KICAgIHJ0ZTwtc3RyX3N1YihydGUsY3V0b2ZmKzEpDQogICAgaWYoc3RyX3N1YihjdXJycnRlLC0xKSVpbiUoYygiUiIsIkwiKSkpew0KICAgICAgc3RwczwtYXMubnVtZXJpYyhzdHJfc3ViKGN1cnJydGUsZW5kPS0yKSkNCiAgICAgIG54dGQ8LXN0cl9zdWIoY3VycnJ0ZSwtMSl9ZWxzZXtzdHBzPC1hcy5udW1lcmljKGN1cnJydGUpDQogICAgICBueHRkPC0ic3RvcCJ9DQogICAgIyMjIHRha2Ugc3RlcHMNCiAgICBzd2l0Y2goY3VycmQsDQogICAgICAgICAgICJOIj17czwtMQ0KICAgICAgICAgICB3aGlsZShzPD1zdHBzKXsNCiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZCkNCiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgIw0KICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS4NCiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVhaw0KICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKQ0KICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdDQogICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0tMQ0KICAgICAgICAgICAgIGlmKG54dHk8MXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe254dHk8LW1heCh3aGljaCghaXMubmEoYm1bLG54dHhdKSkpfQ0KICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjDQogICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLg0KICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrDQogICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09IiMiKXticmVha31lbHNle2N1cnJwPC1jKG54dHgsbnh0eSl9DQogICAgICAgICAgICAgczwtcysxfQ0KICAgICAgICAgICBpZihueHRkPT0iTCIpe2N1cnJkPC0iVyJ9ZWxzZSBpZihueHRkPT0iUiIpe2N1cnJkPC0iRSJ9fSwNCiAgICAgICAgICAgIkUiPXtzPC0xDQogICAgICAgICAgIHdoaWxlKHM8PXN0cHMpew0KICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKQ0KICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdKzENCiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXQ0KICAgICAgICAgICAgIGlmKG54dHg+bmNvbChibSl8fGlzLm5hKGJtW254dHksbnh0eF0pKXtueHR4PC1taW4od2hpY2goIWlzLm5hKGJtW254dHksXSkpKX0NCiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgIw0KICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS4NCiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVhaw0KICAgICAgICAgICAgIGlmKGJtW254dHksbnh0eF09PSIjIil7YnJlYWt9ZWxzZXtjdXJycDwtYyhueHR4LG54dHkpfQ0KICAgICAgICAgICAgIHM8LXMrMX0NCiAgICAgICAgICAgaWYobnh0ZD09IkwiKXtjdXJyZDwtIk4ifWVsc2UgaWYobnh0ZD09IlIiKXtjdXJyZDwtIlMifX0sDQogICAgICAgICAgICJTIj17czwtMQ0KICAgICAgICAgICB3aGlsZShzPD1zdHBzKXsNCiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZCkNCiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXQ0KICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdKzENCiAgICAgICAgICAgICBpZihueHR5Pm5yb3coYm0pfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eTwtbWluKHdoaWNoKCFpcy5uYShibVssbnh0eF0pKSl9DQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT0iIyIpe2JyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgIGlmKG54dGQ9PSJMIil7Y3VycmQ8LSJFIn1lbHNlIGlmKG54dGQ9PSJSIikge2N1cnJkPC0iVyJ9fSwNCiAgICAgICAgICAgIlciPXtzPC0xDQogICAgICAgICAgIHdoaWxlKHM8PXN0cHMpew0KICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKQ0KICAgICAgICAgICAgIG54dHg8LWN1cnJwWzFdLTENCiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXQ0KICAgICAgICAgICAgIGlmKG54dHg8MXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe254dHg8LW1heCh3aGljaCghaXMubmEoYm1bbnh0eSxdKSkpfQ0KICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjDQogICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLg0KICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrDQogICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09IiMiKXticmVha31lbHNle2N1cnJwPC1jKG54dHgsbnh0eSl9DQogICAgICAgICAgICAgczwtcysxfQ0KICAgICAgICAgICBpZihueHRkPT0iTCIpe2N1cnJkPC0iUyJ9ZWxzZSBpZihueHRkPT0iUiIpe2N1cnJkPC0iTiJ9fSwNCiAgICAgICAgICAgY2F0KCJubyBkaXJlY3Rpb25cbiIpKQ0KICAgICMjIyBlbmQgb2Ygd2hpbGUNCiAgICBjb3VudGVyPC1jb3VudGVyKzENCiAgfSMjIyBvdXRzaWRlIG9mIHRoZSB3aGlsZQ0KICBjYXQoY291bnRlcixjdXJycCxjdXJyZCwiXG4iKQ0KICBwc3N3ZDwtDQogICAgc3dpdGNoKGN1cnJkLA0KICAgICAgICAgICAiTiI9MywNCiAgICAgICAgICAgIlciPTIsDQogICAgICAgICAgICJFIj0wLA0KICAgICAgICAgICAiUyI9MSwNCiAgICAgICAgICAgMTAwMDAwMDAwMCkrMTAwMCpjdXJycFsyXSs0KmN1cnJwWzFdDQogIA0KICBwc3N3ZH0NCmBgYA0KDQpgYGB7cn0NCiMjIyBxdWljayBzdHVmZg0KDQoNCmBgYA0KDQoNCmBgYHtyfQ0KcGFydDE8LXF1aWNrcGF0aCgpDQpwYXJ0MQ0KDQojIDQ2IDE2MiBXIA0KIyBbMV0gMTYyMTg2DQoNCmBgYA0KIyMjIFBhcnQgMg0KDQpGaXJzdCwgZG9pbmcgdGhpcyB3aXRoIGp1c3QgdGhlIGZsYXQgbWFwIHRvIG1ha2Ugc3VyZSB0aGUgaWRlYSB3b3JrcyAtIGJ1dCB0aGVyZSdzIGEgc2xpZ2h0IGNoYW5nZSBpbiBwcm9jZXNzOg0KDQpQcm9jZXNzOg0KMS4gU3RhcnQgd2l0aCBhIHBvc2l0aW9uIGFuZCBkaXJlY3Rpb246DQoyLiBGaW5kIGhvdyBtYW55IHN0ZXBzIHlvdSdyZSBnb2luZyB0byB0YWtlICYgd2hlcmUgeW91IHR1cm4gYXQgdGhlIGVuZCBvZiB5b3VyIHdhbGsgKCp0ZWxsIHRoZSB3b3JsZCB5b3UgYXJlIG5vdCBmYWxsaW5nIG9mZiBvZiBhIGNsaWZmKikNCjMuIEZpZ3VyZSBvdXQgd2hlcmUgeW91ciBuZXh0IHN0ZXAgKnNob3VsZCogYmUgLSANCiAgMy5hIGVpdGhlciBpdCdzIHJpZ2h0IGluIGZyb250IG9mIHlvdSwgb3INCiAgMy5iICp5b3UgYXJlIGFib3V0IHRvIGZhbGwgb2ZmIGEgY2xpZmYqIC0gbGV0IGV2ZXJ5b25lIGtub3cgYWJvdXQgdGhlIGNsaWZmICYgd3JhcGFyb3VuZCB0byBmaW5kIHRoZSBuZXh0IHN0ZXAuDQo0LiBGaW5kIG91dCBpZiB0aGVyZSdzIGEgcm9jayB0aGVyZToNCiAgNC5hIGlmIHRoZXJlJ3MgYSByb2NrLCBzdG9wIG1vdmluZyAtICphbmQgbGV0IGV2ZXJ5b25lIGtub3cgeW91IGFyZSBub3QgZmFsbGluZyBvZmYgYSBjbGlmZiogd2hldGhlciBvciBub3QgdGhhdCB3YXMgYSBwb3NzaWJpbGl0eS4NCiAgNC5iIGlmIHRoZXJlJ3Mgbm8gcm9jaywgc3RlcCB0aGVyZQ0KICAgIDQuYi5pIGlmIHlvdSBkaWQgbm90IGZhbGwgb2ZmIGEgY2xpZmYsIGdvIGJhY2sgdG8gc3RlcCAzIGlmIHlvdSBoYXZlIG1vcmUgc3RlcHMNCiAgICA0LmIuaWkgKnJlYXR0YWNoIHRoZSByZW1haW5kZXIgb2YgeW91ciBzdGVwcyAmIHRoZSB0dXJuIHRvIHRoZSByb3V0ZSBsaXN0KiB5b3UgYXJlIG5vdCB0YWtpbmcgYW55IG1vcmUgc3RlcHMgdW50aWwgdGhlIHdob2xlIGNsaWZmIHRoaW5nIGlzIHdvcmtlZCBvdXQuDQo1LiBNYWtlIHRoaXMgeW91ciBuZXcgc3RhcnRpbmcgcG9pbnQgKGVpdGhlciB3YXkpDQo2LiANCiAgNi5hICpJZiB5b3UgZGlkIG5vdCBmYWxsIG9mZiBvZiBhIGNsaWZmKiBGaW5kIHlvdXIgbmV3IGRpcmVjdGlvbiBiYXNlZCBvbiB5b3VyIHR1cm4gLSBnbyBiYWNrIHRvIHN0ZXAgMi4NCiAgNi5iICppZiB5b3UgZGlkIGZhbGwgb2ZmIGEgY2xpZmYqIGtlZXAgeW91ciBjdXJyZW50IGRpcmVjdGlvbiAtIGdvIHRvIHN0ZXAgMiBmb3IgdGhlIHJlc3Qgb2YgdGhlIHN0ZXBzIGJlZm9yZSB0aGUgY2xpZmYgZmFsbA0KICA2LmMgaWYgeW91IGFyZSBhdCB0aGUgZW5kIG9mIHRoZSB3YWxrLCBzdG9wIC0gcmVwb3J0IHdoZXJlIHlvdSBhcmUgYW5kIHdoZXJlIHlvdSdyZSBmYWNpbmcuDQoNCmBgYHtyfQ0KZmxhdHBhdGg8LWZ1bmN0aW9uKHJ0ZT1yb3V0ZSxibT1ib2FyZG1hcCl7DQogIGNvdW50ZXI8LTENCiAgIyMjIGZpbmQgdGhlIHN0YXJ0aW5nIHBvaW50DQogIGN1cnJwPC1jKChtaW4od2hpY2goIShpcy5uYShibVsxLF0pKSkpKSwxKQ0KICBjdXJyZDwtIkUiDQogIHdoaWxlKCFpcy5uYShydGUpKXsNCiAgICAjIyMgcHVsbCB0aGUgZmlyc3QgcGxhY2UgZnJvbSB0aGUgcm91dGVsaXN0DQogICAgY3V0b2ZmPC1zdHJfbG9jYXRlKHJ0ZSwiW1JMXSIpWzFdDQogICAgaWYoaXMubmEoY3V0b2ZmKSl7Y3VycnJ0ZTwtcnRlfWVsc2V7Y3VycnJ0ZTwtc3RyX3N1YihydGUsMSxjdXRvZmYpfQ0KICAgIHJ0ZTwtc3RyX3N1YihydGUsY3V0b2ZmKzEpDQogICAgcmVncm91cDwtRkFMU0UNCiAgICBpZihzdHJfc3ViKGN1cnJydGUsLTEpJWluJShjKCJSIiwiTCIpKSl7DQogICAgICBzdHBzPC1hcy5udW1lcmljKHN0cl9zdWIoY3VycnJ0ZSxlbmQ9LTIpKQ0KICAgICAgbnh0ZDwtc3RyX3N1YihjdXJycnRlLC0xKX1lbHNle3N0cHM8LWFzLm51bWVyaWMoY3VycnJ0ZSkNCiAgICAgIG54dGQ8LSJzdG9wIn0NCiAgICAjIyMgdGFrZSBzdGVwcw0KICAgIHN3aXRjaChjdXJyZCwNCiAgICAgICAgICAgIk4iPXtzPC0xDQogICAgICAgICAgIHdoaWxlKHM8PXN0cHMpew0KICAgICAgICAgICAgICNmaW5kIG5leHQgc3RlcCAod3JhcCBhcm91bmQgaWYgbmVlZGVkKQ0KICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjDQogICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLg0KICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrDQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0NCiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXS0xDQogICAgICAgICAgICAgaWYobnh0eTwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eTwtbWF4KHdoaWNoKCFpcy5uYShibVssbnh0eF0pKSkNCiAgICAgICAgICAgICAjIyMgYWRkIGZsYSBmb3IgcmVncm91cA0KICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9DQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT0iIyIpew0KICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0UNCiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgIGlmKCFyZWdyb3VwKXtpZihueHRkPT0iTCIpe2N1cnJkPC0iVyJ9ZWxzZSBpZihueHRkPT0iUiIpe2N1cnJkPC0iRSJ9fX0sDQogICAgICAgICAgICJFIj17czwtMQ0KICAgICAgICAgICB3aGlsZShzPD1zdHBzKXsNCiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZCkNCiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXSsxDQogICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0NCiAgICAgICAgICAgICAjIyMgd3JhcCBhcm91bmQgcG9zaXRpb24NCiAgICAgICAgICAgICBpZihueHR4Pm5jb2woYm0pfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eDwtbWluKHdoaWNoKCFpcy5uYShibVtueHR5LF0pKSkNCiAgICAgICAgICAgICAjIyMjQWRkIGEgZmxhZyB0byBzYXkgdGhhdCB3ZSBzaG91bGQgc3RvcCAmIHN0YXJ0IGlmIHdlIGhhdmUgdG8gZHJpdmUgb2ZmIHRoZSBjbGlmZi4gDQogICAgICAgICAgICAgcmVncm91cDwtVFJVRX0NCiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgIw0KICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS4NCiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVhaw0KICAgICAgICAgICAgIGlmKGJtW254dHksbnh0eF09PSIjIil7DQogICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRQ0KICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXsNCiAgICAgICAgICAgICAgICAgY3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICAjIyMgYWRkIHRoZSBsaW5lcyB0byANCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgICMjIyMgbWFrZSBzdXJlIHRoYXQgd2UgZG9uJ3QgY2hhbmdlIHRoaW5ncyBpZiB0aGVyZSdzIGEgcmVncm91cA0KICAgICAgICAgICBpZighcmVncm91cCl7aWYobnh0ZD09IkwiKXtjdXJyZDwtIk4ifWVsc2UgaWYobnh0ZD09IlIiKXtjdXJyZDwtIlMifX19LA0KICAgICAgICAgICAiUyI9e3M8LTENCiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7DQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0NCiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXSsxDQogICAgICAgICAgICAgaWYobnh0eT5ucm93KGJtKXx8aXMubmEoYm1bbnh0eSxueHR4XSkpe254dHk8LW1pbih3aGljaCghaXMubmEoYm1bLG54dHhdKSkpDQogICAgICAgICAgICAgIyMjcmVncm91cA0KICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9DQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT0iIyIpew0KICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0UNCiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgIGlmKCFyZWdyb3VwKXtpZihueHRkPT0iTCIpe2N1cnJkPC0iRSJ9ZWxzZSBpZihueHRkPT0iUiIpIHtjdXJyZDwtIlcifX19LA0KICAgICAgICAgICAiVyI9e3M8LTENCiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7DQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0tMQ0KICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdDQogICAgICAgICAgICAgaWYobnh0eDwxfHxpcy5uYShibVtueHR5LG54dHhdKSl7bnh0eDwtbWF4KHdoaWNoKCFpcy5uYShibVtueHR5LF0pKSkNCiAgICAgICAgICAgICByZWdyb3VwPC1UUlVFfQ0KICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjDQogICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLg0KICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrDQogICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09IiMiKXsNCiAgICAgICAgICAgICAgIHJlZ3JvdXA8LUZBTFNFDQogICAgICAgICAgICAgICBicmVha31lbHNle2N1cnJwPC1jKG54dHgsbnh0eSl9DQogICAgICAgICAgICAgaWYocmVncm91cCl7cnRlPC1zdHJfYyhzdHBzLXMsbnh0ZCxydGUpDQogICAgICAgICAgICAgYnJlYWt9DQogICAgICAgICAgICAgczwtcysxfQ0KICAgICAgICAgICBpZighcmVncm91cCl7aWYobnh0ZD09IkwiKXtjdXJyZDwtIlMifWVsc2UgaWYobnh0ZD09IlIiKXtjdXJyZDwtIk4ifX19LA0KICAgICAgICAgICBjYXQoIm5vIGRpcmVjdGlvblxuIikpDQogICAgIyMjIGVuZCBvZiB3aGlsZQ0KICAgIGNvdW50ZXI8LWNvdW50ZXIrMQ0KICB9IyMjIG91dHNpZGUgb2YgdGhlIHdoaWxlDQogIGNhdChjb3VudGVyLGN1cnJwLGN1cnJkLCJcbiIpDQogIHBzc3dkPC0NCiAgICBzd2l0Y2goY3VycmQsDQogICAgICAgICAgICJOIj0zLA0KICAgICAgICAgICAiVyI9MiwNCiAgICAgICAgICAgIkUiPTAsDQogICAgICAgICAgICJTIj0xLA0KICAgICAgICAgICAxMDAwMDAwMDAwKSsxMDAwKmN1cnJwWzJdKzQqY3VycnBbMV0NCiAgDQogIHBzc3dkfQ0KYGBgDQoNCg0KDQpgYGB7cn0NCnBhcnQxPC1mbGF0cGF0aCgpDQpwYXJ0MQ0KDQpgYGANCk5vdyBkbyB0aGUgc2FtZSB0aGluZyB3aXRoIHRoZSBjdWJlIC0gKHRoaXMgaXMgbm90IGEgZ2VuZXJhbCBzb2x1dGlvbiwgaXQgaXMgc3BlY2lmaWMgZm9yIHRoZSBzaGFwZSBvZiB0aGUgaW5wdXQuKQ0KDQoNClByb2Nlc3M6DQoxLiBTdGFydCB3aXRoIGEgcG9zaXRpb24gYW5kIGRpcmVjdGlvbjoNCjIuIEZpbmQgaG93IG1hbnkgc3RlcHMgeW91J3JlIGdvaW5nIHRvIHRha2UgJiB3aGVyZSB5b3UgdHVybiBhdCB0aGUgZW5kIG9mIHlvdXIgd2FsayAoKnRlbGwgdGhlIHdvcmxkIHlvdSBhcmUgbm90IGZhbGxpbmcgb2ZmIG9mIGEgY2xpZmYqKQ0KMy4gRmlndXJlIG91dCB3aGVyZSB5b3VyIG5leHQgc3RlcCAqc2hvdWxkKiBiZSAtIA0KICAzLmEgZWl0aGVyIGl0J3MgcmlnaHQgaW4gZnJvbnQgb2YgeW91LCBvcg0KICAzLmIgKnlvdSBhcmUgYWJvdXQgdG8gZmFsbCBvZmYgYSBjbGlmZiogLSBsZXQgZXZlcnlvbmUga25vdyBhYm91dCB0aGUgY2xpZmYgJiAqKmZvbGxvdyBzb21lIGV4dHJlbWVseSBjb21wbGljYXRlZCBpbnN0cnVjdGlvbnMgdG8gZmluZCB5b3VyIG5leHQgc3RlcCBiYXNlZCBvbiB5b3VyIGN1cnJlbnQgJiBuZXh0IHBvc2l0aW9uKioNCjQuIEZpbmQgb3V0IGlmIHRoZXJlJ3MgYSByb2NrIHRoZXJlOg0KICA0LmEgaWYgdGhlcmUncyBhIHJvY2ssIHN0b3AgbW92aW5nIC0gKmFuZCBsZXQgZXZlcnlvbmUga25vdyB5b3UgYXJlIG5vdCBmYWxsaW5nIG9mZiBhIGNsaWZmKiB3aGV0aGVyIG9yIG5vdCB0aGF0IHdhcyBhIHBvc3NpYmlsaXR5Lg0KICA0LmIgaWYgdGhlcmUncyBubyByb2NrLCBzdGVwIHRoZXJlDQogICAgNC5iLmkgaWYgeW91IGRpZCBub3QgZmFsbCBvZmYgYSBjbGlmZiwgZ28gYmFjayB0byBzdGVwIDMgaWYgeW91IGhhdmUgbW9yZSBzdGVwcw0KICAgIDQuYi5paSAqcmVhdHRhY2ggdGhlIHJlbWFpbmRlciBvZiB5b3VyIHN0ZXBzICYgdGhlIHR1cm4gdG8gdGhlIHJvdXRlIGxpc3QqIHlvdSBhcmUgbm90IHRha2luZyBhbnkgbW9yZSBzdGVwcyB1bnRpbCB0aGUgd2hvbGUgY2xpZmYgdGhpbmcgaXMgd29ya2VkIG91dC4NCjUuIE1ha2UgdGhpcyB5b3VyIG5ldyBzdGFydGluZyBwb2ludCAoZWl0aGVyIHdheSkNCjYuIA0KICA2LmEgKklmIHlvdSBkaWQgbm90IGZhbGwgb2ZmIG9mIGEgY2xpZmYqIEZpbmQgeW91ciBuZXcgZGlyZWN0aW9uIGJhc2VkIG9uIHlvdXIgdHVybiAtIGdvIGJhY2sgdG8gc3RlcCAyLg0KICA2LmIgKmlmIHlvdSBkaWQgZmFsbCBvZmYgYSBjbGlmZiogKiphZ2FpbiwgZm9sbG93IHNvbWUgY29tcGxpY2F0ZWQgaW5zdHJ1Y3Rpb25zIHRvIGZpbmQgeW91ciBuZXh0IGRpcmVjdGlvbioqIC0gZ28gdG8gc3RlcCAyIGZvciB0aGUgcmVzdCBvZiB0aGUgc3RlcHMgYmVmb3JlIHRoZSBjbGlmZiBmYWxsDQogIDYuYyBpZiB5b3UgYXJlIGF0IHRoZSBlbmQgb2YgdGhlIHdhbGssIHN0b3AgLSByZXBvcnQgd2hlcmUgeW91IGFyZSBhbmQgd2hlcmUgeW91J3JlIGZhY2luZy4NCg0KDQpkaXJlY3Rpb24gaXMgYmFzZWQgb24gdGhlIGZsYXQgbWFwLg0KDQpBbmQgd2hhdCBhcmUgdGhlIGNvbXBsaWNhdGVkIGluc3RydWN0aW9ucz8NCklmIHlvdSB3ZXJlIGhlYWRpbmcgTm9ydGg6DQphLiBmb3IgMTw9eDw9NTA6ICAgIGhlYWQgRSAtIHg9NTEsIHk9b2xkIHgrNTAgKG9wcG9zaXRlIG0pDQpiLiBmb3IgNTE9eDw9MTAwOiAgIGhlYWQgRSAtIHg9MSwgeT1vbGQgeCsxMDAgKG9wcG9zaXRlIG8pDQpjLiBmb3IgMTAxPD14PD0xNTA6IGhlYWQgTiAtIHg9b2xkIHggLSAxMDAsIHk9MjAwICAgKG9wcG9zaXRlIGgpDQoNCklmIHlvdSB3ZXJlIGhlYWRpbmcgRWFzdDoNCmQuIGZvciAxPD15PD01MDogICAgaGVhZCBXIC0geD0xLCB5PTE1MS1vbGQgeSAob3Bwb3NpdGUgZikNCmUuIGZvciA1MT15PD0xMDA6ICAgaGVhZCBOIC0geD1vbGR5KzUwLCAgIHk9NTAgKG9wcG9zaXRlIGopDQpmLiBmb3IgMTAxPD15PD0xNTA6IGhlYWQgVyAtIHg9MTUwIHk9ICB5PTE1MS1vbGQgeSAgKG9wcG9zaXRlIGQpIA0KZy4gZm9yIDE1MTw9eTw9MjAwOiBoZWFkIE4gLSB5PTE1MCwgeD1vbGR5LTEwMCAgKG9wcG9zaXRlIGkpDQoNCklmIHlvdSB3ZXJlIGhlYWRpbmcgU291dGg6DQpoLiBmb3IgMTw9eDw9NTA6ICAgICBoZWFkIFMgLSB5PTEsIHg9b2xkeCsxMDAgKG9wcG9zaXRlIGMpDQppLiBmb3IgNTE9eDw9MTAwOiAgICBoZWFkIFcsIHg9MTUwLCB5PW9sZHgrMTAwIChvcHBvc2l0ZSBnKQ0Kai4gZm9yIDEwMTw9eDw9MTUwOiAgaGVhZCBXLCB4PTEwMCwgeT1vbGR4LTUwIChvcHBvc2l0ZSBlKSANCg0KSWYgeW91IHdlcmUgaGVhZGluZyBXZXN0Og0KbC4gZm9yIDE8PXk8PTUwOiAgIGhlYWQgRSAtIHg9MSwgeT0xNTEtb2xkeSAob3Bwb3NpdGUgbikNCm0uIGZvciA1MT15PD0xMDA6ICBoZWFkIFMgLSB4PW9sZHktNTAsIHk9MTAxIChvcHBvc2l0ZSBhKSANCm4uIGZvciAxMDE8PXk8PTE1MDpoZWFkIEUgLSB4PTUxLCB5PTE1MS1vbGR5IChvcHBvc2l0ZSBsKQ0Kby4gZm9yIDE1MTw9eTw9MjAwOmhlYWQgUyAtIHg9b2xkeS0xMDAsIHk9MSAgIChvcHBvc2l0ZSBiKSANCg0KDQpgYGB7cn0NCmN1YmVwYXRoPC1mdW5jdGlvbihydGU9cm91dGUsYm09Ym9hcmRtYXApew0KICBjb3VudGVyPC0xDQogIA0KICAjIyMgZmluZCB0aGUgc3RhcnRpbmcgcG9pbnQNCiAgY3VycnA8LWMoKG1pbih3aGljaCghKGlzLm5hKGJtWzEsXSkpKSkpLDEpDQogIGN1cnJkPC0iRSINCiAgd2hpbGUoIWlzLm5hKHJ0ZSkpew0KICAgICMjIyBwdWxsIHRoZSBmaXJzdCBwbGFjZSBmcm9tIHRoZSByb3V0ZWxpc3QNCiAgICBjdXRvZmY8LXN0cl9sb2NhdGUocnRlLCJbUkxdIilbMV0NCiAgICBpZihpcy5uYShjdXRvZmYpKXtjdXJycnRlPC1ydGV9ZWxzZXtjdXJycnRlPC1zdHJfc3ViKHJ0ZSwxLGN1dG9mZil9DQogICAgcnRlPC1zdHJfc3ViKHJ0ZSxjdXRvZmYrMSkNCiAgICByZWdyb3VwPC1GQUxTRQ0KICAgIGlmKHN0cl9zdWIoY3VycnJ0ZSwtMSklaW4lKGMoIlIiLCJMIikpKXsNCiAgICAgIHN0cHM8LWFzLm51bWVyaWMoc3RyX3N1YihjdXJycnRlLGVuZD0tMikpDQogICAgICBueHRkPC1zdHJfc3ViKGN1cnJydGUsLTEpfWVsc2V7c3RwczwtYXMubnVtZXJpYyhjdXJycnRlKQ0KICAgICAgbnh0ZDwtInN0b3AifQ0KICAgICMjIyB0YWtlIHN0ZXBzDQogICAgc3dpdGNoKGN1cnJkLA0KICAgICAgICAgICAiTiI9e3M8LTENCiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7DQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXQ0KICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdLTENCiAgICAgICAgICAgICBpZihueHR5PDF8fGlzLm5hKGJtW254dHksbnh0eF0pKXsNCiAgICAgICAgICAgICAgIGlmKGN1cnJwWzFdPD01MCl7DQogICAgICAgICAgICAgICAgIG54dHg8LTUxDQogICAgICAgICAgICAgICAgIG54dHk8LWN1cnJwWzFdKzUwDQogICAgICAgICAgICAgICAgIGNsaWZmZDwtIkUiDQogICAgICAgICAgICAgICB9ZWxzZSBpZihjdXJycFsxXT49NTEmJmN1cnJwWzFdPD0xMDApew0KICAgICAgICAgICAgICAgICBueHR4PC0xDQogICAgICAgICAgICAgICAgIG54dHk8LWN1cnJwWzFdKzEwMA0KICAgICAgICAgICAgICAgICBjbGlmZmQ8LSJFIg0KICAgICAgICAgICAgICAgfSBlbHNlew0KICAgICAgICAgICAgICAgICBueHR4PC1jdXJycFsxXS0xMDANCiAgICAgICAgICAgICAgICAgbnh0eTwtMjAwDQogICAgICAgICAgICAgICAgIGNsaWZmZDwtIk4ifQ0KICAgICAgICAgICAgICAgIyMjIGFkZCBmbGFnIGZvciByZWdyb3VwDQogICAgICAgICAgICAgICByZWdyb3VwPC1UUlVFfQ0KICAgICAgICAgICAgICNmaW5kIGlmIGl0J3MgYSAjDQogICAgICAgICAgICAgI2lmIGl0IGlzIGNsZWFyLCBtb3ZlIHRoZXJlLg0KICAgICAgICAgICAgICNpZiBpdCBpcyBibG9ja2VkIHN0YXkgd2hlcmUgSSBhbSAmIGJyZWFrDQogICAgICAgICAgICAgaWYoYm1bbnh0eSxueHR4XT09IiMiKXsNCiAgICAgICAgICAgICAgIHJlZ3JvdXA8LUZBTFNFDQogICAgICAgICAgICAgICBicmVha31lbHNle2N1cnJwPC1jKG54dHgsbnh0eSl9DQogICAgICAgICAgICAgaWYocmVncm91cCl7cnRlPC1zdHJfYyhzdHBzLXMsbnh0ZCxydGUpDQogICAgICAgICAgICAgYnJlYWt9DQogICAgICAgICAgICAgczwtcysxfQ0KICAgICAgICAgICBpZihyZWdyb3VwKXtjdXJyZDwtY2xpZmZkDQogICAgICAgICAgIH0gZWxzZSB7aWYobnh0ZD09IkwiKXtjdXJyZDwtIlcifWVsc2UgaWYobnh0ZD09IlIiKXtjdXJyZDwtIkUifX19LA0KICAgICAgICAgICAiRSI9e3M8LTENCiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7DQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0rMQ0KICAgICAgICAgICAgIG54dHk8LWN1cnJwWzJdDQogICAgICAgICAgICAgIyMjIGNsaWZmIHBvc2l0aW9uICYgZGlyZWN0aW9uDQogICAgICAgICAgICAgaWYobnh0eD5uY29sKGJtKXx8aXMubmEoYm1bbnh0eSxueHR4XSkpew0KICAgICAgICAgICAgICAgaWYoY3VycnBbMl08PTUwKXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtMTAwDQogICAgICAgICAgICAgICAgIG54dHk8LTE1MS1jdXJycFsyXQ0KICAgICAgICAgICAgICAgICBjbGlmZmQ8LSJXIg0KICAgICAgICAgICAgICAgfWVsc2UgaWYoY3VycnBbMl0+PTUxJiZjdXJycFsyXTw9MTAwKXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtY3VycnBbMl0rNTANCiAgICAgICAgICAgICAgICAgbnh0eTwtNTANCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iTiINCiAgICAgICAgICAgICAgIH0gZWxzZSBpZihjdXJycFsyXT49MTAxJiZjdXJycFsyXTw9MTUwKXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtMTUwDQogICAgICAgICAgICAgICAgIG54dHk8LTE1MS1jdXJycFsyXQ0KICAgICAgICAgICAgICAgICBjbGlmZmQ8LSJXIg0KICAgICAgICAgICAgICAgfWVsc2V7DQogICAgICAgICAgICAgICAgIG54dHg8LWN1cnJwWzJdLTEwMA0KICAgICAgICAgICAgICAgICBueHR5PC0xNTANCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iTiJ9IA0KICAgICAgICAgICAgICAgIyMjI0FkZCBhIGZsYWcgdG8gc2F5IHRoYXQgd2Ugc2hvdWxkIHN0b3AgJiBzdGFydCBpZiB3ZSBoYXZlIHRvIGRyaXZlIG9mZiB0aGUgY2xpZmYuIA0KICAgICAgICAgICAgICAgcmVncm91cDwtVFJVRX0NCiAgICAgICAgICAgICAjZmluZCBpZiBpdCdzIGEgIw0KICAgICAgICAgICAgICNpZiBpdCBpcyBjbGVhciwgbW92ZSB0aGVyZS4NCiAgICAgICAgICAgICAjaWYgaXQgaXMgYmxvY2tlZCBzdGF5IHdoZXJlIEkgYW0gJiBicmVhaw0KICAgICAgICAgICAgIGlmKGJtW254dHksbnh0eF09PSIjIil7DQogICAgICAgICAgICAgICByZWdyb3VwPC1GQUxTRQ0KICAgICAgICAgICAgICAgYnJlYWt9ZWxzZXsNCiAgICAgICAgICAgICAgICAgY3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICAjIyMgYWRkIHRoZSBsaW5lcyB0byANCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgICMjIyMgaWYgbm90IGF0IHN0b3AsIGNoYW5nZSBkaXJlY3Rpb25zLg0KICAgICAgICAgICBpZihyZWdyb3VwKXtjdXJyZDwtY2xpZmZkDQogICAgICAgICAgIH0gZWxzZSB7aWYobnh0ZD09IkwiKXtjdXJyZDwtIk4ifWVsc2UgaWYobnh0ZD09IlIiKXtjdXJyZDwtIlMifX19LA0KICAgICAgICAgICAiUyI9e3M8LTENCiAgICAgICAgICAgd2hpbGUoczw9c3Rwcyl7DQogICAgICAgICAgICAgI2ZpbmQgbmV4dCBzdGVwICh3cmFwIGFyb3VuZCBpZiBuZWVkZWQpDQogICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0NCiAgICAgICAgICAgICBueHR5PC1jdXJycFsyXSsxDQogICAgICAgICAgICAgaWYobnh0eT5ucm93KGJtKXx8aXMubmEoYm1bbnh0eSxueHR4XSkpew0KICAgICAgICAgICAgICAgaWYoY3VycnBbMV08PTUwKXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtY3VycnBbMV0rMTAwDQogICAgICAgICAgICAgICAgIG54dHk8LTENCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iUyINCiAgICAgICAgICAgICAgIH1lbHNlIGlmKGN1cnJwWzFdPj01MSYmY3VycnBbMV08PTEwMCl7DQogICAgICAgICAgICAgICAgIG54dHg8LTUwDQogICAgICAgICAgICAgICAgIG54dHk8LWN1cnJwWzFdKzEwMA0KICAgICAgICAgICAgICAgICBjbGlmZmQ8LSJXIg0KICAgICAgICAgICAgICAgfSBlbHNlew0KICAgICAgICAgICAgICAgICBueHR4PC0xMDANCiAgICAgICAgICAgICAgICAgbnh0eTwtY3VycnBbMV0tNTANCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iVyJ9ICAgICAgICAgICANCiAgICAgICAgICAgICAgICMjI3JlZ3JvdXANCiAgICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9DQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT0iIyIpew0KICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0UNCiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgIGlmKHJlZ3JvdXApe2N1cnJkPC1jbGlmZmQNCiAgICAgICAgICAgfSBlbHNlIHtpZihueHRkPT0iTCIpe2N1cnJkPC0iRSJ9ZWxzZSBpZihueHRkPT0iUiIpe2N1cnJkPC0iVyJ9fX0sDQogICAgICAgICAgICJXIj17czwtMQ0KICAgICAgICAgICB3aGlsZShzPD1zdHBzKXsNCiAgICAgICAgICAgICAjZmluZCBuZXh0IHN0ZXAgKHdyYXAgYXJvdW5kIGlmIG5lZWRlZCkNCiAgICAgICAgICAgICBueHR4PC1jdXJycFsxXS0xDQogICAgICAgICAgICAgbnh0eTwtY3VycnBbMl0NCiAgICAgICAgICAgICAjIyMgY2xpZmYgcG9zaXRpb24gJiBkaXJlY3Rpb24NCiAgICAgICAgICAgICBpZihueHR4PDF8fGlzLm5hKGJtW254dHksbnh0eF0pKXsNCiAgICAgICAgICAgICAgIGlmKGN1cnJwWzJdPD01MCl7DQogICAgICAgICAgICAgICAgIG54dHg8LTENCiAgICAgICAgICAgICAgICAgbnh0eTwtMTUxLWN1cnJwWzJdDQogICAgICAgICAgICAgICAgIGNsaWZmZDwtIkUiDQogICAgICAgICAgICAgICB9ZWxzZSBpZihjdXJycFsyXT49NTEmJmN1cnJwWzJdPD0xMDApew0KICAgICAgICAgICAgICAgICBueHR4PC1jdXJycFsyXS01MA0KICAgICAgICAgICAgICAgICBueHR5PC0xMDENCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iUyINCiAgICAgICAgICAgICAgIH0gZWxzZSBpZihjdXJycFsyXT49MTAxJiZjdXJycFsyXTw9MTUwKXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtNTENCiAgICAgICAgICAgICAgICAgbnh0eTwtMTUxLWN1cnJwWzJdDQogICAgICAgICAgICAgICAgIGNsaWZmZDwtIkUiDQogICAgICAgICAgICAgICB9ZWxzZXsNCiAgICAgICAgICAgICAgICAgbnh0eDwtY3VycnBbMl0tMTAwDQogICAgICAgICAgICAgICAgIG54dHk8LTENCiAgICAgICAgICAgICAgICAgY2xpZmZkPC0iUyJ9ICANCiAgICAgICAgICAgICAgIHJlZ3JvdXA8LVRSVUV9DQogICAgICAgICAgICAgI2ZpbmQgaWYgaXQncyBhICMNCiAgICAgICAgICAgICAjaWYgaXQgaXMgY2xlYXIsIG1vdmUgdGhlcmUuDQogICAgICAgICAgICAgI2lmIGl0IGlzIGJsb2NrZWQgc3RheSB3aGVyZSBJIGFtICYgYnJlYWsNCiAgICAgICAgICAgICBpZihibVtueHR5LG54dHhdPT0iIyIpew0KICAgICAgICAgICAgICAgcmVncm91cDwtRkFMU0UNCiAgICAgICAgICAgICAgIGJyZWFrfWVsc2V7Y3VycnA8LWMobnh0eCxueHR5KX0NCiAgICAgICAgICAgICBpZihyZWdyb3VwKXtydGU8LXN0cl9jKHN0cHMtcyxueHRkLHJ0ZSkNCiAgICAgICAgICAgICBicmVha30NCiAgICAgICAgICAgICBzPC1zKzF9DQogICAgICAgICAgIGlmKHJlZ3JvdXApe2N1cnJkPC1jbGlmZmQNCiAgICAgICAgICAgfSBlbHNlIHtpZihueHRkPT0iTCIpe2N1cnJkPC0iUyJ9ZWxzZSBpZihueHRkPT0iUiIpe2N1cnJkPC0iTiJ9fX0sDQogICAgICAgICAgIGNhdCgibm8gZGlyZWN0aW9uXG4iKSkNCiAgICAjIyMgZW5kIG9mIHdoaWxlDQogICAgY291bnRlcjwtY291bnRlcisxDQogIH0jIyMgb3V0c2lkZSBvZiB0aGUgd2hpbGUNCiAgY2F0KGNvdW50ZXIsIGN1cnJwLGN1cnJkLCJcbiIpDQogIHBzc3dkPC0NCiAgICBzd2l0Y2goY3VycmQsDQogICAgICAgICAgICJOIj0zLA0KICAgICAgICAgICAiVyI9MiwNCiAgICAgICAgICAgIkUiPTAsDQogICAgICAgICAgICJTIj0xLA0KICAgICAgICAgICAxMDAwMDAwMDAwKSsxMDAwKmN1cnJwWzJdKzQqY3VycnBbMV0NCiAgDQogIHBzc3dkfQ0KYGBgDQoNCkJlY2F1c2UgdGhlIHNhbXBsZSBpcyBhIGRpZmZlcmVudCBzaGFwZSBhbiBkaW1lbnNpb25zIHRvIHRoZSBzb2x1dGlvbiwgaXQgd29uJ3Qgd29yay4NCg0KYGBge3IsZXZhbD1GQUxTRSxtZXNzYWdlPUZBTFNFfQ0KcGFydDI8LWN1YmVwYXRoKCkNCnBhcnQyDQpgYGANCg==</div>
+
+
 
 </div>
 
@@ -1987,7 +2332,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Day14.Rmd");
+  window.initializeSourceEmbed("Day22.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

@@ -1,23 +1,120 @@
 ---
-title: "Day XX Notebook"
+title: "Day 24 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 library(dplyr)
+conflicts_prefer(dplyr::filter)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
 library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
 
 ## Part 1
+
+```{r}
+input<-read_lines("Day24Sample2.txt")
+blizzardmap<-matrix(ncol=nchar(input[1]),nrow=length(input))
+for(i in 1:length(input)){
+  for(j in 1:nchar(input[1])){
+    blizzardmap[i,j]<-str_sub(input[i],j,j)}}
+```
+
+Run this as a search.
+
+Basically, it will pull something off the queue, check up, down, left, right, and stay in place to see if there's a going to be a blizzard next step. If not put that move in the queue (with time  & priority based on manhattan distance & time)
+
+How to know if there's a blizzard? Multiple dictionaries - because the blizzards are cyclical, they can be pre-mapped.
+
+```{r}
+mazerunner<-function(sp=c(2,1),ep,st=0,bm=blizzardmap){
+  ### start by setting up the maps
+  hm<-dict()  #horizontal dictionary for < & > - repeats every bmwidth  
+  vm<-dict()  #vertical dictionary for v & ^ - repeats every bmheight
+  bmwidth<-ncol(bm)-2 #ignore the edges
+  bmheight<-nrow(bm)-2   #ignore top bottom edges
+  for(x in 1:ncol(bm)){
+    for(y in 1:nrow(bm)){
+      s<-bm[y,x]
+      if(s %in% c("#","v","^","<",">")){
+        switch(s,
+               #  #s are stable, appear in every lookup
+               "#"={for(v in 0:(bmheight-1)){
+                 vm$set(toString(c(v,x,y)),"#")} 
+                 for(h in 0:(bmwidth-1)){
+                   hm$set(toString(c(h,x,y)),"#")}},
+                 # v's go into the vm dict - 
+                 "v"={for(v in 0:(bmheight-1)){
+                   flipy<-if(y+v>=nrow(bm)){y+v-bmheight}else{y+v}
+                   vm$set(toString(c(v,x,flipy)),"v")}},
+                 "^"={for(v in 0:(bmheight-1)){
+                   flipy<-if(y-v<=1){y-v+bmheight}else{y-v}
+                   vm$set(toString(c(v,x,flipy)),"^")}},
+                 ">"={for(h in 0:(bmwidth-1)){
+                   flipx<-if(x+h>=ncol(bm)){x+h-bmwidth}else{x+h}
+                   hm$set(toString(c(h,flipx,y)),">")}},
+                 "<"={for(h in 0:(bmwidth-1)){
+                   flipx<-if(x-h<=1){x-h+bmwidth}else{x-h}
+                   hm$set(toString(c(h,flipx,y)),"<")}},
+                 cat("something went wrong\n"))}}}
+  #### set up the queue & start
+  pq<-priority_queue()
+  pq$push(c(st,sp),priority=sum(abs(ep-sp)))
+  beenthere<-dict()
+  counter<-1
+  maxdist<-0
+  while(pq$size()>0){
+    working<-pq$pop()
+    if(beenthere$has(toString(working))){next}
+    beenthere$set(toString(working),working)
+    if(all(working[2:3]==ep)){
+      return(working)
+      break}else{
+        possibilities<-
+          as.data.frame(rbind(c(1,0,0)+working,
+                              c(1,1,0)+working,
+                              c(1,0,1)+working,
+                              c(1,-1,0)+working,
+                              c(1,0,-1)+working))
+        colnames(possibilities)<-c("t","x","y")
+        possibilities<-possibilities %>%rowwise%>%
+          filter(x>=1,y>=1,x<=ncol(bm),y<=nrow(bm)) %>%
+          filter(!vm$has(toString(c(t%%bmheight,x,y))))%>%
+          filter(!hm$has(toString(c(t%%bmwidth,x,y))))%>%
+          filter(!beenthere$has(toString(c(t,x,y))))%>%
+          mutate(pri=t+2*sum(abs(ep-c(x,y))))
+        if(nrow(possibilities>0)){
+          for(i in 1:nrow(possibilities)){
+            p<-possibilities[i,]
+            pq$push(c(p$t,p$x,p$y),priority=-p$pri)}}}
+        counter<-counter+1}}
+```
+
+
+```{r}
+part1<-mazerunner(c(2,1),c(7,6),0,blizzardmap)
+part1
+part1<-part1[1]
+part1
+```
+
+
+
+
+## Part 2 - 
+Because "wait" is an option, the fastest to the end can be the start of the fastest back (if one of the later times is a better time to leave, the "wait" option will find it.)
+
+```{r}
+backtostart<-mazerunner(c(7,6),c(2,1),part1,blizzardmap)
+backtostart<-backtostart[1]
+part2<-mazerunner(c(2,1),c(7,6),backtostart,blizzardmap)
+part2<-part2[1]
+backtostart;part2
+```
 

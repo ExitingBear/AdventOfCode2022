@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 18 Notebook"
 output: html_notebook
 ---
 
@@ -15,9 +15,154 @@ library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
 
 ## Part 1
+For part 1, find all six sides, find which ones aren't in the list
+```{r}
+input<-read_lines("Day18Sample.txt")
+cubes<-input
+```
+
+```{r}
+openfaces<-sapply(cubes,function(x){
+  x<-as.numeric(unlist(str_split(x,",")))
+  up<-if(str_flatten(x+c(1,0,0),",") %in% cubes){0}else{1}
+  down<-if(str_flatten(x+c(-1,0,0),",")%in% cubes){0}else{1}
+  left<-if(str_flatten(x+c(0,1,0),",")%in% cubes){0}else{1}
+  right<-if(str_flatten(x+c(0,-1,0),",")%in% cubes){0}else{1}
+  front<-if(str_flatten(x+c(0,0,1),",")%in% cubes){0}else{1}
+  back<-if(str_flatten(x+c(0,0,-1),",")%in% cubes){0}else{1}
+  y<-up+down+left+right+front+back
+y})
+
+part1<-sum(openfaces)
+part1
+```
+
+##Part 2
+
+To find the outside, flood fill around the outside - from (0,0,0) to (max(x)+1,max(y)+1,max(z)+1).  Then find how many of the flood fill surfaces are touching the lump.
+
+```{r}
+### find maxes
+maxx<-0
+maxy<-0
+maxz<-0
+for(i in 1:length(cubes)){
+  c<-as.numeric(unlist(str_split(cubes[i],",")))
+  maxx<-max(maxx,c[1])
+  maxy<-max(maxy,c[2])
+  maxz<-max(maxz,c[3])}
+maxx;maxy;maxz
+```
+
+```{r}
+floodcube<-function(mx=maxx+2,my=maxy+2,mz=maxz+2,cubelist=cubes){
+  d<-dict()
+  q<-queue()
+  ### start at (-1,-1,-1) because (0,0,0) didn't go around far enough
+  pos<-c(-1,-1,-1)
+  q$push(list(pos,str_flatten(pos,",")))
+  while(q$size()>0){
+    ### pop
+    p<-q$pop()
+    ### flattenedversion
+    st<-p[[2]]
+    ### as coordinates
+    cr<-p[[1]]
+    ### if been here before, get the next item on the stack
+    if(d$has(st)){next
+    }else{
+      ### otherwise, add this to the dictionary
+      d$set(st,cr)
+      ### check in all six directions.  if it's within bounds and not in the cube, then add it to the queue
+      if(cr[1]>-1){
+        nx<-(cr-c(1,0,0))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[1]<mx){
+        nx<-(cr+c(1,0,0))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[2]>-1){
+        nx<-(cr-c(0,1,0))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[2]<my){
+        nx<-(cr+c(0,1,0))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[3]>-1){
+        nx<-(cr-c(0,0,1))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}
+      if(cr[3]<mz){
+        nx<-(cr+c(0,0,1))
+        fnx<-str_flatten(nx,",")
+        if(!(fnx%in%cubelist)){q$push(list(nx,fnx))}}}}
+  ### return the dictionary
+  d}
+```
+
+
+```{r}
+
+###run to get the list where it would have flooded from the outside.
+waterlist<-floodcube()
+waterlist<-waterlist$values()
+```
+
+With the new waterlist, do something similar to what was done earlier - which (if any) of these cubes is next to a cube face.
+
+```{r}
+wetfaces<-sapply(waterlist,function(x){
+  ##unlike above, count if it *is* next to a cube
+  up<-if(str_flatten(x+c(1,0,0),",") %in% cubes){1}else{0}
+  down<-if(str_flatten(x+c(-1,0,0),",")%in% cubes){1}else{0}
+  left<-if(str_flatten(x+c(0,1,0),",")%in% cubes){1}else{0}
+  right<-if(str_flatten(x+c(0,-1,0),",")%in% cubes){1}else{0}
+  front<-if(str_flatten(x+c(0,0,1),",")%in% cubes){1}else{0}
+  back<-if(str_flatten(x+c(0,0,-1),",")%in% cubes){1}else{0}
+  y<-up+down+left+right+front+back
+y})
+
+part2<-sum(wetfaces)
+part2
+```
+
+```{r,include=FALSE,echo=FALSE,eval=FALSE,webgl=TRUE}
+realinput <- read_lines("../../AoCData/AOC2022/Day18.txt")
+realcubes<-lapply(realinput,function(x){as.numeric(unlist(str_split(x,",")))})
+rmx<-0
+rmy<-0
+rmz<-0
+for(i in 1:length(realcubes)){
+  c<-realcubes[[i]]
+  rmx<-max(rmx,c[1])
+  rmy<-max(rmy,c[2])
+  rmz<-max(rmz,c[3])}
+
+realwl<-floodcube(rmx+2,rmy+2,rmz+2,realinput)
+realwl<-realwl$values()
+
+
+lava<-t(as.data.frame(realcubes))
+water<-t(as.data.frame(realwl))
+water[,1]<-as.numeric(water[,1])
+water[,2]<-as.numeric(water[,2])
+water[,3]<-as.numeric(water[,3])
+
+for(i in 1:(nrow(lava))){
+      shade3d(translate3d(cube3d(col = "#222222"),lava[i,1]+2,lava[i,2]+2,lava[i,3]+2))}
+
+for(i in 1:(nrow(water))){
+      spheres3d(x=(water[i,1]+2),y=(water[i,2]+2),z=(water[i,3]+2),radius=.25,col = "#88CCFF",alpha=.25)}
+
+
+```
+
 

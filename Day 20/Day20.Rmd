@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 20 Notebook"
 output: html_notebook
 ---
 
@@ -20,4 +20,69 @@ options(scipen = 999)
 
 
 ## Part 1
+
+
+First, read in the input
+Then make that into a dataframe - one column is the "current position" the other is the numbers
+
+```{r}
+input<-read.csv("Day20Sample.txt",header=FALSE)
+
+encfile<-cbind(0:(nrow(input)-1),input)
+colnames(encfile)<-c("pos","num")
+```
+
+Then create the function to mix the numbers - 
+* if the number is negative, make it into a positive (mod, length of the chain -1)
+* then either move it forward or backwards, depending on which takes less math
+
+```{r}
+mixfile<-function(mixes=1,df){
+  for(m in 1:mixes){
+    encryptlength<-nrow(df)
+    for (i in 1:encryptlength){
+      ### i is the position of the currently working number
+      ###  figure out the numbers to move
+      ## get the number & make it positive
+      ### renum is the "working" number
+      renum<-df$num[i]%%(encryptlength-1)
+      ### sp is the starting position
+      sp<-df$pos[i]
+      ## if the number would have to circle all the way around to go forward, make it go backwards instead
+      ## makes the next step easier
+      if(renum+sp>encryptlength){renum<-renum-(encryptlength-1)}
+      ## shuffle all the numbers between the old & new position - forward or backward
+      if (renum > 0) {
+        shuffleseat<-(sp+(1:renum))%%encryptlength
+        df$pos[which(df$pos %in% shuffleseat)] <-sapply(df$pos[which(df$pos %in% shuffleseat)],
+                                                        function(x){(x - 1)%%encryptlength})
+        }else if(renum < 0) {
+        shuffleseat<-(sp+((-1):renum))%% encryptlength
+        df$pos[which(df$pos %in% shuffleseat)] <-sapply(df$pos[which(df$pos %in% shuffleseat)],
+                                                        function(x){(x + 1)%%encryptlength})}
+      df$pos[i] <- (sp + renum) %% encryptlength}}
+  ## after completing all, find the 1000,2000, & 3000 place.
+  grove<-c(1000,2000,3000)
+  grcoord<-sapply(grove,function(x){
+    y<-(x+df$pos[which(df$num==0)])%%encryptlength
+    df$num[which(df$pos==y)]})
+  grcoord}
+
+
+```
+
+
+```{r}
+part1<-sum(mixfile(1,encfile))
+part1
+```
+
+## Part 2
+
+Multiply the numbers and run it again, 10 times.
+```{r}
+keyfile<-encfile %>% mutate(num=num*811589153)
+part2<-sum(mixfile(10,keyfile))
+part2
+```
 
